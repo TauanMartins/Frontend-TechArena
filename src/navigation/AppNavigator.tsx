@@ -7,7 +7,7 @@ import LoginScreen from '../screens/Login';
 import DashboardScreen from '../screens/Dashboard';
 import Splash from '../screens/Splash';
 
-export interface AppNavigatorProps {
+interface AppNavigatorProps {
   styles: {
     container: {
       flex: number;
@@ -28,7 +28,7 @@ const screens = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-const AppNavigator: React.FC<AppNavigatorProps> = () => {
+const AppNavigator = () => {
   const { isAuthenticated } = useAuth();
   return (
     <NavigationContainer>

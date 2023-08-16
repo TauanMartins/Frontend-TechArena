@@ -1,8 +1,7 @@
 import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
-import { ScreenProps } from '../../navigation/ScreenProps';
 
-const Splash: React.FC<ScreenProps<'Splash'>> = ({navigation}) => {
+const Splash = () => {
   return (
     <View style={styles.container}>
       <Image source={require('../../assets/Logo/logo.png')} style={styles.logo} />
