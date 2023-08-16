@@ -1,14 +1,21 @@
 import {createContext, useContext} from 'react';
 
-export interface User {
-  permission: string;
-  // Outras propriedades do usuário, se houver
+export interface Token {
+  accessToken: string;
+  refreshToken: string;
 }
+export interface User {
+  exp: number;
+  name: string;
+  permission: string
+  // Outras propriedades do usuário
+}
+
 
 interface AuthContextData {
   user: User;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<string | Error>;
+  login: (email: string, password: string) => Promise<Token | Error>;
   logout: () => void;
 }
 

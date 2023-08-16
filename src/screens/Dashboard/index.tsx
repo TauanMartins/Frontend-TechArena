@@ -12,7 +12,7 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo ao Dashboard</Text>
+      <Text style={styles.title}>Bem-vindo ao Dashboard, {user.name}</Text>
       <Text style={styles.text}>
         Aqui você pode ver as informações da sua conta e do seu aplicativo
       </Text>
