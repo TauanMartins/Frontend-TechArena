@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useAuth } from '../../utils/Auth/AuthContext';
-import { ScreenProps } from '../../navigation/ScreenProps';
-import { navigate } from '../../navigation/NavigationUtils';
+import React, {useState} from 'react';
+import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
+import {useAuth} from '../../utils/Auth/AuthContext';
+import {ScreenProps} from '../../navigation/ScreenProps';
 
-const Login: React.FC<ScreenProps<'Login'>> = ({ navigation }) => {
-  const { isAuthenticated, login } = useAuth();
+const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
+  const {login} = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -17,9 +16,9 @@ const Login: React.FC<ScreenProps<'Login'>> = ({ navigation }) => {
       } catch (error: any) {
         console.log(error);
         setFeedbackMessage(error.message);
-        setTimeout(()=>{
+        setTimeout(() => {
           setFeedbackMessage('');
-        },3000)        
+        }, 3000);
       }
     }
   };
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 16,
-    color: 'black'
+    color: 'black',
   },
   input: {
     color: 'black',

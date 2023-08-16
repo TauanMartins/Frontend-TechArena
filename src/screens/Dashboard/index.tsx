@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
-import { ScreenProps } from '../../navigation/ScreenProps';
-import { useAuth } from '../../utils/Auth/AuthContext';
-import { navigate } from '../../navigation/NavigationUtils';
+import {Button, StyleSheet, Text, View} from 'react-native';
+import {ScreenProps} from '../../navigation/ScreenProps';
+import {useAuth} from '../../utils/Auth/AuthContext';
+import {navigate} from '../../navigation/NavigationUtils';
 
-const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
-  const { logout, isAuthenticated, user } = useAuth();
+const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({navigation}) => {
+  const {logout, isAuthenticated, user} = useAuth();
   const handleLogout = () => {
     logout();
   };
@@ -13,10 +13,15 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao Dashboard</Text>
-      <Text style={styles.text}>Aqui você pode ver as informações da sua conta e do seu aplicativo</Text>
+      <Text style={styles.text}>
+        Aqui você pode ver as informações da sua conta e do seu aplicativo
+      </Text>
       <Button title="Sair" onPress={handleLogout} />
-      <Text style={styles.title}>{' '}</Text>
-      <Button title="Ir" onPress={()=>navigate(navigation, 'Dashboard', isAuthenticated, user)} />
+      <Text style={styles.title}> </Text>
+      <Button
+        title="Ir"
+        onPress={() => navigate(navigation, 'Dashboard', isAuthenticated, user)}
+      />
     </View>
   );
 };

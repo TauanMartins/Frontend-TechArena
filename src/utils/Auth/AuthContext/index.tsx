@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import {createContext, useContext} from 'react';
 
 export interface User {
   permission: string;
@@ -12,7 +12,9 @@ interface AuthContextData {
   logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextData | undefined>(undefined);
+export const AuthContext = createContext<AuthContextData | undefined>(
+  undefined,
+);
 
 const useAuth = () => {
   const context = useContext(AuthContext);
@@ -22,4 +24,4 @@ const useAuth = () => {
   return context;
 };
 
-export { useAuth };
+export {useAuth};

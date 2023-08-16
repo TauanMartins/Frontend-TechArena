@@ -4,7 +4,10 @@ import {Image, StyleSheet, View} from 'react-native';
 const Splash = () => {
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/Logo/logo.png')} style={styles.logo} />
+      <Image
+        source={require('../../assets/Logo/logo.png')}
+        style={styles.logo}
+      />
     </View>
   );
 };

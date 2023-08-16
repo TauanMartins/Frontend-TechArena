@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import SplashScreen from './src/screens/Splash';
 import AppNavigator from './src/navigation/AppNavigator';
-import { AuthProvider } from './src/utils/Auth/AuthProvider';
-
+import {AuthProvider} from './src/utils/Auth/AuthProvider';
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -14,7 +13,6 @@ const App = () => {
 
       setLoading(false);
     })();
-
   }, []);
 
   if (loading) {
