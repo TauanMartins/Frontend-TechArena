@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import { ScreenProps } from '../../navigation/ScreenProps';
-import { useAuth } from '../../utils/AuthContext';
+import { useAuth } from '../../utils/Auth/AuthContext';
+import { navigate } from '../../navigation/NavigationUtils';
 
 const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated, user } = useAuth();
   const handleLogout = () => {
     logout();
   };
@@ -14,6 +15,8 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
       <Text style={styles.title}>Bem-vindo ao Dashboard</Text>
       <Text style={styles.text}>Aqui você pode ver as informações da sua conta e do seu aplicativo</Text>
       <Button title="Sair" onPress={handleLogout} />
+      <Text style={styles.title}>{' '}</Text>
+      <Button title="Ir" onPress={()=>navigate(navigation, 'Dashboard', isAuthenticated, user)} />
     </View>
   );
 };

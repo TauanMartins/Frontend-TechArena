@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useAuth } from '../../utils/AuthContext';
+import { useAuth } from '../../utils/Auth/AuthContext';
 import { ScreenProps } from '../../navigation/ScreenProps';
+import { navigate } from '../../navigation/NavigationUtils';
 
 const Login: React.FC<ScreenProps<'Login'>> = ({ navigation }) => {
+  const { isAuthenticated, login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
-
-  const { login } = useAuth(); // Função de login do contexto de autenticação
 
   const handleLogin = async () => {
     if (email && password) {

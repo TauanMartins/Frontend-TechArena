@@ -1,28 +1,14 @@
 import React, { useEffect } from 'react';
-import { useAuth } from '../utils/AuthContext';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { useAuth } from '../utils/Auth/AuthContext';
+import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from './NavigationTypes';
 import LoginScreen from '../screens/Login';
 import DashboardScreen from '../screens/Dashboard';
-import Splash from '../screens/Splash';
-
-interface AppNavigatorProps {
-  styles: {
-    container: {
-      flex: number;
-      backgroundColor: string;
-    };
-    text: {
-      color: string;
-    };
-  };
-}
 
 const screens = {
   Login: { name: 'Login', component: LoginScreen },
   Dashboard: { name: 'Dashboard', component: DashboardScreen },
-  Splash: { name: 'Splash', component: Splash },
   // ... Outras telas
 };
 
@@ -56,5 +42,7 @@ const AppNavigator = () => {
     </NavigationContainer>
   );
 };
+
+
 
 export default AppNavigator;
