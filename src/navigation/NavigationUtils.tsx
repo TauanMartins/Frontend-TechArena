@@ -10,7 +10,6 @@ const PERMISSIONS = {
 };
 
 const SCREEN_PERMISSIONS: Record<keyof RootStackParamList, string> = {
-  Splash: PERMISSIONS.GUEST,
   Login: PERMISSIONS.GUEST,
   Dashboard: PERMISSIONS.USER,
 };

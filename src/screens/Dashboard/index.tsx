@@ -1,15 +1,27 @@
-import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
-import {ScreenProps} from '../../navigation/ScreenProps';
-import {useAuth} from '../../utils/Auth/AuthContext';
-import {navigate} from '../../navigation/NavigationUtils';
+import React, { useState } from 'react';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import { ScreenProps } from '../../navigation/ScreenProps';
+import { useAuth } from '../../utils/Auth/AuthContext';
+import { navigate } from '../../navigation/NavigationUtils';
+import axios from 'axios';
+import { FlatList } from 'react-native-gesture-handler';
 
-const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({navigation}) => {
-  const {logout, isAuthenticated, user} = useAuth();
+const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
+  const { logout, user } = useAuth();
+  const [countries, setCountries] = useState([{ id: 0, name: '' }])
   const handleLogout = () => {
     logout();
   };
-
+  const api = async () => {
+    await axios.get('http://api.locroom.com.br/common/countries')
+      .then((response: { data: any; }) => {
+        let countries = response.data;
+        console.log(countries)
+        setCountries(countries)
+      }).catch((error: string | undefined) => {
+        throw new Error(error);
+      })
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao Dashboard, {user.name}</Text>
@@ -20,9 +32,25 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({navigation}) => {
       <Text style={styles.title}> </Text>
       <Button
         title="Ir"
-        onPress={() => navigate(navigation, 'Dashboard', isAuthenticated, user)}
+        onPress={() => api()}
       />
-    </View>
+      {countries.length > 1 ? (
+        <FlatList
+          data={countries}
+          renderItem={({ item }) => (
+            <Text style={styles.item} key={item.id}>
+              {item.name}
+            </Text>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          ListHeaderComponent={() => (
+            <Text style={styles.title}>Countries</Text>
+          )}
+        />
+      ) : (
+        <Text style={styles.title}>No countries available</Text>
+      )}
+    </View >
   );
 };
 
@@ -45,6 +73,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginVertical: 8,
+  },
+  item: {
+    color: 'black',
+    padding: 10,
+    fontSize: 18,
+    height: 44,
   },
 });
 

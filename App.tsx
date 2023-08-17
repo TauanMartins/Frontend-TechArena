@@ -1,24 +1,8 @@
-import React, {useState, useEffect} from 'react';
-import SplashScreen from './src/screens/Splash';
+import React from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
 import {AuthProvider} from './src/utils/Auth/AuthProvider';
 
 const App = () => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      // Realizar alguma operação assíncrona
-      // ...
-
-      setLoading(false);
-    })();
-  }, []);
-
-  if (loading) {
-    return <SplashScreen />;
-  }
-
   return (
     <AuthProvider>
       <AppNavigator />

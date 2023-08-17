@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getToken, clearToken, saveToken, decodeAccessToken, isTokenValid } from '../../TokenUtils';
-import { AuthContext, User } from '../AuthContext';
-import jwtDecode from 'jwt-decode';
-import { tokenAPI } from '../../API';
+import { AuthContext, Token, User } from '../AuthContext';
+import axios from 'axios';
+
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>({ permission: 'G', name: 'Convidado', exp: 0 });
@@ -10,10 +10,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const verifyIsLogged = async () => {
     const token = await getToken();
-    const isValid = isTokenValid(token)    
-    if (token && isValid) { 
+    const isValid = isTokenValid(token)
+    if (token && isValid) {
       console.log('Autenticado, logando.')
       setIsAuthenticated(true);
+      if (user.name === 'Convidado') {
+        const userData = decodeAccessToken(token)
+        setUser(userData);
+      }
       return true;
     } else {
       console.log('Não autenticado, deslogando.')
@@ -23,21 +27,18 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = password === '123' ? tokenAPI : (() => {
-        throw new Error();
-      })();
-      const token = response;
-      const userData = decodeAccessToken(token.accessToken)
-      setIsAuthenticated(true);
-      setUser(userData);
-      saveToken(token);
-      return token;
-    } catch (error) {
-      console.log(error)
-      throw new Error('Erro ao autenticar usuário');
-    }
-  };
+    return await axios.post('http://api.locroom.com.br/security/auth/locroom', { username: email, password: password })
+      .then(response => {
+        const token = response.data as Token;
+        const userData = decodeAccessToken(token.accessToken)
+        setIsAuthenticated(true);
+        setUser(userData);
+        saveToken(token);
+        return token;
+      }).catch(error => {
+        throw new Error(error);
+      })
+  }
 
   const logout = () => {
     clearToken();

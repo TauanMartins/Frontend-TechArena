@@ -1,7 +1,6 @@
-import jwt_decode, { JwtPayload } from 'jwt-decode';
+import jwt_decode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Token, User } from '../Auth/AuthContext';
-import jwtDecode from 'jwt-decode';
 
 // Funções de mais alto nível, serão utilizadas para trazer, salvar ou remover o token.
 // Além da função de verificação de token válido.
@@ -21,7 +20,6 @@ export const clearToken = () => {
 export const decodeAccessToken = (accessToken: string) => {
   const decodedToken = jwt_decode(accessToken) as User;
   const { name, exp } = decodedToken;
-  console.log({ name, exp, permission: 'GU' })
   return { name, exp, permission: 'GU' };
 };
 
