@@ -4,17 +4,30 @@ import { Token, User } from '../Auth/AuthContext';
 
 // Funções de mais alto nível, serão utilizadas para trazer, salvar ou remover o token.
 // Além da função de verificação de token válido.
-export const saveToken = (token: Token) => {
-  setCookie('token', token);
+export const saveAccessToken = (token: Token["accessToken"]) => {
+  setCookie('accessToken', token);
 };
 
-export const getToken = async () => {
-  const token = await getCookie('token');
+export const getAccessToken = async () => {
+  const token = await getCookie('accessToken');
   return token;
 };
 
-export const clearToken = () => {
-  deleteCookie('token');
+export const clearAccessToken = () => {
+  deleteCookie('accessToken');
+};
+
+export const saveRefreshToken = (token: Token["refreshToken"]) => {
+  setCookie('refreshToken', token);
+};
+
+export const getRefreshToken = async () => {
+  const token = await getCookie('refreshToken');
+  return token;
+};
+
+export const clearRefreshToken = () => {
+  deleteCookie('refreshToken');
 };
 
 export const decodeAccessToken = (accessToken: string) => {
@@ -23,20 +36,16 @@ export const decodeAccessToken = (accessToken: string) => {
   return { name, exp, permission: 'GU' };
 };
 
-export const isTokenValid = (token: string | null) => {
-  if (token) {
-    const decodedToken = jwt_decode(token) as User;
-    const tokenTime = decodedToken?.exp;
-    const now = Date.now() / 1000;
-    return tokenTime > now; 
-  } else {
-    return false
-  }
+export const isTokenValid = (token: string) => {
+  const decodedToken = jwt_decode(token) as User;
+  const tokenTime = decodedToken.exp;
+  const now = Date.now() / 1000;
+  return tokenTime > now;
 };
 
 // Funções mais primitivas, mexem com o cookie diretamente
-export const setCookie = async (key: string, value: Token) => {
-  await AsyncStorage.setItem(key, value.accessToken);
+export const setCookie = async (key: string, value: string) => {
+  await AsyncStorage.setItem(key, value);
 };
 
 export const getCookie = async (key: string) => {

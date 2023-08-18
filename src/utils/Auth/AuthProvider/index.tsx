@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getToken, clearToken, saveToken, decodeAccessToken, isTokenValid } from '../../TokenUtils';
+import { getAccessToken, clearAccessToken, saveAccessToken, decodeAccessToken, isTokenValid, saveRefreshToken, clearRefreshToken, getRefreshToken } from '../../TokenUtils';
 import { AuthContext, Token, User } from '../AuthContext';
 import axios from 'axios';
 
@@ -9,39 +9,68 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const verifyIsLogged = async () => {
-    const token = await getToken();
-    const isValid = isTokenValid(token)
-    if (token && isValid) {
-      console.log('Autenticado, logando.')
-      setIsAuthenticated(true);
-      if (user.name === 'Convidado') {
-        const userData = decodeAccessToken(token)
-        setUser(userData);
+    const token = await getAccessToken();
+    const refreshToken = await getRefreshToken();
+    if (token) {
+      let isValid = isTokenValid(token)
+      if (isValid) {
+        console.log('Autenticado, logando...')
+        setIsAuthenticated(true);
+        if (user.name === 'Convidado') { // Caso o usuário saia do app e abra novamente será verificado o Token e por isso não passará pela função Login, portanto, será necessário a decodificação deste Token.
+          const userData = decodeAccessToken(token)
+          setUser(userData);
+        }
+      } else {
+        clearAccessToken();
       }
-      return true;
     } else {
-      console.log('Não autenticado, deslogando.')
-      logout();
-      return false;
+      if (refreshToken) {
+        let isValid = isTokenValid(refreshToken);
+        if (isValid) {
+          refreshLogin(refreshToken);
+        } else {
+          logout()
+        }
+      } else {
+        logout();
+      }
     }
   };
 
   const login = async (email: string, password: string) => {
-    return await axios.post('http://api.locroom.com.br/security/auth/locroom', { username: email, password: password })
+    return await axios.post('http://15.228.203.132/api/http?route=/security/auth/locroom', { username: email, password: password })
       .then(response => {
         const token = response.data as Token;
-        const userData = decodeAccessToken(token.accessToken)
-        setIsAuthenticated(true);
-        setUser(userData);
-        saveToken(token);
+        registerLogin(token)
         return token;
       }).catch(error => {
         throw new Error(error);
       })
   }
 
+  const refreshLogin = async (refreshToken: Token["refreshToken"]) => {
+    return await axios.get(`http://api.locroom.com.br/security/auth/refresh?r=${refreshToken}`)
+      .then(response => {
+        const token = response.data as Token;
+        registerLogin(token);
+        return token;
+      }).catch(error => {
+        logout();
+        throw new Error(error);
+      })
+  }
+  const registerLogin = (token: Token) => {
+    console.log('Autenticado, logando...')
+    const userData = decodeAccessToken(token.accessToken)
+    setIsAuthenticated(true);
+    setUser(userData);
+    saveAccessToken(token.accessToken);
+    saveRefreshToken(token.refreshToken);
+  }
   const logout = () => {
-    clearToken();
+    console.log('Não autenticado, deslogando...')
+    clearAccessToken();
+    clearRefreshToken();
     setUser({ permission: 'G', name: 'Convidado', exp: 0 });
     setIsAuthenticated(false);
   };

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { ScreenProps } from '../../navigation/ScreenProps';
 import { useAuth } from '../../utils/Auth/AuthContext';
-import { navigate } from '../../navigation/NavigationUtils';
 import axios from 'axios';
 import { FlatList } from 'react-native-gesture-handler';
 
@@ -13,10 +12,9 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
     logout();
   };
   const api = async () => {
-    await axios.get('http://api.locroom.com.br/common/countries')
+    await axios.get('http://15.228.203.132/api/http?route=/common/countries')
       .then((response: { data: any; }) => {
         let countries = response.data;
-        console.log(countries)
         setCountries(countries)
       }).catch((error: string | undefined) => {
         throw new Error(error);
@@ -29,7 +27,7 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ navigation }) => {
         Aqui você pode ver as informações da sua conta e do seu aplicativo
       </Text>
       <Button title="Sair" onPress={handleLogout} />
-      <Text style={styles.title}> </Text>
+      <Text style={styles.text}> Token de acesso vence em {new Date(user.exp * 1000).toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' })}</Text>
       <Button
         title="Ir"
         onPress={() => api()}
