@@ -46,7 +46,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         registerLogin(token)
         return token;
       }).catch(error => {
-        throw new Error('');
+        throw new Error('Erro ao autenticar usuário.');
       })
   }
 
