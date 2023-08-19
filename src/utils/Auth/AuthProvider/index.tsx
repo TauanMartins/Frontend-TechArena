@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getAccessToken, clearAccessToken, saveAccessToken, decodeAccessToken, isTokenValid, saveRefreshToken, clearRefreshToken, getRefreshToken } from '../../TokenUtils';
-import { AuthContext, Token, User } from '../AuthContext';
+import { Token } from '../../Model/Token';
+import { User } from '../../Model/User';
+import { AuthContext } from '../../Auth/AuthContext';
 import axios from 'axios';
 
 
@@ -44,7 +46,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         registerLogin(token)
         return token;
       }).catch(error => {
-        throw new Error(error);
+        throw new Error('');
       })
   }
 

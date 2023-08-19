@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
-import {useAuth} from '../../utils/Auth/AuthContext';
-import {ScreenProps} from '../../navigation/ScreenProps';
+import React, { useState } from 'react';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useAuth } from '../../utils/Auth/AuthContext';
+import { ScreenProps } from '../../navigation/ScreenProps';
+import { navigate } from '../../navigation/NavigationUtils';
 
-const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
-  const {login} = useAuth();
+const Login: React.FC<ScreenProps<'Login'>> = ({ navigation }) => {
+  const { login, isAuthenticated, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -41,6 +42,8 @@ const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
       />
       <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
       <Button title="Entrar" onPress={handleLogin} />
+      <Text style={styles.feedbackMessage}>{}</Text>
+      <Button title="Teste sua permissão. Clique para ir para dashboard." onPress={() => navigate(navigation, 'Dashboard', isAuthenticated, user)} />
     </View>
   );
 };

@@ -1,27 +1,8 @@
 import {createContext, useContext} from 'react';
-
-export interface Token {
-  accessToken: string;
-  refreshToken: string;
-}
-export interface User {
-  exp: number;
-  name: string;
-  permission: string
-  // Outras propriedades do usuário
-}
+import { AuthContextData } from '../../Model/Context';
 
 
-interface AuthContextData {
-  user: User;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<Token | Error>;
-  logout: () => void;
-}
-
-export const AuthContext = createContext<AuthContextData | undefined>(
-  undefined,
-);
+export const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 const useAuth = () => {
   const context = useContext(AuthContext);

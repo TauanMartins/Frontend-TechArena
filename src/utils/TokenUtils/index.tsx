@@ -1,6 +1,7 @@
 import jwt_decode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Token, User } from '../Auth/AuthContext';
+import { Token } from '../Model/Token';
+import { User } from '../Model/User';
 
 // Funções de mais alto nível, serão utilizadas para trazer, salvar ou remover o token.
 // Além da função de verificação de token válido.
