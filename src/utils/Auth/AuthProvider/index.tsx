@@ -54,7 +54,7 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
       })) as Token;
       registerLogin(userInfo.idToken);
     } catch (error: any) {
-      throw new Error('Desculpe, não foi possível concluir o login :(');
+      throw new Error(`Desculpe, não foi possível concluir o login :(\n ${error}` );
     }
   };
 
@@ -69,7 +69,7 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
       })) as Token;
       registerLogin(userInfo.idToken);
     } catch (error: any) {
-      throw new Error('Desculpe, não foi possível concluir o login :(');
+      throw new Error(`Desculpe, não foi possível concluir o login :(\n ${error}` );
     }
   };
 
