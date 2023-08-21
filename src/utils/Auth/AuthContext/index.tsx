@@ -1,8 +1,9 @@
 import {createContext, useContext} from 'react';
-import { AuthContextData } from '../../Model/Context';
+import {AuthContextData} from '../../Model/Context';
 
-
-export const AuthContext = createContext<AuthContextData | undefined>(undefined);
+export const AuthContext = createContext<AuthContextData | undefined>(
+  undefined,
+);
 
 const useAuth = () => {
   const context = useContext(AuthContext);

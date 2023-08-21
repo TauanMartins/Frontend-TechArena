@@ -1,11 +1,11 @@
 import jwt_decode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Token } from '../Model/Token';
-import { User } from '../Model/User';
+import {Token} from '../Model/Token';
+import {User} from '../Model/User';
 
 // Funções de mais alto nível, serão utilizadas para trazer, salvar ou remover o token.
 // Além da função de verificação de token válido.
-export const saveAccessToken = (token: Token["accessToken"]) => {
+export const saveAccessToken = (token: Token['idToken']) => {
   setCookie('accessToken', token);
 };
 
@@ -18,7 +18,7 @@ export const clearAccessToken = () => {
   deleteCookie('accessToken');
 };
 
-export const saveRefreshToken = (token: Token["refreshToken"]) => {
+export const saveRefreshToken = (token: Token['idToken']) => {
   setCookie('refreshToken', token);
 };
 
@@ -33,8 +33,7 @@ export const clearRefreshToken = () => {
 
 export const decodeAccessToken = (accessToken: string) => {
   const decodedToken = jwt_decode(accessToken) as User;
-  const { name, exp } = decodedToken;
-  return { name, exp, permission: 'GU' };
+  return decodedToken;
 };
 
 export const isTokenValid = (token: string) => {

@@ -1,49 +1,35 @@
-import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useAuth } from '../../utils/Auth/AuthContext';
-import { ScreenProps } from '../../navigation/ScreenProps';
-import { navigate } from '../../navigation/NavigationUtils';
+import React, {useState} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import {useAuth} from '../../utils/Auth/AuthContext';
+import {ScreenProps} from '../../navigation/ScreenProps';
+import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 
-const Login: React.FC<ScreenProps<'Login'>> = ({ navigation }) => {
-  const { login, isAuthenticated, user } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
+  const {login} = useAuth();
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
   const handleLogin = async () => {
-    if (email && password) {
-      try {
-        await login(email, password);
-      } catch (error: any) {
-        console.log(error);
-        setFeedbackMessage(error.message);
-        setTimeout(() => {
-          setFeedbackMessage('');
-        }, 3000);
-      }
+    try {
+      await login();
+    } catch (error: any) {
+      console.log(error);
+      setFeedbackMessage(error.message);
+      setTimeout(() => {
+        setFeedbackMessage('');
+      }, 3000);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Faça o login na sua conta</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite seu e-mail"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Digite sua senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+      <GoogleSigninButton
+        style={styles.button}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={handleLogin}
       />
       <Text style={styles.feedbackMessage}>{feedbackMessage}</Text>
-      <Button title="Entrar" onPress={handleLogin} />
-      <Text style={styles.feedbackMessage}>{}</Text>
-      <Button title="Teste sua permissão. Clique para ir para dashboard." onPress={() => navigate(navigation, 'Dashboard', isAuthenticated, user)} />
     </View>
   );
 };
@@ -61,6 +47,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 16,
     color: 'black',
+  },
+  button: {
+    textAlign: 'center',
+    marginVertical: 20,
+    width: 'auto',
   },
   input: {
     color: 'black',

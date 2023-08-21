@@ -1,7 +1,7 @@
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from './NavigationTypes';
 import {Alert} from 'react-native';
-import { User } from '../utils/Model/User';
+import {User} from '../utils/Model/User';
 
 const PERMISSIONS = {
   ADMIN: 'A',

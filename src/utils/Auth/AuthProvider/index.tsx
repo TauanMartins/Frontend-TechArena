@@ -1,26 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { getAccessToken, clearAccessToken, saveAccessToken, decodeAccessToken, isTokenValid, saveRefreshToken, clearRefreshToken, getRefreshToken } from '../../TokenUtils';
-import { Token } from '../../Model/Token';
-import { User } from '../../Model/User';
-import { AuthContext } from '../../Auth/AuthContext';
-import axios from 'axios';
+import React, {useEffect, useState} from 'react';
+import {
+  getAccessToken,
+  clearAccessToken,
+  saveAccessToken,
+  decodeAccessToken,
+  isTokenValid,
+  saveRefreshToken,
+  clearRefreshToken,
+  getRefreshToken,
+} from '../../TokenUtils';
+import {Token} from '../../Model/Token';
+import {UnauthenticatedUser, User} from '../../Model/User';
+import {AuthContext} from '../../Auth/AuthContext';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {GOOGLE_CLIENT_ID} from '../../Config';
 
-
-const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User>({ permission: 'G', name: 'Convidado', exp: 0 });
+const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+  const [user, setUser] = useState<User>(UnauthenticatedUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const verifyIsLogged = async () => {
     const token = await getAccessToken();
     const refreshToken = await getRefreshToken();
     if (token) {
-      let isValid = isTokenValid(token)
+      let isValid = isTokenValid(token);
       if (isValid) {
-        console.log('Autenticado, logando...')
-        setIsAuthenticated(true);
-        if (user.name === 'Convidado') { // Caso o usuário saia do app e abra novamente será verificado o Token e por isso não passará pela função Login, portanto, será necessário a decodificação deste Token.
-          const userData = decodeAccessToken(token)
-          setUser(userData);
+        if (!isAuthenticated) {
+          registerLogin(token);
         }
       } else {
         clearAccessToken();
@@ -29,52 +35,63 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       if (refreshToken) {
         let isValid = isTokenValid(refreshToken);
         if (isValid) {
-          refreshLogin(refreshToken);
+          refreshLogin();
         } else {
-          logout()
+          logout();
         }
-      } else {
-        logout();
       }
     }
   };
 
-  const login = async (email: string, password: string) => {
-    return await axios.post('http://15.228.203.132/api/http?route=/security/auth/locroom', { username: email, password: password })
-      .then(response => {
-        const token = response.data as Token;
-        registerLogin(token)
-        return token;
-      }).catch(error => {
-        throw new Error('Erro ao autenticar usuário.');
-      })
-  }
+  const login = async () => {
+    try {
+      GoogleSignin.configure({
+        webClientId: GOOGLE_CLIENT_ID,
+      });
+      await GoogleSignin.hasPlayServices();
+      const userInfo = (await GoogleSignin.signIn().then(response => {
+        return response;
+      })) as Token;
+      registerLogin(userInfo.idToken);
+    } catch (error: any) {
+      throw new Error('Desculpe, não foi possível concluir o login :(');
+    }
+  };
 
-  const refreshLogin = async (refreshToken: Token["refreshToken"]) => {
-    return await axios.get(`http://api.locroom.com.br/security/auth/refresh?r=${refreshToken}`)
-      .then(response => {
-        const token = response.data as Token;
-        registerLogin(token);
-        return token;
-      }).catch(error => {
-        logout();
-        throw new Error(error);
-      })
-  }
-  const registerLogin = (token: Token) => {
-    console.log('Autenticado, logando...')
-    const userData = decodeAccessToken(token.accessToken)
+  const refreshLogin = async () => {
+    try {
+      GoogleSignin.configure({
+        webClientId: GOOGLE_CLIENT_ID,
+      });
+      await GoogleSignin.hasPlayServices();
+      const userInfo = (await GoogleSignin.signInSilently().then(response => {
+        return response;
+      })) as Token;
+      registerLogin(userInfo.idToken);
+    } catch (error: any) {
+      throw new Error('Desculpe, não foi possível concluir o login :(');
+    }
+  };
+
+  const registerLogin = (token: Token['idToken']) => {
+    console.log('Autenticado, logando...');
+    const userData = decodeAccessToken(token);
+    setUser(userData); // TODO: implementar comunicação com o backend com o id do usuário e email
+    saveAccessToken(token);
+    saveRefreshToken(token);
     setIsAuthenticated(true);
-    setUser(userData);
-    saveAccessToken(token.accessToken);
-    saveRefreshToken(token.refreshToken);
-  }
-  const logout = () => {
-    console.log('Não autenticado, deslogando...')
+  };
+
+  const logout = async () => {
+    console.log('Não autenticado, deslogando...');
+    setIsAuthenticated(false);
+    setUser(UnauthenticatedUser);
     clearAccessToken();
     clearRefreshToken();
-    setUser({ permission: 'G', name: 'Convidado', exp: 0 });
-    setIsAuthenticated(false);
+    if (isAuthenticated) {
+      await GoogleSignin.revokeAccess(); // Revoke the access token
+      await GoogleSignin.signOut(); // Sign out of Google
+    }
   };
 
   useEffect(() => {
@@ -86,10 +103,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{user, isAuthenticated, login, logout}}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export { AuthProvider };
+export {AuthProvider};
