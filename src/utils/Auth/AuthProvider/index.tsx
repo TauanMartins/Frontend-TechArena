@@ -24,11 +24,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     const refreshToken = await getRefreshToken();
     if (accessToken && refreshToken) {
       let isValid = isTokenValid(accessToken);
-      if (!isValid) {
+      if (isValid && user.permission === 'G') {
+        console.log("É válido...")
+        registerLogin(accessToken, refreshToken);
+      } else if (!isValid) {
         console.log("Não é válido...")
         refreshLogin();
       }
-    } 
+    }
   };
 
   const login = async () => {
@@ -70,11 +73,11 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     console.log('Não autenticado, deslogando...');
     setIsAuthenticated(false);
     clearAccessToken();
-    clearRefreshToken();    
+    clearRefreshToken();
     setUser(UnauthenticatedUser);
     if (isAuthenticated) {
       console.log('Entrou aqui')
-      await GoogleSignin.revokeAccess(); 
+      await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
     }
   };
