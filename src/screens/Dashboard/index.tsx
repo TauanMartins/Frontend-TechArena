@@ -40,6 +40,8 @@ const Dashboard: React.FC<ScreenProps<'Dashboard'>> = ({ }) => {
           timeZoneName: 'short',
         })}
       </Text>
+      <Text style={styles.text}>Emissor:{' '}{user.azp}
+      </Text>
       <Button title="Sair" onPress={handleLogout} />
       <Text style={styles.text}>{}</Text>
       <Button
