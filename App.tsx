@@ -1,6 +1,6 @@
 import React from 'react';
 import AppNavigator from './src/navigation/AppNavigator';
-import {AuthProvider} from './src/utils/Auth/AuthProvider';
+import { AuthProvider } from './src/utils/Auth/AuthProvider';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { GOOGLE_CLIENT_ID } from './src/utils/Config';
 

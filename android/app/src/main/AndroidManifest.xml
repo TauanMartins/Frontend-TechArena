@@ -7,8 +7,8 @@
       android:icon="@mipmap/ic_launcher"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
-      android:theme="@style/AppTheme"
-      android:networkSecurityConfig="@xml/network_security_config"> <!-- Adição desta linha para permitir chamada HTTP -->
+      android:theme="@style/AppTheme">
+      <!-- android:networkSecurityConfig="@xml/network_security_config"> Adição desta linha para permitir chamada HTTP -->
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

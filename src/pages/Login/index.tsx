@@ -5,6 +5,7 @@ import {ScreenProps} from '../../navigation/ScreenProps';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 
 const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
+  console.log('Login')
   const {login} = useAuth();
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     color: 'black',
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F4F4F4',
   },
   title: {
     fontSize: 24,

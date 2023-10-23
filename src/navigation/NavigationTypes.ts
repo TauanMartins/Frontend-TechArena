@@ -1,5 +1,6 @@
 export type RootStackParamList = {
   Login: undefined;
-  Dashboard: undefined;
+  Home: undefined;
+  Profile: undefined;
   // ... Outras telas e parâmetros de navegação
 };

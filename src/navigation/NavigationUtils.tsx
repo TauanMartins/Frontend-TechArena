@@ -11,7 +11,8 @@ const PERMISSIONS = {
 
 const SCREEN_PERMISSIONS: Record<keyof RootStackParamList, string> = {
   Login: PERMISSIONS.GUEST,
-  Dashboard: PERMISSIONS.USER,
+  Home: PERMISSIONS.USER,
+  Profile: PERMISSIONS.USER,
 };
 
 const navigate = (

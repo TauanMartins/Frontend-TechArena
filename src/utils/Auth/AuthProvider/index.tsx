@@ -19,14 +19,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const verifyIsLogged = async () => {
-    console.log("Verificando...")
     const accessToken = await getAccessToken();
     const refreshToken = await getRefreshToken();
     if (accessToken && refreshToken) {
       let isValid = isTokenValid(accessToken);
-      if (isValid && user.permission === 'G') {
+      if (isValid && !isAuthenticated) {
         console.log("É válido...")
-        registerLogin(accessToken, refreshToken);
+        await registerLogin(accessToken, refreshToken);
       } else if (!isValid) {
         console.log("Não é válido...")
         refreshLogin();
@@ -60,7 +59,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }
   };
 
-  const registerLogin = (accessToken: Token['idToken'], refreshToken: Token['serverAuthCode']) => {
+  const registerLogin = async (accessToken: Token['idToken'], refreshToken: Token['serverAuthCode']) => {
     console.log('Autenticado, logando...');
     const userData = decodeAccessToken(accessToken);
     setUser(userData); // TODO: implementar comunicação com o backend com o id do usuário e email    
@@ -85,10 +84,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     verifyIsLogged();
     const checkTokenInterval = setInterval(() => {
-      verifyIsLogged();
+       verifyIsLogged();
     }, 3000);
     return () => clearInterval(checkTokenInterval);
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
