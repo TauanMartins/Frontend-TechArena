@@ -7,7 +7,7 @@ export const HomeIcon = ({ color, size, isActive }) => {
     return (
         <View>
             <View style={{ height: 1.8, bottom: 4, backgroundColor: isActive ? color : 'transparent' }} />
-            <AntDesign name='home' color={color} size={size} />
+            <AntDesign name='home' style={{width: '100%'}} color={color} size={size} />
         </View>
     );
 };

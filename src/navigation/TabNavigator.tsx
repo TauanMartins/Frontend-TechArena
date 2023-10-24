@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { screens } from "./ScreenProps";
-import { CreateMatchIcon, HomeIcon, LeagueIcon, MapIcon, ProfileIcon } from '../components/IconsButton';
+import { ProfileIcon, CreateMatchIcon, HomeIcon, LeagueIcon, MapIcon } from '../components/IconsButton';
 const Tab = createBottomTabNavigator();
 
 export const TabNavigator = () => {

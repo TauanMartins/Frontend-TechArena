@@ -5,7 +5,6 @@ import { useAuth } from '../../utils/Auth/AuthContext';
 import axios from 'axios';
 
 const Profile: React.FC<ScreenProps<'Profile'>> = ({ }) => {
-  console.log('Profile')
   const { logout, user } = useAuth();
   const [answer, setAnswer] = useState({})
   const healthCheck = async () => {

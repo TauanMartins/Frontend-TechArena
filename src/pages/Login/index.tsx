@@ -5,7 +5,6 @@ import {ScreenProps} from '../../navigation/ScreenProps';
 import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
 
 const Login: React.FC<ScreenProps<'Login'>> = ({}) => {
-  console.log('Login')
   const {login} = useAuth();
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
