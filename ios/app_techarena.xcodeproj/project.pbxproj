@@ -14,6 +14,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-app_techarena-app_techarenaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-app_techarena-app_techarenaTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F2EE39EF5C1140B0B53B90B7 /* PostNoBillsColombo Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0A24B67CA8348CAB80711B4 /* PostNoBillsColombo Medium.ttf */; };
+		0A8DD895927F4893B3498A80 /* Sansation Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1110BB5E651342FC87330A65 /* Sansation Light.ttf */; };
+		39E138F4A0054B17B029558B /* Sansation Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 236D4D73C38F42F0A38AB66A /* Sansation Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +47,9 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = app_techarena/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-app_techarena-app_techarenaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-app_techarena-app_techarenaTests.release.xcconfig"; path = "Target Support Files/Pods-app_techarena-app_techarenaTests/Pods-app_techarena-app_techarenaTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		D0A24B67CA8348CAB80711B4 /* PostNoBillsColombo Medium.ttf */ = {isa = PBXFileReference; name = "PostNoBillsColombo Medium.ttf"; path = "../src/assets/fonts/PostNoBillsColombo/PostNoBillsColombo Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1110BB5E651342FC87330A65 /* Sansation Light.ttf */ = {isa = PBXFileReference; name = "Sansation Light.ttf"; path = "../src/assets/fonts/Sansation/Sansation Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		236D4D73C38F42F0A38AB66A /* Sansation Regular.ttf */ = {isa = PBXFileReference; name = "Sansation Regular.ttf"; path = "../src/assets/fonts/Sansation/Sansation Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +128,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				C4C17096EB2A43F28DA9E70F /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -147,6 +154,17 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		C4C17096EB2A43F28DA9E70F /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				D0A24B67CA8348CAB80711B4 /* PostNoBillsColombo Medium.ttf */,
+				1110BB5E651342FC87330A65 /* Sansation Light.ttf */,
+				236D4D73C38F42F0A38AB66A /* Sansation Regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -244,6 +262,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				F2EE39EF5C1140B0B53B90B7 /* PostNoBillsColombo Medium.ttf in Resources */,
+				0A8DD895927F4893B3498A80 /* Sansation Light.ttf in Resources */,
+				39E138F4A0054B17B029558B /* Sansation Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

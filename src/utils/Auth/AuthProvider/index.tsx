@@ -34,29 +34,25 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   const login = async () => {
+    let userInfo: Token;
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = (await GoogleSignin.signIn().then(response => {
-        return response;
-      })) as Token;
-      registerLogin(userInfo.idToken, userInfo.serverAuthCode);
-    } catch (error: any) {
-      throw new Error(`Desculpe, não foi possível concluir o login :(\n ${error} \nRequester: ${user.azp}`);
+      userInfo = await GoogleSignin.signIn() as Token;
+    } catch (error) {
+      return;
     }
+    registerLogin(userInfo.idToken, userInfo.serverAuthCode);
   };
 
   const refreshLogin = async () => {
-    console.log('RefreshLogin')
+    let userInfo: Token;
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = (await GoogleSignin.signInSilently().then(response => {
-        return response;
-      })) as Token;
-      registerLogin(userInfo.idToken, userInfo.serverAuthCode);
+      userInfo = await GoogleSignin.signInSilently() as Token;
     } catch (error: any) {
       logout();
-      throw new Error(`Desculpe, não foi possível concluir o login :(\n ${error}`);
     }
+    registerLogin(userInfo.idToken, userInfo.serverAuthCode);
   };
 
   const registerLogin = async (accessToken: Token['idToken'], refreshToken: Token['serverAuthCode']) => {
@@ -66,6 +62,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     setIsAuthenticated(true);
     saveAccessToken(accessToken);
     saveRefreshToken(refreshToken);
+
   };
 
   const logout = async () => {
@@ -75,7 +72,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     clearRefreshToken();
     setUser(UnauthenticatedUser);
     if (isAuthenticated) {
-      console.log('Entrou aqui')
       await GoogleSignin.revokeAccess();
       await GoogleSignin.signOut();
     }
@@ -84,7 +80,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   useEffect(() => {
     verifyIsLogged();
     const checkTokenInterval = setInterval(() => {
-       verifyIsLogged();
+      verifyIsLogged();
     }, 3000);
     return () => clearInterval(checkTokenInterval);
   }, [isAuthenticated]);
