@@ -3,7 +3,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from './NavigationTypes';
 import LoginScreen from '../pages/Login';
 import HomeScreen from '../pages/Home';
-import ProfileScreen from '../pages/Profile';
+import ConfigurationScreen from '../pages/Configuration';
 
 export type ScreenProps<T extends keyof RootStackParamList> = {
   route: RouteProp<RootStackParamList, T>;
@@ -12,6 +12,6 @@ export type ScreenProps<T extends keyof RootStackParamList> = {
 export const screens = {
   Login: { name: 'Login', component: LoginScreen },
   Home: { name: 'Home', component: HomeScreen },
-  Profile: { name: 'Profile', component: ProfileScreen },
+  Configuration: { name: 'Configuration', component: ConfigurationScreen },
   // ... Outras telas
 };

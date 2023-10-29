@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { StatusBar, useColorScheme } from 'react-native';
 import {
   getAccessToken,
   clearAccessToken,
@@ -13,10 +14,41 @@ import { Token } from '../../Model/Token';
 import { UnauthenticatedUser, User } from '../../Model/User';
 import { AuthContext } from '../../Auth/AuthContext';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Theme from '../../Theme';
+import changeNavigationBarColor from 'react-native-navigation-bar-color';
+import { ThemeContext } from '../../Theme/ThemeContext';
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(UnauthenticatedUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [theme, setTheme] = useState(null);
+  const deviceTheme = useColorScheme();
+
+  const changeThemeFirstScreen = () => {
+    const standardTheme = Theme['light'];
+    const nextBarStyle = 'dark-content'; // Dark = letra da topBar preta
+    changeNavigationBarColor(standardTheme.SECONDARY); // Secondary = Tema da barra de cima/baixo virará preto
+    StatusBar.setBackgroundColor(standardTheme.PRIMARY); // Primary = Tema da barra de cima virará branco
+    StatusBar.setBarStyle(nextBarStyle) // Tema da fonte da barra de cima
+  }
+
+  const changeTheme = (preferedTheme: User["prefered_theme"]) => {
+    const nextTheme = preferedTheme ? Theme[preferedTheme] : Theme[deviceTheme];
+    if (theme === nextTheme) {
+      return;
+    } else {
+      const nextBarStyle = nextTheme === Theme['light'] ? 'dark-content' : 'light-content';
+      setTheme(nextTheme) // Tema geral
+      changeNavigationBarColor(nextTheme.PRIMARY, theme === Theme['light']); // Tema da barra de cima/baixo
+      StatusBar.setBackgroundColor(nextTheme.PRIMARY); // Tema da barra de cima
+      StatusBar.setBarStyle(nextBarStyle) // Tema da fonte da barra de cima
+    }
+  }
+
+  const saveTheme = (preferedTheme: User["prefered_theme"]) => {
+    const nameTheme = Theme[preferedTheme] === Theme['light'] ? 'light' : 'dark'
+    setUser({ ...user, prefered_theme: nameTheme }) //TODO: implementar salvamento do tema
+  }
 
   const verifyIsLogged = async () => {
     const accessToken = await getAccessToken();
@@ -58,6 +90,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const registerLogin = async (accessToken: Token['idToken'], refreshToken: Token['serverAuthCode']) => {
     console.log('Autenticado, logando...');
     const userData = decodeAccessToken(accessToken);
+    // checar se o usuário possui um tema junto com outras informações a partir do endpoint POST /user
+    changeTheme(null); // TODO: implementar comunicação com o backend com o id do usuário e email   
     setUser(userData); // TODO: implementar comunicação com o backend com o id do usuário e email    
     setIsAuthenticated(true);
     saveAccessToken(accessToken);
@@ -85,10 +119,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return () => clearInterval(checkTokenInterval);
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      changeTheme(null)
+    }
+  }, [deviceTheme])
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <ThemeContext.Provider value={{ theme, changeThemeFirstScreen, changeTheme }}>
+      <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+        {children}
+      </AuthContext.Provider>
+    </ThemeContext.Provider>
   );
 };
 

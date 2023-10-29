@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 const Loader = () => {
     return (
@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-});
+        zIndex: 10
 
+    }
+  });
 export default Loader;

@@ -12,7 +12,7 @@ const PERMISSIONS = {
 const SCREEN_PERMISSIONS: Record<keyof RootStackParamList, string> = {
   Login: PERMISSIONS.GUEST,
   Home: PERMISSIONS.USER,
-  Profile: PERMISSIONS.USER,
+  Configuration: PERMISSIONS.USER,
 };
 
 const navigate = (
@@ -26,10 +26,10 @@ const navigate = (
     if (user.permission.includes(requiredPermission)) {
       return navigation.navigate(routeName);
     } else {
-      return Alert.alert('Error', 'Desculpe, você não tem permissão. :(');
+      return Alert.alert('Erro', 'Desculpe, você não tem permissão. :(');
     }
   } else {
-    return Alert.alert('Error', 'Desculpe, você não está autenticado. :(');
+    return Alert.alert('Erro', 'Desculpe, você não está autenticado. :(');
   }
 };
 

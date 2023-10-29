@@ -1,51 +1,71 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
 import { ScreenProps } from '../../navigation/ScreenProps';
+import { StyleSheet, Image, ScrollView, View, Text, TouchableOpacity } from 'react-native';
 import { useAuth } from '../../utils/Auth/AuthContext';
+import { NotificationIcon } from '../../components/IconsButton';
+import { useTheme } from '../../utils/Theme/ThemeContext';
 
-const Home: React.FC<ScreenProps<'Home'>> = ({ route }) => {
+
+const Home: React.FC<ScreenProps<'Home'>> = () => {
   const { user } = useAuth();
+  const { theme } = useTheme();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo ao {route.name}, {user.name}</Text>
-    </View >
+    <ScrollView style={{ ...styles.scrollView, backgroundColor: theme.PRIMARY }}>
+      <View style={{ ...styles.container, backgroundColor: theme.PRIMARY }} >
+        <View style={styles.row}>
+          <View style={styles.col}>
+            <Text style={{ ...styles.text_1, color: theme.SECONDARY }}>Olá, {user.name}!</Text>
+            <Text style={{ ...styles.text_2, color: theme.SECONDARY }}>Encontre partidas</Text>
+          </View>
+          <View style={styles.col}>
+            <View style={styles.row}>
+              <NotificationIcon style={styles.notification} color={theme.SECONDARY} size={32} />
+              {user.picture && <Image style={{ ...styles.picture, borderColor: theme.SECONDARY }} source={{ uri: user.picture }} />}
+            </View>
+          </View>
+        </View>
+      </View >
+    </ScrollView>
   );
 };
 
+
+
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1
+  },
   container: {
-    color: 'black',
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#F4F4F4',
-    borderWidth: 0
+    flex: 1
   },
-  title: {
-    color: 'black',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginVertical: 16,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
   },
-  text: {
-    color: 'black',
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 8,
+  col: {
+    justifyContent: 'center',
   },
-  item: {
-    color: 'black',
-    padding: 10,
-    fontSize: 18,
-    height: 44,
+  text_1: {
+    fontFamily: 'Sansation Regular',
+    marginTop: '10%',
+    fontSize: 14,
+  },
+  text_2: {
+    fontFamily: 'Sansation Regular',
+    fontSize: 28,
+  },
+  notification: {
+    marginTop: '30%',
   },
   picture: {
+    marginTop: '30%',
+    marginLeft: '5%',
     borderRadius: 50,
-    width: 50,
-    height: 50,
-    alignSelf: 'center',
-  },
+    borderWidth: 2,
+    width: 55,
+    height: 55,
+  }
 });
-
 export default Home;

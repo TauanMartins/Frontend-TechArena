@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Image, StyleSheet, Alert, TouchableOpacity, Text, View, ScrollView } from 'react-native';
 import { useAuth } from '../../utils/Auth/AuthContext';
 import { ScreenProps } from '../../navigation/ScreenProps';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Loader from '../../components/Loader';
 import PrivacyPolicies_ServiceTems from '../../components/PrivacyPoliciesServiceTerms';
+import { useTheme } from '../../utils/Theme/ThemeContext';
 
-const Login: React.FC<ScreenProps<'Login'>> = ({ }) => {
+const Login: React.FC<ScreenProps<'Login'>> = () => {
   const { login } = useAuth();
+  const { changeThemeFirstScreen } = useTheme();
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -20,86 +22,97 @@ const Login: React.FC<ScreenProps<'Login'>> = ({ }) => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    changeThemeFirstScreen()
+  }, [])
+
   return (
-    <>
-      <View style={styles.container}>
-        <Text style={styles.title}>TECHARENA</Text>
-        <Image source={require('../../assets/Logo/logo_WT.png')} style={styles.logo} />
+    <View style={styles.container}>
+      {loading && <Loader />}
+      <View style={styles.containerUp}>
+        <Text style={styles.brandName}>TECHARENA</Text>
+        <Image style={styles.logo} source={require('../../assets/Logo/logo_WT.png')} />
       </View>
-      <View style={styles.container_2}>
-        <Text style={styles.text_1}>O aplicativo perfeito para você praticar esportes a qualquer momento e em qualquer lugar.</Text>
+      <ScrollView contentContainerStyle={styles.containerDownContent} style={styles.containerDown}>
+        <Text style={styles.text}>O aplicativo perfeito para você praticar esportes a qualquer momento e em qualquer lugar.</Text>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <AntDesign name='google' color={'#424242'} size={25} />
-          <Text style={styles.button_text}>Continuar com o Google</Text>
-        </TouchableOpacity >
+          <Text style={styles.buttonText}>Continuar com o Google</Text>
+        </TouchableOpacity>
         <PrivacyPolicies_ServiceTems />
-      </View>
-      {loading && <Loader />}
-    </>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    color: '#424242',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F4F4F4',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
-  container_2: {
-    color: '#F4F4F4',
+  containerUp: {
+    height: '60%',
+    alignItems: 'center'
+  },
+  containerDown: {
     flex: 1,
-    padding: 0,
-    margin: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopRightRadius: 170,
-    borderTopLeftRadius: 170,
-    backgroundColor: '#424242'
+    borderTopRightRadius: 150,
+    borderTopLeftRadius: 150,
+    overflow: 'hidden',
+    backgroundColor: '#424242',
   },
-  title: {
+  containerDownContent: {
+    paddingVertical: '15%',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  brandName: {
     fontFamily: 'PostNoBillsColombo Medium',
-    fontSize: 36,
+    fontSize: 25,
     color: '#424242',
+    margin: '7.5%',
     textShadowColor: '#424242',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 6
-  },
-  text_1: {
-    fontFamily: 'PostNoBillsColombo Medium',
-    textAlign: 'center',
-    fontSize: 24,
-    color: '#F4F4F4',
-    marginLeft: 20,
-    marginRight: 20,
-    textShadowColor: '#F4F4F4',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 3
+    textShadowOffset: { height: 1, width: 1 },
+    textShadowRadius: 6,
   },
   logo: {
-    height: 250,
-    width: 250,
+    height: 200,
+    width: 200,
+  },
+  text: {
+    fontFamily: 'PostNoBillsColombo Medium',
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#F4F4F4',
+    marginLeft: '10%',
+    marginRight: '10%',
+    textShadowColor: '#F4F4F4',
+    textShadowOffset: { height: 1, width: 1 },
+    textShadowRadius: 3,
   },
   button: {
     backgroundColor: '#D3DDDF',
     elevation: 7,
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    margin: 10,
-    padding: 18,
-    borderRadius: 50
+    paddingRight: '10%',
+    paddingLeft: '10%',
+    paddingTop: '2.5%',
+    paddingBottom: '2.5%',
+    margin: '10%',
+    borderRadius: 50,
+
   },
-  button_text: {
+  buttonText: {
     fontFamily: 'Sansation Regular',
-    fontSize: 22,
+    fontSize: 12,
     color: '#424242',
-    marginLeft: 20,
-    marginRight: 20,
+    marginLeft: '10%',
+    marginRight: '10%',
     textShadowColor: '#424242',
     textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 4
+    textShadowRadius: 4,
   },
 });
 
