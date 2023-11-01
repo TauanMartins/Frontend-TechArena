@@ -3,8 +3,10 @@ import { ThemeContextData } from '../../Model/Context/ThemeContext';
 
 export const ThemeContext = createContext<ThemeContextData>({
     theme: null,
+    setTheme: () => { },
     changeThemeFirstScreen: () => { },
-    changeTheme: () => { }
+    changeTheme: () => { },
+    saveTheme: async () => { }
 });
 
 const useTheme = () => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import {
   getAccessToken,
   clearAccessToken,
@@ -10,13 +10,14 @@ import {
   clearRefreshToken,
   getRefreshToken,
 } from '../../TokenUtils';
-import { Token } from '../../Model/Token';
+import { Tokens, UserDecoded } from '../../Model/Token';
 import { UnauthenticatedUser, User } from '../../Model/User';
 import { AuthContext } from '../../Auth/AuthContext';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import Theme from '../../Theme';
-import changeNavigationBarColor from 'react-native-navigation-bar-color';
 import { ThemeContext } from '../../Theme/ThemeContext';
+import API from '../../API';
+import { getComplementarData } from '../../UserUtils';
+import { changeTheme, changeThemeFirstScreen, saveTheme } from '../../Theme/ThemeUtils';
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(UnauthenticatedUser);
@@ -24,40 +25,16 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [theme, setTheme] = useState(null);
   const deviceTheme = useColorScheme();
 
-  const changeThemeFirstScreen = () => {
-    const standardTheme = Theme['light'];
-    const nextBarStyle = 'dark-content'; // Dark = letra da topBar preta
-    changeNavigationBarColor(standardTheme.SECONDARY); // Secondary = Tema da barra de cima/baixo virará preto
-    StatusBar.setBackgroundColor(standardTheme.PRIMARY); // Primary = Tema da barra de cima virará branco
-    StatusBar.setBarStyle(nextBarStyle) // Tema da fonte da barra de cima
-  }
-
-  const changeTheme = (preferedTheme: User["prefered_theme"]) => {
-    const nextTheme = preferedTheme ? Theme[preferedTheme] : Theme[deviceTheme];
-    if (theme === nextTheme) {
-      return;
-    } else {
-      const nextBarStyle = nextTheme === Theme['light'] ? 'dark-content' : 'light-content';
-      setTheme(nextTheme) // Tema geral
-      changeNavigationBarColor(nextTheme.PRIMARY, theme === Theme['light']); // Tema da barra de cima/baixo
-      StatusBar.setBackgroundColor(nextTheme.PRIMARY); // Tema da barra de cima
-      StatusBar.setBarStyle(nextBarStyle) // Tema da fonte da barra de cima
-    }
-  }
-
-  const saveTheme = (preferedTheme: User["prefered_theme"]) => {
-    const nameTheme = Theme[preferedTheme] === Theme['light'] ? 'light' : 'dark'
-    setUser({ ...user, prefered_theme: nameTheme }) //TODO: implementar salvamento do tema
-  }
-
   const verifyIsLogged = async () => {
+    let dt_birth: string, gender: string, age: number;
     const accessToken = await getAccessToken();
     const refreshToken = await getRefreshToken();
     if (accessToken && refreshToken) {
       let isValid = isTokenValid(accessToken);
       if (isValid && !isAuthenticated) {
-        console.log("É válido...")
-        await registerLogin(accessToken, refreshToken);
+        console.log("É válido...");
+        ({ dt_birth, gender } = await getComplementarData());
+        await registerLogin(accessToken, refreshToken, {dt_birth, gender});
       } else if (!isValid) {
         console.log("Não é válido...")
         refreshLogin();
@@ -66,37 +43,42 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   };
 
   const login = async () => {
-    let userInfo: Token;
+    let userInfo: UserDecoded, dt_birth: string, gender: string, age: number;
     try {
       await GoogleSignin.hasPlayServices();
-      userInfo = await GoogleSignin.signIn() as Token;
+      userInfo = await GoogleSignin.signIn() as UserDecoded;
+      ({ age, dt_birth, gender } = await getComplementarData());
     } catch (error) {
       return;
     }
-    registerLogin(userInfo.idToken, userInfo.serverAuthCode);
+    if (age < 18) {
+      logout();
+      throw new Error('Você não possui idade suficiente :(');
+    }
+    registerLogin(userInfo.idToken, userInfo.serverAuthCode, { dt_birth, gender });
   };
 
   const refreshLogin = async () => {
-    let userInfo: Token;
+    let userInfo: UserDecoded, dt_birth: string, gender: string;
     try {
       await GoogleSignin.hasPlayServices();
-      userInfo = await GoogleSignin.signInSilently() as Token;
+      userInfo = await GoogleSignin.signInSilently() as UserDecoded;
+      ({ dt_birth, gender } = await getComplementarData());
     } catch (error: any) {
       logout();
     }
-    registerLogin(userInfo.idToken, userInfo.serverAuthCode);
+    registerLogin(userInfo.idToken, userInfo.serverAuthCode, { dt_birth, gender });
   };
 
-  const registerLogin = async (accessToken: Token['idToken'], refreshToken: Token['serverAuthCode']) => {
+  const registerLogin = async (idToken: UserDecoded['idToken'], serverAuthCode: UserDecoded['serverAuthCode'], complementarData: { dt_birth: User['dt_birth'], gender: User['gender'] }) => {
     console.log('Autenticado, logando...');
-    const userData = decodeAccessToken(accessToken);
-    // checar se o usuário possui um tema junto com outras informações a partir do endpoint POST /user
-    changeTheme(null); // TODO: implementar comunicação com o backend com o id do usuário e email   
-    setUser(userData); // TODO: implementar comunicação com o backend com o id do usuário e email    
+    const userData = decodeAccessToken(idToken);
+    const { data: { preferences, user } } = await API.$users.user_info({ idToken: idToken, dt_birth: complementarData.dt_birth, gender: complementarData.gender }) // get user data like prefered_theme
+    changeTheme(null, preferences.prefered_theme, theme, setTheme, deviceTheme);
+    setUser({ ...userData, dt_birth: complementarData.dt_birth, gender: complementarData.gender, prefered_theme: preferences.prefered_theme })
     setIsAuthenticated(true);
-    saveAccessToken(accessToken);
-    saveRefreshToken(refreshToken);
-
+    saveAccessToken(idToken);
+    saveRefreshToken(serverAuthCode);
   };
 
   const logout = async () => {
@@ -105,10 +87,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     clearAccessToken();
     clearRefreshToken();
     setUser(UnauthenticatedUser);
-    if (isAuthenticated) {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-    }
+    await GoogleSignin.signOut();
   };
 
   useEffect(() => {
@@ -121,12 +100,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     if (isAuthenticated) {
-      changeTheme(null)
+      changeTheme(null, user.prefered_theme, theme, setTheme, deviceTheme)
     }
   }, [deviceTheme])
+
   return (
-    <ThemeContext.Provider value={{ theme, changeThemeFirstScreen, changeTheme }}>
-      <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <ThemeContext.Provider value={{ theme, setTheme, changeThemeFirstScreen, changeTheme, saveTheme }}>
+      <AuthContext.Provider value={{ user, setUser, isAuthenticated, login, logout }}>
         {children}
       </AuthContext.Provider>
     </ThemeContext.Provider>

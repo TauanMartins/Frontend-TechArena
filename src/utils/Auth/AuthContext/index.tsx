@@ -4,6 +4,7 @@ import { UnauthenticatedUser } from '../../Model/User';
 
 export const AuthContext = createContext<AuthContextData>({
   user: UnauthenticatedUser,
+  setUser: () => { },
   isAuthenticated: false,
   login: async () => { },
   logout: () => { }

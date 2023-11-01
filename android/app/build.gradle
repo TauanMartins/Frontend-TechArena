@@ -78,8 +78,8 @@ android {
         applicationId "com.app_techarena"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.3.1"
+        versionCode 9
+        versionName "1.4.0"
     }
     signingConfigs {
         debug {

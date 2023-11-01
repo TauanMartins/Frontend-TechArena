@@ -13,6 +13,8 @@ export interface User {
   picture: string;
   sub: string;
   permission: string;
+  gender: string;
+  dt_birth: string;
   prefered_theme: null | 'light' | 'dark'
 }
 
@@ -31,5 +33,7 @@ export const UnauthenticatedUser: User = {
   picture: '',
   sub: '',
   permission: 'G',
+  gender: '',
+  dt_birth: '',
   prefered_theme: null
 };

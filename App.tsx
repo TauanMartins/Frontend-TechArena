@@ -7,7 +7,13 @@ import { GOOGLE_CLIENT_ID } from './src/utils/Config';
 const App = () => {
   GoogleSignin.configure({
     webClientId: GOOGLE_CLIENT_ID,
-    offlineAccess: true
+    offlineAccess: true,
+    scopes: [
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/user.birthday.read",
+      "https://www.googleapis.com/auth/user.gender.read"
+    ],
   })
   return (
     <AuthProvider>

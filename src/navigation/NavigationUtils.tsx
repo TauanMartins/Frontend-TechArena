@@ -21,6 +21,7 @@ const navigate = (
   isAuthenticated: boolean,
   user: User,
 ) => {
+  console.log(routeName, navigation)
   const requiredPermission = SCREEN_PERMISSIONS[routeName];
   if (isAuthenticated) {
     if (user.permission.includes(requiredPermission)) {

@@ -3,7 +3,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from './NavigationTypes';
 import LoginScreen from '../pages/Login';
 import HomeScreen from '../pages/Home';
-import ConfigurationScreen from '../pages/Configuration';
+import ConfigurationScreen from '../pages/Configuration/main';
 
 export type ScreenProps<T extends keyof RootStackParamList> = {
   route: RouteProp<RootStackParamList, T>;
