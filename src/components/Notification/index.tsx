@@ -1,62 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { useTheme } from '../../utils/Theme/ThemeContext';
+import React, {useState, useEffect, useRef} from 'react';
+import {Text, StyleSheet, Animated, ViewStyle} from 'react-native';
+import {useTheme} from '../../utils/Theme/ThemeContext';
 
-const Notification = ({ message, success, visible, onClose }) => {
-    const [fadeAnim] = useState(new Animated.Value(1));
-    const { theme } = useTheme();
-    useEffect(() => {
-        if (visible) {
-            // Faz a notificação aparecer suavemente
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 500,
-                useNativeDriver: true,
-            }).start();
+const Notification = ({message, success = false, visible = false, onClose}) => {
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const {theme} = useTheme();
+  const isAnimating = useRef(false);
 
-            const timer = setTimeout(() => {
-                // Faz a notificação desaparecer suavemente
-                Animated.timing(fadeAnim, {
-                    toValue: 0,
-                    duration: 500,
-                    useNativeDriver: true,
-                }).start(onClose);
-            }, 2500);
+  const animateNotification = (toValue: number, callback?: () => void) => {
+    Animated.timing(fadeAnim, {
+      toValue,
+      duration: 400,
+      useNativeDriver: true,
+    }).start(() => {
+      if (callback) {
+        callback();
+      }
+    });
+  };
 
-            return () => {
-                clearTimeout(timer);
-            };
-        }
-    }, [visible, onClose]);
+  useEffect(() => {
+    if (visible) {
+      if (!isAnimating.current) {
+        isAnimating.current = true;
+        animateNotification(1);
+      }
+      const hideTimer = setTimeout(() => {
+        animateNotification(0, () => {
+          isAnimating.current = false;
+          onClose();
+        });
+      }, 2000);
+      return () => {
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [visible, onClose, fadeAnim]);
 
-    return visible ? (
-        <Animated.View style={[styles.notification, success ? styles.success : styles.error, { opacity: fadeAnim }]}>
-            <Text style={{...styles.message, color: theme.TERCIARY}}>{message}</Text>
-        </Animated.View>
-    ) : null;
+  const dynamicStyle: ViewStyle = success
+    ? {backgroundColor: 'green'}
+    : {backgroundColor: 'red'};
+
+  return (
+    <Animated.View
+      style={[styles.notification, dynamicStyle, {opacity: fadeAnim}]}>
+      <Text style={[styles.message, {color: theme.TERTIARY}]}>{message}</Text>
+    </Animated.View>
+  );
 };
 
 const styles = StyleSheet.create({
-    notification: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 9999,
-    },
-    success: {
-        backgroundColor: 'green',
-    },
-    error: {
-        backgroundColor: 'red',
-    },
-    message: {
-        color: 'white',
-        fontSize: 16,
-    },
+  notification: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  message: {
+    fontSize: 16,
+  },
 });
 
 export default Notification;

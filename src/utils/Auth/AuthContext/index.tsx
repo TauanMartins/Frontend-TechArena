@@ -1,13 +1,13 @@
-import { createContext, useContext } from 'react';
-import { AuthContextData } from '../../Model/Context/AuthContext';
-import { UnauthenticatedUser } from '../../Model/User';
+import {createContext, useContext} from 'react';
+import {AuthContextData} from '../../Model/Context/AuthContext';
+import {UnauthenticatedUser} from '../../Model/User';
 
 export const AuthContext = createContext<AuthContextData>({
   user: UnauthenticatedUser,
-  setUser: () => { },
+  setUser: () => {},
   isAuthenticated: false,
-  login: async () => { },
-  logout: () => { }
+  login: async () => {},
+  logout: () => {},
 });
 
 const useAuth = () => {
@@ -15,4 +15,4 @@ const useAuth = () => {
   return context;
 };
 
-export { useAuth };
+export {useAuth};

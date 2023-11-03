@@ -15,7 +15,7 @@ export interface User {
   permission: string;
   gender: string;
   dt_birth: string;
-  prefered_theme: null | 'light' | 'dark'
+  prefered_theme: null | 'light' | 'dark';
 }
 
 export const UnauthenticatedUser: User = {
@@ -35,5 +35,5 @@ export const UnauthenticatedUser: User = {
   permission: 'G',
   gender: '',
   dt_birth: '',
-  prefered_theme: null
+  prefered_theme: null,
 };

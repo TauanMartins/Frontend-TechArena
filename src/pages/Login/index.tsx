@@ -1,15 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Alert, TouchableOpacity, Text, View, ScrollView } from 'react-native';
-import { useAuth } from '../../utils/Auth/AuthContext';
-import { ScreenProps } from '../../navigation/ScreenProps';
+import React, {useState, useEffect} from 'react';
+import {
+  Image,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  Text,
+  View,
+  ScrollView,
+} from 'react-native';
+import {useAuth} from '../../utils/Auth/AuthContext';
+import {ScreenProps} from '../../navigation/ScreenProps';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Loader from '../../components/Loader';
 import PrivacyPolicies_ServiceTems from '../../components/PrivacyPoliciesServiceTerms';
-import { useTheme } from '../../utils/Theme/ThemeContext';
+import {useTheme} from '../../utils/Theme/ThemeContext';
 
 const Login: React.FC<ScreenProps<'Login'>> = () => {
-  const { login } = useAuth();
-  const { changeThemeFirstScreen } = useTheme();
+  const {login} = useAuth();
+  const {changeThemeFirstScreen} = useTheme();
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -17,26 +25,44 @@ const Login: React.FC<ScreenProps<'Login'>> = () => {
       setLoading(true);
       await login();
     } catch (error: any) {
-      Alert.alert('Sentimos muito!', error.message ? error.message : 'Não conseguimos confirmar sua conta. :(')
+      Alert.alert(
+        'Sentimos muito!',
+        error.message
+          ? error.message
+          : 'Não conseguimos confirmar sua conta. :(',
+      );
     } finally {
       setLoading(false);
     }
   };
   useEffect(() => {
-    changeThemeFirstScreen()
-  }, [])
+    changeThemeFirstScreen();
+  }, []);
 
   return (
     <View style={styles.container}>
       {loading && <Loader />}
       <View style={styles.containerUp}>
         <Text style={styles.brandName}>TECHARENA</Text>
-        <Image style={styles.logo} source={require('../../assets/Logo/logo_WT.png')} />
+        <Image
+          style={styles.logo}
+          source={require('../../assets/Logo/logo_WT.png')}
+        />
       </View>
-      <ScrollView contentContainerStyle={styles.containerDownContent} style={styles.containerDown}>
-        <Text style={styles.text}>O aplicativo perfeito para você praticar esportes a qualquer momento e em qualquer lugar.</Text>
+      <ScrollView
+        contentContainerStyle={styles.containerDownContent}
+        style={styles.containerDown}>
+        <Text style={styles.text}>
+          O aplicativo perfeito para você praticar esportes a qualquer momento e
+          em qualquer lugar.
+        </Text>
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <AntDesign name='google' color={'#424242'} size={25} />
+          <AntDesign
+            style={styles.buttonIcon}
+            name="google"
+            color={'#424242'}
+            size={25}
+          />
           <Text style={styles.buttonText}>Continuar com o Google</Text>
         </TouchableOpacity>
         <PrivacyPolicies_ServiceTems />
@@ -53,7 +79,7 @@ const styles = StyleSheet.create({
   },
   containerUp: {
     height: '60%',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   containerDown: {
     flex: 1,
@@ -73,7 +99,7 @@ const styles = StyleSheet.create({
     color: '#424242',
     margin: '7.5%',
     textShadowColor: '#424242',
-    textShadowOffset: { height: 1, width: 1 },
+    textShadowOffset: {height: 1, width: 1},
     textShadowRadius: 6,
   },
   logo: {
@@ -88,7 +114,7 @@ const styles = StyleSheet.create({
     marginLeft: '10%',
     marginRight: '10%',
     textShadowColor: '#F4F4F4',
-    textShadowOffset: { height: 1, width: 1 },
+    textShadowOffset: {height: 1, width: 1},
     textShadowRadius: 3,
   },
   button: {
@@ -96,22 +122,21 @@ const styles = StyleSheet.create({
     elevation: 7,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: '10%',
-    paddingLeft: '10%',
-    paddingTop: '2.5%',
-    paddingBottom: '2.5%',
-    margin: '10%',
+    justifyContent: 'center',
+    width: '80%',
+    paddingVertical: '4%',
+    margin: 15,
     borderRadius: 50,
-
+  },
+  buttonIcon: {
+    marginRight: 10,
   },
   buttonText: {
     fontFamily: 'Sansation Regular',
-    fontSize: 12,
+    fontSize: 13,
     color: '#424242',
-    marginLeft: '10%',
-    marginRight: '10%',
     textShadowColor: '#424242',
-    textShadowOffset: { width: 1, height: 1 },
+    textShadowOffset: {width: 1, height: 1},
     textShadowRadius: 4,
   },
 });

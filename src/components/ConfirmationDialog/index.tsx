@@ -1,7 +1,6 @@
-import React from 'react';
-import { Alert } from 'react-native';
+import {Alert} from 'react-native';
 
-const ConfirmationDialog = ({ title, message, onConfirm, onCancel }) => {
+const ConfirmationDialog = ({title, message, onConfirm, onCancel}) => {
   const handleConfirmation = () => {
     Alert.alert(title, message, [
       {
