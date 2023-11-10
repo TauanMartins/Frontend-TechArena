@@ -20,4 +20,13 @@ export type RootStackParamList = {
   SettingsPreferencesStack: undefined;
   SettingsPreferences: undefined;
   SettingsThemePreferences: undefined;
+  
+ /* ------------------------------------------------------------------------------------------------*/
+
+
+  SocialStack: undefined;
+  Social: undefined;
+  SocialChatStack: { chat_id: string, friend: string, image: string } ;
+  SocialChat: undefined;
+  SocialUserChatDetail: undefined;
 };

@@ -72,7 +72,7 @@ export const SettingsPreferences = ({navigation}) => {
               navigation,
               screens.SettingsThemePreferences.name as keyof RootStackParamList,
               isAuthenticated,
-              user,
+              user
             )
           }
           style={styles.settingsButton}>

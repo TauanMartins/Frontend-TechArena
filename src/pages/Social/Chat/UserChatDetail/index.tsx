@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,46 +7,46 @@ import {
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import { ScreenProps } from '../../../../navigation/ScreenProps';
-import { useAuth } from '../../../../utils/Auth/AuthContext';
-import { useTheme } from '../../../../utils/Theme/ThemeContext';
+import {ScreenProps} from '../../../../navigation/ScreenProps';
+import {useAuth} from '../../../../utils/Auth/AuthContext';
+import {useTheme} from '../../../../utils/Theme/ThemeContext';
 import LoaderUnique from '../../../../components/LoaderUnique';
 import ConfirmationDialog from '../../../../components/ConfirmationDialog';
-import { User } from '../../../../utils/Model/User';
+import {User} from '../../../../utils/Model/User';
 import RadioButton from '../../../../components/RadioButton';
 import Notification from '../../../../components/Notification';
-import { BackButton } from '../../../../components/IconsButton';
+import {BackButton} from '../../../../components/IconsButton';
 
 const themeOptions: {
   label: string;
   value: User['prefered_theme'];
   description: string;
 }[] = [
-    {
-      label: 'Configuração do Dispositivo',
-      value: null,
-      description:
-        'Esta configuração fará o aplicativo acompanhar o tema padrão do dispositivo.',
-    },
-    {
-      label: 'Tema Escuro',
-      value: 'dark',
-      description: 'Esta configuração alterará o tema do aplicativo para escuro.',
-    },
-    {
-      label: 'Tema Claro',
-      value: 'light',
-      description: 'Esta configuração alterará o tema do aplicativo para claro.',
-    },
-  ];
+  {
+    label: 'Configuração do Dispositivo',
+    value: null,
+    description:
+      'Esta configuração fará o aplicativo acompanhar o tema padrão do dispositivo.',
+  },
+  {
+    label: 'Tema Escuro',
+    value: 'dark',
+    description: 'Esta configuração alterará o tema do aplicativo para escuro.',
+  },
+  {
+    label: 'Tema Claro',
+    value: 'light',
+    description: 'Esta configuração alterará o tema do aplicativo para claro.',
+  },
+];
 
 const SettingsThemePreferences: React.FC<
   ScreenProps<'SettingsThemePreferences'>
-> = ({ navigation }) => {
+> = ({navigation}) => {
   // As próximas cinco linhas serão normalmente visualizadas pois contam com elementos para
   // gerenciar usuário, gerenciar o tema e gerenciar componentes de carregamento e notificação.
-  const { user, setUser } = useAuth();
-  const { theme, setTheme, changeTheme, saveTheme } = useTheme();
+  const {user, setUser} = useAuth();
+  const {theme, setTheme, changeTheme, saveTheme} = useTheme();
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({
     message: '',
@@ -58,7 +58,7 @@ const SettingsThemePreferences: React.FC<
   const [preferedTheme, setPreferedTheme] = useState({
     prefered_theme: user.prefered_theme,
     edited: false,
-  } as { prefered_theme: User['prefered_theme']; edited: boolean });
+  } as {prefered_theme: User['prefered_theme']; edited: boolean});
 
   const handleSelectedOption = (option: User['prefered_theme']) => {
     setPreferedTheme({
@@ -81,7 +81,7 @@ const SettingsThemePreferences: React.FC<
             success: true,
             visible: true,
           });
-          setPreferedTheme({ ...preferedTheme, edited: false });
+          setPreferedTheme({...preferedTheme, edited: false});
         } catch (error) {
           setNotification({
             message: 'Não conseguimos salvar as alterações :(',
@@ -92,7 +92,7 @@ const SettingsThemePreferences: React.FC<
           setLoading(false);
         }
       },
-      onCancel: () => { },
+      onCancel: () => {},
     });
   };
 
@@ -110,25 +110,25 @@ const SettingsThemePreferences: React.FC<
           changeTheme(null, user.prefered_theme, theme, setTheme, deviceTheme);
           navigation.dispatch(e.data.action);
         },
-        onCancel: () => { },
+        onCancel: () => {},
       });
     });
 
     return backHandler;
   }, [navigation, preferedTheme.edited]);
   return (
-    <ScrollView style={{ ...styles.scrollView, backgroundColor: theme.PRIMARY }}>
-      <View style={{ ...styles.container, backgroundColor: theme.PRIMARY }}>
+    <ScrollView style={{...styles.scrollView, backgroundColor: theme.PRIMARY}}>
+      <View style={{...styles.container, backgroundColor: theme.PRIMARY}}>
         <View style={styles.headerRow}>
           <BackButton
             onPress={() => navigation.goBack()}
             style={{}}
             color={theme.SECONDARY}
           />
-          <Text style={{ ...styles.title, color: theme.SECONDARY }}>
+          <Text style={{...styles.title, color: theme.SECONDARY}}>
             Temas claro e escuro
           </Text>
-          <View style={{ width: 50 }} />
+          <View style={{width: 50}} />
         </View>
         <View style={styles.col}>
           {themeOptions.map(themeOption => (
@@ -147,9 +147,9 @@ const SettingsThemePreferences: React.FC<
           <TouchableOpacity
             onPress={handleSavePreferedTheme}
             disabled={!preferedTheme.edited}
-            style={{ ...styles.button, backgroundColor: theme.TERTIARY }}>
+            style={{...styles.button, backgroundColor: theme.TERTIARY}}>
             {loading && <LoaderUnique />}
-            <Text style={{ ...styles.button_text, color: theme.QUATERNARY }}>
+            <Text style={{...styles.button_text, color: theme.QUATERNARY}}>
               Salvar
             </Text>
           </TouchableOpacity>
@@ -158,7 +158,7 @@ const SettingsThemePreferences: React.FC<
           message={notification.message}
           success={notification.success}
           visible={notification.visible}
-          onClose={() => setNotification({ ...notification, visible: false })}
+          onClose={() => setNotification({...notification, visible: false})}
         />
       </View>
     </ScrollView>
@@ -180,9 +180,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: 'Sansation Regular',
-    fontSize: 26,
-    alignItems: 'center', 
-    flex: 1,
+    fontSize: 28,
+    alignItems: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -204,7 +203,7 @@ const styles = StyleSheet.create({
   },
   button_text: {
     fontFamily: 'Sansation Regular',
-    textShadowOffset: { width: 0.5, height: 0.5 },
+    textShadowOffset: {width: 0.5, height: 0.5},
     textShadowRadius: 1,
     fontSize: 14,
   },

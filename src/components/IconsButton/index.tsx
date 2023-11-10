@@ -3,12 +3,13 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {View, TouchableOpacity, ViewStyle} from 'react-native';
+import Feather from 'react-native-vector-icons/Feather';
+import { View, TouchableOpacity, ViewStyle } from 'react-native';
 
-export const HomeIcon = ({color, size, isActive}) => {
+export const HomeIcon = ({ color, size, isActive }) => {
   return (
     <View
-      style={{flexDirection: 'column', alignContent: 'center', height: '100%'}}>
+      style={{ flexDirection: 'column', alignContent: 'center', height: '100%' }}>
       <View
         style={{
           height: 1.8,
@@ -18,7 +19,7 @@ export const HomeIcon = ({color, size, isActive}) => {
         }}
       />
       <AntDesign
-        style={{marginTop: '10%'}}
+        style={{ marginTop: '13%' }}
         name="home"
         color={color}
         size={size}
@@ -26,7 +27,7 @@ export const HomeIcon = ({color, size, isActive}) => {
     </View>
   );
 };
-export const LeagueIcon = ({color, size, isActive}) => {
+export const LeagueIcon = ({ color, size, isActive }) => {
   return (
     <View
       style={{
@@ -46,7 +47,7 @@ export const LeagueIcon = ({color, size, isActive}) => {
     </View>
   );
 };
-export const CreateMatchIcon = ({color, size, isActive}) => {
+export const CreateMatchIcon = ({ color, size, isActive }) => {
   return (
     <View
       style={{
@@ -66,27 +67,25 @@ export const CreateMatchIcon = ({color, size, isActive}) => {
     </View>
   );
 };
-export const MapIcon = ({color, size, isActive}) => {
+export const SocialIcon = ({ color, size, isActive }) => {
   return (
     <View
       style={{
-        flexDirection: 'column',
-        alignContent: 'center',
-        width: '100%',
-        height: '100%',
+        flexDirection: 'column', alignContent: 'center', height: '100%', 
       }}>
       <View
         style={{
-          height: 1.8,
+          height: 1.8, 
           borderRadius: 25,
+          width: 'auto',
           backgroundColor: isActive ? color : 'transparent',
         }}
       />
-      <EvilIcons name="location" color={color} size={size} />
+      <Feather style={{ marginTop: '13%' }} name="users" color={color} size={size} />
     </View>
   );
 };
-export const SettingsIcon = ({color, size, isActive}) => {
+export const SettingsIcon = ({ color, size, isActive }) => {
   return (
     <View
       style={{
@@ -118,7 +117,7 @@ export const NotificationIcon = ({
   style: ViewStyle;
 }) => {
   return (
-    <View style={{...style}}>
+    <View style={{ ...style }}>
       <Ionicons name="notifications-outline" color={color} size={size} />
     </View>
   );
@@ -136,7 +135,7 @@ export const BackButton = ({
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={{...style, paddingVertical: 10, paddingHorizontal: 10}}>
+      style={{ ...style, paddingVertical: 10, paddingHorizontal: 10 }}>
       <AntDesign name="left" size={25} color={color} />
     </TouchableOpacity>
   );
@@ -149,7 +148,7 @@ export const PreferenceIcon = ({
   color: string;
 }) => {
   return (
-    <View style={{...style, paddingHorizontal: 10}}>
+    <View style={{ ...style, paddingHorizontal: 10 }}>
       <FontAwesome5 name="sliders-h" size={20} color={color} />
     </View>
   );
@@ -162,8 +161,48 @@ export const PreferenceThemeIcon = ({
   color: string;
 }) => {
   return (
-    <View style={{...style, paddingHorizontal: 10}}>
+    <View style={{ ...style, paddingHorizontal: 10 }}>
       <FontAwesome5 name="palette" size={20} color={color} />
+    </View>
+  );
+};
+
+export const AddUserFriendIcon = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10 }}>
+      <Feather name="user-plus" size={20} color={color} />
+    </View>
+  );
+};
+export const ChatIcon = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10, alignSelf: 'center' }}>
+      <Ionicons name="chatbubble" size={24} color={color} />
+    </View>
+  );
+};
+export const ChatsIcon = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10 }}>
+      <Ionicons name="chatbubbles" size={30} color={color} />
     </View>
   );
 };

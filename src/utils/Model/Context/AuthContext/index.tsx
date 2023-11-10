@@ -1,5 +1,6 @@
-import {User} from '../../User';
-import {Dispatch, SetStateAction} from 'react';
+import { Tokens } from '../../Token';
+import { User } from '../../User';
+import { Dispatch, SetStateAction } from 'react';
 export interface AuthContextData {
   user: User;
   setUser: Dispatch<SetStateAction<User>>;

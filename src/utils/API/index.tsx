@@ -1,6 +1,9 @@
 import axios from 'axios';
 import Users from './Users';
 import UserSensitiveInformation from './UserSensitiveInformation';
+import Chats from './Chats';
+import Messages from './Messages';
+import Friends from './Friends';
 
 const API = axios.create({
   baseURL: 'https://api.techarena.com.br/api',
@@ -19,11 +22,17 @@ const API_2 = axios.create({
 
 const $users = Users(API)('/users');
 const $users_prefered_theme = Users(API)('/users/theme');
-const $users_sensitive_information =
-  UserSensitiveInformation(API_2)('/people/me');
+const $users_sensitive_information =  UserSensitiveInformation(API_2)('/people/me');
+const $chat =  Chats(API)('/chat');
+const $messages =  Messages(API)('/message');
+const $friends =  Friends(API)('/friend');
 
 export default {
   $users,
   $users_prefered_theme,
   $users_sensitive_information,
+  $chat,
+  $messages,
+  $friends
+
 };

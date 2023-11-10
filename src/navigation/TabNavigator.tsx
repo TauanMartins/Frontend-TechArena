@@ -6,7 +6,7 @@ import {
   CreateMatchIcon,
   HomeIcon,
   LeagueIcon,
-  MapIcon,
+  SocialIcon,
 } from '../components/IconsButton';
 import {useTheme} from '../utils/Theme/ThemeContext';
 import {RootStackParamList} from './NavigationTypes';
@@ -71,15 +71,15 @@ export const TabNavigator = () => {
         })}
       />
       <Tab.Screen
-        name="Map"
-        component={screens.Home.component}
+        name="SocialStack"
+        component={screens.SocialStack.component}
         options={({navigation}) => ({
-          title: 'Map',
+          title: 'SocialStack',
           tabBarIcon: () => (
-            <MapIcon
+            <SocialIcon
               isActive={navigation.isFocused()}
               color={theme.SECONDARY}
-              size={34}
+              size={24}
             />
           ),
         })}

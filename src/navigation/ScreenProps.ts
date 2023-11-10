@@ -11,10 +11,13 @@ import SettingsPreferencesStack, {
 import HomeStack from '../pages/Home';
 import Home from '../pages/Home/Recommended';
 import Recommended from '../pages/Home/Recommended';
+import SocialStack, { Social } from '../pages/Social';
+import SocialChatStack, { SocialChat } from '../pages/Social/Chat';
 
 export type ScreenProps<T extends keyof RootStackParamList> = {
   route: RouteProp<RootStackParamList, T>;
   navigation: StackNavigationProp<RootStackParamList, T>;
+  parameters: RootStackParamList[T];
 };
 export const screens = {
   // Páginas seguem hierarquia:
@@ -47,6 +50,23 @@ export const screens = {
   },
   SettingsThemePreferences: {
     name: 'SettingsThemePreferences',
+    component: SettingsThemePreferences,
+  },
+
+  /* ------------------------------------------------------------------------------------------------*/
+
+  SocialStack: {name: 'SocialStack', component: SocialStack},
+  Social: {name: 'Social', component: Social},
+  SocialChatStack: {
+    name: 'SocialChatStack',
+    component: SocialChatStack,
+  },
+  SocialChat: {
+    name: 'SocialChat',
+    component: SocialChat,
+  },
+  SocialUserChatDetail: {
+    name: 'SocialUserChatDetail',
     component: SettingsThemePreferences,
   },
 };

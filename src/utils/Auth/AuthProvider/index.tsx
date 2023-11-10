@@ -1,29 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {useColorScheme, Alert} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useColorScheme, Alert } from 'react-native';
 import {
-  getAccessToken,
-  clearAccessToken,
-  saveAccessToken,
-  decodeAccessToken,
+  clearIdToken,
+  decodeIdToken,
+  getIdToken,
   isTokenValid,
-  saveRefreshToken,
-  clearRefreshToken,
-  getRefreshToken,
+  saveIdToken
 } from '../../TokenUtils';
-import {UserDecoded} from '../../Model/Token';
-import {UnauthenticatedUser, User} from '../../Model/User';
-import {AuthContext} from '../../Auth/AuthContext';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {ThemeContext} from '../../Theme/ThemeContext';
+import { Tokens, UserDecoded } from '../../Model/Token';
+import { UnauthenticatedUser, User } from '../../Model/User';
+import { AuthContext } from '../../Auth/AuthContext';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { ThemeContext } from '../../Theme/ThemeContext';
 import API from '../../API';
-import {getComplementarData} from '../../UserUtils';
+import { getComplementarData } from '../../UserUtils';
 import {
   changeTheme,
   changeThemeFirstScreen,
   saveTheme,
 } from '../../Theme/ThemeUtils';
 
-const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(UnauthenticatedUser);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState(null);
@@ -31,14 +28,13 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
 
   const verifyAuthentication = async () => {
     let dt_birth: string, gender: string;
-    const accessToken = await getAccessToken();
-    const refreshToken = await getRefreshToken();
-    if (accessToken && refreshToken) {
-      let isValid = isTokenValid(accessToken);
+    const idToken = await getIdToken();
+    if (idToken) {
+      let isValid = isTokenValid(idToken);
       if (isValid && !isAuthenticated) {
         console.log('É válido...');
-        ({dt_birth, gender} = await getComplementarData());
-        await registerLogin(accessToken, refreshToken, {dt_birth, gender});
+        ({ dt_birth, gender } = await getComplementarData());
+        await registerLogin(idToken, { dt_birth, gender });
       } else if (!isValid) {
         console.log('Não é válido...');
         refreshLogin();
@@ -51,18 +47,16 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     try {
       await GoogleSignin.hasPlayServices();
       userInfo = (await GoogleSignin.signIn()) as UserDecoded;
-      ({age, dt_birth, gender} = await getComplementarData());
+      ({ age, dt_birth, gender } = await getComplementarData());
     } catch (error) {
+      logout();
       return;
     }
     if (age < 18) {
       logout();
       throw new Error('Você não possui idade suficiente :(');
     }
-    registerLogin(userInfo.idToken, userInfo.serverAuthCode, {
-      dt_birth,
-      gender,
-    });
+    registerLogin(userInfo.idToken, { dt_birth, gender, });
   };
 
   const refreshLogin = async () => {
@@ -70,57 +64,63 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     try {
       await GoogleSignin.hasPlayServices();
       userInfo = (await GoogleSignin.signInSilently()) as UserDecoded;
-      ({dt_birth, gender} = await getComplementarData());
+      ({ dt_birth, gender } = await getComplementarData());
     } catch (error: any) {
       logout();
     }
-    registerLogin(userInfo.idToken, userInfo.serverAuthCode, {
-      dt_birth,
-      gender,
-    });
+    registerLogin(userInfo.idToken, { dt_birth, gender });
   };
 
   const registerLogin = async (
     idToken: UserDecoded['idToken'],
-    serverAuthCode: UserDecoded['serverAuthCode'],
-    complementarData: {dt_birth: User['dt_birth']; gender: User['gender']},
+    complementarData: { dt_birth: User['dt_birth']; gender: User['gender'] },
   ) => {
     console.log('Autenticado, logando...');
     try {
-      const userData = decodeAccessToken(idToken);
+      const userData = decodeIdToken(idToken);
+      const extendedUserData = { ...userData, idToken: idToken }
       const {
         data: {
-          preferences: {prefered_theme},
-          user,
+          preferences: { prefered_theme },
+          user: {
+            permission,
+            username
+          },
         },
       } = await API.$users.user_info({
         idToken: idToken,
         dt_birth: complementarData.dt_birth,
-        gender: complementarData.gender,
-      }); // get user data like prefered_theme
+        gender: complementarData.gender
+      }); // get user data = prefered_theme, permission..
       changeTheme(null, prefered_theme, theme, setTheme, deviceTheme);
       setUser({
-        ...userData,
+        ...extendedUserData,
         dt_birth: complementarData.dt_birth,
         gender: complementarData.gender,
         prefered_theme: prefered_theme,
+        permission: permission,
+        username: username
       });
+      console.log(extendedUserData,
+        complementarData.dt_birth,
+        complementarData.gender,
+        prefered_theme,
+        permission,
+        username)
       setIsAuthenticated(true);
-      saveAccessToken(idToken);
-      saveRefreshToken(serverAuthCode);
+      saveIdToken(idToken);
     } catch (error) {
-      Alert.alert('Sentimos muito!', 'Falha ao estabelecer conexão!');
+      Alert.alert('Sentimos muito!', 'Falha ao estabelecer conexão!', error);
       logout();
     }
   };
 
   const logout = async () => {
     console.log('Não autenticado, deslogando...');
-    setIsAuthenticated(false);
-    clearAccessToken();
-    clearRefreshToken();
+    await clearIdToken();
     setUser(UnauthenticatedUser);
     await GoogleSignin.signOut();
+    setIsAuthenticated(false);
   };
 
   useEffect(() => {
@@ -137,15 +137,16 @@ const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     }
   }, [deviceTheme]);
 
+
   return (
     <ThemeContext.Provider
-      value={{theme, setTheme, changeThemeFirstScreen, changeTheme, saveTheme}}>
+      value={{ theme, setTheme, changeThemeFirstScreen, changeTheme, saveTheme }}>
       <AuthContext.Provider
-        value={{user, setUser, isAuthenticated, login, logout}}>
+        value={{ user, setUser, isAuthenticated, login, logout }}>
         {children}
       </AuthContext.Provider>
     </ThemeContext.Provider>
   );
 };
 
-export {AuthProvider};
+export { AuthProvider };
