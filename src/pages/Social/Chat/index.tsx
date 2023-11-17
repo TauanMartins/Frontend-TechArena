@@ -55,8 +55,12 @@ interface Message {
   username: string;
 }
 
+interface Data {
+  data: Message[],
+  next_cursor: string
+};
 interface MessageResponse {
-  data: Message[];
+  data: Data;
 }
 
 export const SocialChat = ({ navigation, route }) => {
@@ -64,7 +68,10 @@ export const SocialChat = ({ navigation, route }) => {
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
+  const [isScreenActive, setIsScreenActive] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [nextPageCursor, setNextPageCursor] = useState(null);
+  const ws = useRef(null);
 
   const flatListRef = useRef(null);
   const friend = route.params.friend;
@@ -81,20 +88,85 @@ export const SocialChat = ({ navigation, route }) => {
     return `${hours}:${minutes}`;
   };
 
+  const scrollToBottom = () => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  };
   const fetchMessages = () => {
     API.$messages.select_messages({ idToken: user.idToken, chat_id: chat_id })
       .then((response: MessageResponse) => {
-        setMessages(response.data);
-        scrollToBottom();
+        setMessages(response.data.data);
+        setNextPageCursor(response.data.next_cursor);
       })
       .catch((error: any) => {
         console.error(error);
+      }).finally(() => {
+        setLoading(false);
+        scrollToBottom();
+      });
+  };
+  const loadMoreMessages = () => {
+    if (loading || !nextPageCursor) return;
+    setRefreshing(true);
+    API.$messages.select_messages({ idToken: user.idToken, chat_id: chat_id, cursor: nextPageCursor })
+      .then((response: MessageResponse) => {
+        const newMessages = response.data.data.filter(
+          newMessage => !messages.some(message => message.id === newMessage.id)
+        );
+        setMessages([...newMessages, ...messages]);
+        setNextPageCursor(response.data.next_cursor);
       })
+      .catch((error: any) => {
+        console.error(error);
+      }).finally(() => {
+        setRefreshing(false)
+      });
+  };
+  const openWebSocketConnection = () => {
+    // Fechando a conexão WebSocket existente se estiver aberta
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.close();
+    }
+
+    // Abrindo uma nova conexão WebSocket
+    ws.current = new WebSocket('https://chat.techarena.com.br/app/local_key');
+
+    ws.current.onopen = () => {
+      const subscribeMessage = {
+        event: 'pusher:subscribe',
+        data: {
+          channel: `public.chat.${chat_id}`
+        }
+      };
+      console.log('Estava fechada.')
+      ws.current.send(JSON.stringify(subscribeMessage));
+    };
+    ws.current.onmessage = (e) => {
+      // Receive a message from the server
+      fetchMessages();
+      console.log('on message: ', (JSON.parse(e.data)));
+    };
+
+    ws.current.onerror = (e: any) => {
+      // An error occurred
+      console.log(e.message);
+    };
+
+    ws.current.onclose = (e) => {
+      // Connection closed
+      console.log(e.code, e.reason);
+    };
+
+    fetchMessages();
+
+
   };
   const sendMessages = (message: string) => {
+    if (ws.current.readyState === WebSocket.CLOSED) {
+      openWebSocketConnection();
+    }
     API.$messages.create_message({ idToken: user.idToken, chat_id: chat_id, message: message })
       .then((response: MessageResponse) => {
-        setMessages(response.data);
+        //console.log(response)
       })
       .catch((error: any) => {
         console.error(error);
@@ -105,21 +177,18 @@ export const SocialChat = ({ navigation, route }) => {
       });
   };
 
-  const handleRefresh = () => {
-    setRefreshing(true);
-    fetchMessages();
-    setRefreshing(false);
-  };
-
   useEffect(() => {
-    setLoading(true);
-    fetchMessages();
-    setLoading(false);
+
+    setLoading(true)
+    openWebSocketConnection();
+    return () => {
+      // Fechando a conexão WebSocket quando o componente é desmontado
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.close();
+      }
+    };
   }, []);
 
-  const scrollToBottom = () => {
-    flatListRef.current?.scrollToEnd({ animated: true });
-  };
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', scrollToBottom);
     return () => {
@@ -130,7 +199,7 @@ export const SocialChat = ({ navigation, route }) => {
   const handleSendMessage = () => {
     sendMessages(inputMessage);
   };
-  
+
   const isMyMessage = (message: Message) => {
     return message.username === user.username;
   };
@@ -151,7 +220,6 @@ export const SocialChat = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-
       {loading && <Loader />}
       <View style={styles.headerRow}>
         <BackButton onPress={() => navigation.goBack()} style={{}} color={theme.SECONDARY} />
@@ -167,10 +235,8 @@ export const SocialChat = ({ navigation, route }) => {
         ref={flatListRef}
         data={messages}
         renderItem={renderItem}
-        onEndReached={handleRefresh}
-        onEndReachedThreshold={0.5}
         refreshing={refreshing}
-        onRefresh={handleRefresh}
+        onRefresh={loadMoreMessages}
         keyExtractor={(message) => message.id.toString()}
         style={styles.messageList}
       />
@@ -178,6 +244,7 @@ export const SocialChat = ({ navigation, route }) => {
         <TextInput
           style={styles.input}
           value={inputMessage}
+          onPointerEnter={() => { scrollToBottom(); }}
           onChangeText={setInputMessage}
           placeholder="Digite sua mensagem aqui..."
           placeholderTextColor="#888"

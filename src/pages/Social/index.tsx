@@ -22,6 +22,7 @@ import { Image } from 'react-native-elements';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import Notification from '../../components/Notification';
 import { navigate } from '../../navigation/NavigationUtils';
+import { Keyboard } from 'react-native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -198,6 +199,7 @@ export const Social = ({ navigation }) => {
     });
   };
   const handleSearch = () => {
+    Keyboard.dismiss();
     setLoading(true);
     API.$users.select_users({ search: inputUserSearchForUsers })
       .then((response: UsersSearchResponse) => {
