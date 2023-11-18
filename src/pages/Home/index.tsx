@@ -16,6 +16,7 @@ import { NotificationIcon } from '../../components/IconsButton';
 import { useAuth } from '../../utils/Auth/AuthContext';
 import Recommended from './Recommended';
 import { navigate } from '../../navigation/NavigationUtils';
+import { AvatarImage } from '../../components/AvatarImage';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const HomeStack = () => {
@@ -111,7 +112,7 @@ const UserNotificationRow = ({ user, SECONDARY }) => (
   <View style={styles.notificationRow}>
     <NotificationIcon style={styles.notificationIcon} color={SECONDARY} size={32} />
     {user.picture && (
-      <Image style={[styles.userPicture, { borderColor: SECONDARY }]} source={{ uri: user.picture }} />
+      <AvatarImage image={ user.picture} size={55}/>
     )}
   </View>
 );
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   notificationRow: {
     flexDirection: 'row',
@@ -218,7 +219,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   column: {
+    flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   centeredColumn: {
     alignItems: 'center',

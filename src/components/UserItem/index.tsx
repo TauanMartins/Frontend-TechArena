@@ -14,34 +14,27 @@ import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { AvatarImage } from '../AvatarImage';
 
-export const Chat = ({ id, image, name, message, navigation, isAuthenticated, user }) => {
+export const UserItem = ({ id, image, name, subtitle, action, border = true }) => {
   const { theme } = useTheme();
-  const styles = createStyles(theme);
+  const styles = createStyles(theme, border);
   return (
-    <TouchableOpacity onPress={() => {
-      navigate(
-        navigation,
-        screens.SocialChatStack.name as keyof RootStackParamList,
-        isAuthenticated,
-        user, { chat_id: id, friend: name, image: image })
-    }} style={styles.chat_button}>
-      <AvatarImage image={image}/>
+    <TouchableOpacity onPress={() => { action() }} style={styles.chat_button}>
+      <AvatarImage image={image} />
       <View style={styles.chat_content}>
         <Text style={styles.chat_text_title}>{name}</Text>
-        <Text style={styles.chat_text_subtitle}>{message}</Text>
+        <Text style={styles.chat_text_subtitle}>{subtitle}</Text>
       </View>
     </TouchableOpacity>
   )
 }
 
-const createStyles = (theme: typeof Light | typeof Dark) =>
+const createStyles = (theme: typeof Light | typeof Dark, border: boolean) =>
   StyleSheet.create({
     chat_button: {
       flexDirection: 'row',
       alignItems: 'center',
       padding: 10,
-      borderWidth: 1,
-      borderColor: theme.TERTIARY,
+      ...(border ? { borderBottomWidth: 1, borderColor: theme.TERTIARY } : {})
     },
     image: {
       borderColor: theme.QUATERNARY,
@@ -52,6 +45,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       marginRight: 10,
     },
     chat_content: {
+      flex: 1,
       justifyContent: 'center',
       alignItems: 'flex-start',
     },

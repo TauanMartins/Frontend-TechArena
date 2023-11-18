@@ -56,17 +56,18 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       logout();
       throw new Error('Você não possui idade suficiente :(');
     }
-    registerLogin(userInfo.idToken, { dt_birth, gender, });
+    registerLogin(userInfo.idToken, { dt_birth, gender });
   };
 
   const refreshLogin = async () => {
-    let userInfo: UserDecoded, dt_birth: string, gender: string;
+    let userInfo: UserDecoded, dt_birth: string, gender: string, age: number;
     try {
       await GoogleSignin.hasPlayServices();
       userInfo = (await GoogleSignin.signInSilently()) as UserDecoded;
-      ({ dt_birth, gender } = await getComplementarData());
+      ({ age, dt_birth, gender } = await getComplementarData());
     } catch (error: any) {
       logout();
+      Alert.alert('Sentimos muito!', `Falha ao reestabelecer conexão! \n${error}` );
     }
     registerLogin(userInfo.idToken, { dt_birth, gender });
   };
@@ -110,8 +111,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setIsAuthenticated(true);
       saveIdToken(idToken);
     } catch (error) {
-      Alert.alert('Sentimos muito!', 'Falha ao estabelecer conexão!', error);
-      logout();
+      logout();      
+      Alert.alert('Sentimos muito!', `Falha ao reestabelecer conexão! \n${error}` );
     }
   };
 

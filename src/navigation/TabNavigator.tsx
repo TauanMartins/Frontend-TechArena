@@ -1,6 +1,6 @@
-import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {screens} from './ScreenProps';
+import React, { useState, useEffect } from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { screens } from './ScreenProps';
 import {
   SettingsIcon,
   CreateMatchIcon,
@@ -8,30 +8,47 @@ import {
   LeagueIcon,
   SocialIcon,
 } from '../components/IconsButton';
-import {useTheme} from '../utils/Theme/ThemeContext';
-import {RootStackParamList} from './NavigationTypes';
+import { useTheme } from '../utils/Theme/ThemeContext';
+import { RootStackParamList } from './NavigationTypes';
+import { Keyboard } from 'react-native';
 const Tab = createBottomTabNavigator();
 
 export const TabNavigator = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarIconStyle: {width: 34, height: 34},
+        tabBarIconStyle: { width: 34, height: 34 },
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 10,
           maxHeight: 40,
           backgroundColor: theme.PRIMARY,
+          display: keyboardVisible ? 'none' : 'flex'
         },
       }}>
       <Tab.Screen
         name="HomeStack"
         component={screens.HomeStack.component}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           title: 'HomeStack',
           tabBarIcon: () => (
             <HomeIcon
@@ -45,7 +62,7 @@ export const TabNavigator = () => {
       <Tab.Screen
         name="League"
         component={screens.Home.component}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           title: 'League',
           tabBarIcon: () => (
             <LeagueIcon
@@ -59,7 +76,7 @@ export const TabNavigator = () => {
       <Tab.Screen
         name="CreateMatch"
         component={screens.Home.component}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           title: 'CreateMatch',
           tabBarIcon: () => (
             <CreateMatchIcon
@@ -73,7 +90,7 @@ export const TabNavigator = () => {
       <Tab.Screen
         name="SocialStack"
         component={screens.SocialStack.component}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           title: 'SocialStack',
           tabBarIcon: () => (
             <SocialIcon
@@ -87,7 +104,7 @@ export const TabNavigator = () => {
       <Tab.Screen
         name={screens.SettingsStack.name as keyof RootStackParamList}
         component={screens.SettingsStack.component}
-        options={({navigation}) => ({
+        options={({ navigation }) => ({
           title: 'SettingsStack',
           tabBarIcon: () => (
             <SettingsIcon

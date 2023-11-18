@@ -10,6 +10,9 @@ import API from '../../../utils/API';
 import Loader from '../../../components/Loader';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import Notification from '../../../components/Notification';
+import Light from '../../../utils/Theme/Light';
+import Dark from '../../../utils/Theme/Dark';
+import { AvatarImage } from '../../../components/AvatarImage';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -92,6 +95,7 @@ export const SocialChat = ({ navigation, route }) => {
     flatListRef.current?.scrollToEnd({ animated: true });
   };
   const fetchMessages = () => {
+    console.log('chamou')
     API.$messages.select_messages({ idToken: user.idToken, chat_id: chat_id })
       .then((response: MessageResponse) => {
         setMessages(response.data.data);
@@ -224,7 +228,7 @@ export const SocialChat = ({ navigation, route }) => {
       <View style={styles.headerRow}>
         <BackButton onPress={() => navigation.goBack()} style={{}} color={theme.SECONDARY} />
         <View style={styles.row}>
-          <Image style={{ ...styles.image, borderColor: theme.SECONDARY }} source={{ uri: image }} />
+          <AvatarImage image={image} size={50}/>
           <Text style={{ ...styles.title, color: theme.SECONDARY }}>
             {friend}
           </Text>
@@ -261,7 +265,7 @@ export const SocialChat = ({ navigation, route }) => {
   );
 };
 
-const createStyles = (theme: { PRIMARY: string; SECONDARY: string; TERTIARY: string; QUATERNARY: string; FUTEBOL: string; BASQUETE: string; VOLEI: string; TENIS: string; } | { PRIMARY: string; SECONDARY: string; TERTIARY: string; QUATERNARY: string; FUTEBOL: string; BASQUETE: string; VOLEI: string; TENIS: string; }) => StyleSheet.create({
+const createStyles = (theme: typeof Light | typeof Dark) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.PRIMARY,
@@ -275,12 +279,6 @@ const createStyles = (theme: { PRIMARY: string; SECONDARY: string; TERTIARY: str
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-  },
-  image: {
-    borderRadius: 50,
-    borderWidth: 2,
-    width: 50,
-    height: 50,
   },
   title: {
     fontFamily: 'Sansation Regular',

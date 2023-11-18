@@ -11,7 +11,6 @@ import {
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { screens } from '../../navigation/ScreenProps';
 import { RootStackParamList } from '../../navigation/NavigationTypes';
-import Light from '../../utils/Theme/Light';
 import { useAuth } from '../../utils/Auth/AuthContext';
 import API from '../../utils/API';
 import { Chat } from '../../components/Chat';
@@ -23,6 +22,10 @@ import ConfirmationDialog from '../../components/ConfirmationDialog';
 import Notification from '../../components/Notification';
 import { navigate } from '../../navigation/NavigationUtils';
 import { Keyboard } from 'react-native';
+import Dark from '../../utils/Theme/Dark';
+import Light from '../../utils/Theme/Light';
+import { SearchUsers } from '../../components/SearchUsers';
+import { SearchFriendsAndSolicitations } from '../../components/SearchFriendsAndSolicitations';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -69,8 +72,9 @@ interface Chat {
 }
 
 interface ChatResponse {
-  data: Chat[];
+  data: { friendsChats: Chat[], teamsChats: Chat[], appointmentsChats: Chat[] };
 }
+
 
 interface UsersSearch {
   id: number;
@@ -94,54 +98,26 @@ interface FriendsResponse {
   data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
 }
 
-
 export const Social = ({ navigation }) => {
   const { user, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const [loading, setLoading] = useState(false);
   const [chats, setChats] = useState<Chat[] | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [inputUserSearchForUsers, setinputUserSearchForUsers] = useState('');
-  const [isFriendsModalVisible, setIsFriendsModalVisible] = useState(false);
+
   const [friends, setFriends] = useState<Friend[] | null>(null);
   const [friendsReceived, setFriendsReceived] = useState<Friend[] | null>(null);
   const [friendsRequested, setFriendsRequested] = useState<Friend[] | null>(null);
 
-  const [usersSearched, setUsersSearched] = useState<UsersSearch[] | null>(null)
+  // variáveis para controlar aparecimento de modais.
+  const [isSearchUsersModalVisible, setIsSearchUsersModalVisible] = useState(false);
+  const [isFriendsModalVisible, setIsFriendsModalVisible] = useState(false);
+
   const [notification, setNotification] = useState({
     message: '',
     success: false,
     visible: false,
   });
-  const handleSendFriendRequest = (userPossibleFriend: UsersSearch) => {
-    ConfirmationDialog({
-      title: 'Confirmação',
-      message: 'Deseja enviar pedido de amizade?',
-      onConfirm: async () => {
-        setLoading(true);
-        API.$friends.request_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
-          .then((response: UsersSearchResponse) => {
-            setUsersSearched(response.data);
-            setNotification({
-              message: 'Pedido de amizade enviado com sucesso!',
-              success: true,
-              visible: true,
-            });
-          })
-          .catch((error: any) => {
-            setNotification({
-              message: 'Não conseguimos enviar o pedido de amizade :(',
-              success: false,
-              visible: true,
-            });
-          }).finally(() => {
-            setLoading(false);
-          })
-      },
-      onCancel: () => { },
-    });
-  };
   const handleAcceptRequest = (userPossibleFriend: UsersSearch) => {
     ConfirmationDialog({
       title: 'Confirmação',
@@ -198,23 +174,10 @@ export const Social = ({ navigation }) => {
       onCancel: () => { },
     });
   };
-  const handleSearch = () => {
-    Keyboard.dismiss();
-    setLoading(true);
-    API.$users.select_users({ search: inputUserSearchForUsers })
-      .then((response: UsersSearchResponse) => {
-        setUsersSearched(response.data);
-      })
-      .catch((error: any) => {
-        console.error(error);
-      }).finally(() => {
-        setLoading(false);
-      })
-  };
   const fetchChat = () => {
     setLoading(true);
     API.$chat.select_chats({ idToken: user.idToken }).then((response: ChatResponse) => {
-      return setChats(response.data)
+      return setChats(response.data.friendsChats)
     }).catch((erro: any) => {
       console.log(erro)
     }).finally(() => {
@@ -233,68 +196,26 @@ export const Social = ({ navigation }) => {
       setLoading(false);
     })
   };
-  const toggleModal = () => {
-    setinputUserSearchForUsers('');
-    setUsersSearched(null)
-    setIsModalVisible(!isModalVisible);
-  };
   const toggleFriendsModal = () => {
     if (!isFriendsModalVisible) { fetchFriends(); }
     setIsFriendsModalVisible(!isFriendsModalVisible);
   };
+  const toggleSearchUsersModal = () => {
+    setIsSearchUsersModalVisible(!isSearchUsersModalVisible);
+  };
   useEffect(() => {
     fetchChat();
   }, [])
-  const renderItemUser = ({ item: user }) => (
-    <TouchableOpacity onPress={() => handleSendFriendRequest(user)} style={styles.userButton}>
-      <Image style={styles.userImage} source={{ uri: user.image }} />
-      <View style={styles.userContent}>
-        <Text style={styles.chat_text_title}>{user.name}</Text>
-        <Text style={styles.chat_text_title}>{user.username}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-  const renderItemFriends = ({ item: user }) => (
-    <TouchableOpacity onPress={() => { handleChatToUser(user) }} style={styles.friendButton}>
-      <Image style={styles.userImage} source={{ uri: user.image }} />
-      <View style={{ justifyContent: 'space-between', flex: 1, flexDirection: 'row' }}>
-        <View style={styles.friendContent}>
-          <Text style={styles.chat_text_title}>{user.name}</Text>
-          <Text style={styles.chat_text_title}>{user.username}</Text>
-        </View>
-        <ChatIcon color={theme.SECONDARY} />
-      </View>
-    </TouchableOpacity>
-  );
-  const renderItemFriendsRequested = ({ item: user }) => (
-    <TouchableOpacity onPress={() => { }} style={styles.friendButton}>
-      <Image style={styles.userImage} source={{ uri: user.image }} />
-      <View style={styles.friendContent}>
-        <View style={styles.col}>
-          <Text style={styles.chat_text_title}>{user.name}</Text>
-          <Text style={styles.chat_text_title}>{user.username}</Text>
-        </View>
-        <Text style={styles.chat_text}>Pendente</Text>
-      </View>
-    </TouchableOpacity>
-  );
-  const renderItemFriendsReceived = ({ item: user }) => (
-    <TouchableOpacity onPress={() => { handleAcceptRequest(user) }} style={styles.friendButton}>
-      <Image style={styles.userImage} source={{ uri: user.image }} />
-      <View style={styles.friendContent}>
-        <View style={styles.col}>
-          <Text style={styles.chat_text_title}>{user.name}</Text>
-          <Text style={styles.chat_text_title}>{user.username}</Text>
-        </View>
-        <Text style={styles.chat_text}>Aceitar</Text>
-      </View>
-    </TouchableOpacity>
-  );
   const renderChatItem = ({ item }) => (
-    <Chat key={item.id} id={item.id} styles={styles} friend={item.name} message={item.last_message} navigation={navigation} image={item.image} isAuthenticated={isAuthenticated} user={user} />
+    <Chat key={item.id} id={item.id} name={item.name} message={item.last_message} navigation={navigation} image={item.image} isAuthenticated={isAuthenticated} user={user} />
   );
   return (
     <>
+      <Notification
+        message={notification.message}
+        success={notification.success}
+        visible={notification.visible}
+        onClose={() => setNotification({ ...notification, visible: false })} />
       <FlatList
         ListHeaderComponent={(
           <>
@@ -303,7 +224,7 @@ export const Social = ({ navigation }) => {
             </View>
             <View style={styles.row}>
               <Text style={styles.subtitle}>Amigos</Text>
-              <TouchableOpacity style={{ padding: 10 }} onPress={toggleModal}>
+              <TouchableOpacity style={{ padding: 10 }} onPress={toggleSearchUsersModal}>
                 <AddUserFriendIcon color={theme.SECONDARY} />
               </TouchableOpacity>
             </View>
@@ -324,90 +245,18 @@ export const Social = ({ navigation }) => {
         )}
         style={styles.container}
       />
-      <Modal animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}>
-
-        <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
-          <Text style={styles.modalText}>Usuários</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={inputUserSearchForUsers}
-              onChangeText={setinputUserSearchForUsers}
-              placeholder="Digite o nome do usuário"
-            />
-            <TouchableOpacity
-              onPress={handleSearch}
-              disabled={inputUserSearchForUsers.length === 0}
-              style={{ ...styles.sendButton, backgroundColor: theme.TERTIARY }}
-            >
-              <Text style={{ ...styles.sendButtonText, color: theme.QUATERNARY }}>Pesquisar</Text>
-            </TouchableOpacity>
-          </View>
-          {loading && <LoaderUnique />}
-          <FlatList
-            data={usersSearched}
-            renderItem={renderItemUser}
-            keyExtractor={(userSearched) => userSearched.id.toString()}
-            style={styles.list}
-          />
-          <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-            <Text style={styles.modalButtonText}>Fechar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isFriendsModalVisible}
-        onRequestClose={toggleFriendsModal}
-      >
-        <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
-          {loading && <LoaderUnique />}
-          <Text style={styles.modalText}>Amigos</Text>
-          <FlatList
-            data={friends}
-            renderItem={renderItemFriends}
-            keyExtractor={(friend) => friend.id.toString()}
-            style={styles.list}
-          />
-          <Text style={styles.modalText}>Solicitações de amizade</Text>
-          {friendsRequested && friendsRequested.length > 0 &&
-            (<FlatList
-              data={friendsRequested}
-              renderItem={renderItemFriendsRequested}
-              keyExtractor={(friend) => friend.id.toString()}
-              style={styles.list}
-            />)}
-          {friendsReceived && friendsReceived.length > 0 &&
-            (<FlatList
-              data={friendsReceived}
-              renderItem={renderItemFriendsReceived}
-              keyExtractor={(friend) => friend.id.toString()}
-              style={styles.list}
-            />)}
-          <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleFriendsModal}>
-            <Text style={styles.modalButtonText}>Fechar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+      <SearchUsers open={isSearchUsersModalVisible} close={toggleSearchUsersModal} />
+      <SearchFriendsAndSolicitations open={isFriendsModalVisible} close={toggleFriendsModal} navigation={navigation} />
       <TouchableOpacity
         style={styles.addButton}
         onPress={toggleFriendsModal}>
         <ChatsIcon color={theme.SECONDARY} />
       </TouchableOpacity>
-      <Notification
-        message={notification.message}
-        success={notification.success}
-        visible={notification.visible}
-        onClose={() => setNotification({ ...notification, visible: false })} />
     </>
   );
 };
 
-const createStyles = (theme: typeof Light) =>
+const createStyles = (theme: typeof Light | typeof Dark) =>
   StyleSheet.create({
     addButton: {
       position: 'absolute',
