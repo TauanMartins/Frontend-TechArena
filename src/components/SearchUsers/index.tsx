@@ -4,7 +4,7 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    Modal, TextInput, FlatList
+    Modal, TextInput, FlatList, Alert
 } from 'react-native';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { useAuth } from '../../utils/Auth/AuthContext';
@@ -29,16 +29,7 @@ interface UsersSearchResponse {
     data: UsersSearch[];
 }
 
-interface Friend {
-    id: number;
-    name: string;
-    image: string;
-    username: string;
-}
 
-interface FriendsResponse {
-    data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
-}
 export const SearchUsers = ({ open, close }) => {
     // Definição padrão para qualquer componente
 
@@ -57,6 +48,7 @@ export const SearchUsers = ({ open, close }) => {
     // Variáveis para texto de pesquisa de usuários e usuário encontrados
     const [inputUserSearchForUsers, setinputUserSearchForUsers] = useState('');
     const [usersSearched, setUsersSearched] = useState<UsersSearch[] | null>(null)
+    const [notFound, setNotFound] = useState(false)
 
     const handleSendFriendRequest = (userPossibleFriend: UsersSearch) => {
         ConfirmationDialog({
@@ -91,6 +83,11 @@ export const SearchUsers = ({ open, close }) => {
         setLoading(true);
         API.$users.select_users({ search: inputUserSearchForUsers })
             .then((response: UsersSearchResponse) => {
+                if (response.data.length === 0) {
+                    setNotFound(true)
+                } else {
+                    setNotFound(false)
+                }
                 setUsersSearched(response.data);
             })
             .catch((error: any) => {
@@ -111,39 +108,27 @@ export const SearchUsers = ({ open, close }) => {
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
-            <Modal animationType="slide"
+            <Modal animationType="fade"
                 transparent={true}
-
                 visible={open}
                 onRequestClose={toggleModal}>
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>Usuários</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            value={inputUserSearchForUsers}
-                            onChangeText={setinputUserSearchForUsers}
-                            placeholder="Digite o nome de usuário"                            
-                        />
-                        <TouchableOpacity
-                            onPress={handleSearch}
-                            disabled={inputUserSearchForUsers.length === 0}
-                            style={styles.searchButton}
-                        >
+                        <TextInput style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
+                        <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForUsers.length === 0} style={styles.searchButton}>
                             <Text style={styles.searchButtonText}>Pesquisar</Text>
                         </TouchableOpacity>
                     </View>
+                    <TouchableOpacity onPress={() => { Alert.alert('Ops', 'Essa funcionalidade não está pronta ainda.') }} style={styles.inviteButton}>
+                        <Text style={styles.inviteButtonText}>Não encontrou? Convide seus amigos.</Text>
+                    </TouchableOpacity>
+                    {notFound && <Text style={styles.notFoundText}>Nenhum usuário encontrado.</Text>}
                     {loading && <LoaderUnique />}
-
-                    <FlatList
-                        data={usersSearched}
-                        renderItem={({ item: user }) => (<UserItem action={() => handleSendFriendRequest(user)} key={user.id} id={user.id} image={user.image} name={user.name} subtitle={user.username} />)}
-                        style={styles.list}
-                    />
+                    <FlatList data={usersSearched} renderItem={({ item: user }) => (<UserItem action={() => handleSendFriendRequest(user)} key={user.id} id={user.id} image={user.image} name={user.name} subtitle={user.username} />)} style={styles.list} />
                     <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
                         <Text style={styles.modalButtonText}>Fechar</Text>
                     </TouchableOpacity>
-
                 </View>
             </Modal>
         </>
@@ -206,10 +191,28 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             alignItems: 'center',
             justifyContent: 'center',
         },
+        inviteButton: {
+            width: "auto",
+            borderRadius: 25,
+            padding: 15,
+            justifyContent: 'center',
+        },
         searchButtonText: {
             fontFamily: 'Sansation Regular',
             fontSize: 16,
             color: theme.QUATERNARY,
+        },
+        inviteButtonText: {
+            fontFamily: 'Sansation Regular',
+            fontSize: 16,
+            color: theme.SECONDARY,
+            textDecorationLine: 'underline'
+        },
+        notFoundText: {
+            textAlign: 'center',
+            fontFamily: 'Sansation Regular',
+            fontSize: 18,
+            color: theme.SECONDARY,
         },
         list: {
             width: '100%'

@@ -16,7 +16,7 @@ import API from '../../utils/API';
 import { Chat } from '../../components/Chat';
 import LoaderUnique from '../../components/LoaderUnique';
 import SocialChatStack from './Chat';
-import { AddUserFriendIcon, ChatIcon, ChatsIcon } from '../../components/IconsButton';
+import { AddUserFriendIcon, ChatIcon, FriendsIcon, SocialIcon, TeamsIcon } from '../../components/IconsButton';
 import { Image } from 'react-native-elements';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import Notification from '../../components/Notification';
@@ -26,6 +26,7 @@ import Dark from '../../utils/Theme/Dark';
 import Light from '../../utils/Theme/Light';
 import { SearchUsers } from '../../components/SearchUsers';
 import { SearchFriendsAndSolicitations } from '../../components/SearchFriendsAndSolicitations';
+import { SearchTeamsAndSolicitations } from '../../components/SearchTeamsAndSolicitations';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -103,77 +104,18 @@ export const Social = ({ navigation }) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const [loading, setLoading] = useState(false);
-  const [chats, setChats] = useState<Chat[] | null>(null);
-
-  const [friends, setFriends] = useState<Friend[] | null>(null);
-  const [friendsReceived, setFriendsReceived] = useState<Friend[] | null>(null);
-  const [friendsRequested, setFriendsRequested] = useState<Friend[] | null>(null);
-
-  // variáveis para controlar aparecimento de modais.
-  const [isSearchUsersModalVisible, setIsSearchUsersModalVisible] = useState(false);
-  const [isFriendsModalVisible, setIsFriendsModalVisible] = useState(false);
-
   const [notification, setNotification] = useState({
     message: '',
     success: false,
     visible: false,
   });
-  const handleAcceptRequest = (userPossibleFriend: UsersSearch) => {
-    ConfirmationDialog({
-      title: 'Confirmação',
-      message: 'Deseja aceitar o pedido de amizade?',
-      onConfirm: async () => {
-        setLoading(true);
-        API.$friends.accept_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
-          .then((response) => {
-            setNotification({
-              message: 'Pedido de amizade aceito com sucesso!',
-              success: true,
-              visible: true,
-            });
-            fetchFriends();
-          })
-          .catch((error: any) => {
-            setNotification({
-              message: 'Não conseguimos aceitar o pedido de amizade :(',
-              success: false,
-              visible: true,
-            });
-          }).finally(() => {
-            setLoading(false);
-          })
-      },
-      onCancel: () => { },
-    });
-  };
-  const handleChatToUser = (friend: UsersSearch) => {
-    ConfirmationDialog({
-      title: 'Confirmação',
-      message: 'Deseja iniciar uma conversa?',
-      onConfirm: async () => {
-        setLoading(true);
-        API.$chat.post_chats({ username_user_1: user.username, username_user_2: friend.username })
-          .then((response) => {
-            toggleFriendsModal();
-            navigate(navigation,
-              screens.SocialChatStack.name as keyof RootStackParamList,
-              isAuthenticated,
-              user, { chat_id: response.data.chat_id, friend: friend.name, image: friend.image })
-          })
-          .catch((error: any) => {
-            console.log(error);
-            setNotification({
-              message: 'Não conseguimos iniciar uma conversa :(',
-              success: false,
-              visible: true,
-            });
-          }).finally(() => {
-            setLoading(false);
-          })
-      },
-      onCancel: () => { },
-    });
-  };
+
+  // variáveis para controlar aparecimento de modais.
+  const [isFriendsModalVisible, setIsFriendsModalVisible] = useState(false);
+  const [isTeamsModalVisible, setIsTeamsModalVisible] = useState(false);
+
+  const [chats, setChats] = useState<Chat[] | null>(null);
+
   const fetchChat = () => {
     setLoading(true);
     API.$chat.select_chats({ idToken: user.idToken }).then((response: ChatResponse) => {
@@ -184,24 +126,11 @@ export const Social = ({ navigation }) => {
       setLoading(false);
     })
   };
-  const fetchFriends = () => {
-    setLoading(true);
-    API.$friends.list_friends({ username: user.username }).then((response: FriendsResponse) => {
-      setFriends(response.data.friends)
-      setFriendsReceived(response.data.received_friends)
-      setFriendsRequested(response.data.requested_friends)
-    }).catch((erro: any) => {
-      console.log(erro)
-    }).finally(() => {
-      setLoading(false);
-    })
-  };
   const toggleFriendsModal = () => {
-    if (!isFriendsModalVisible) { fetchFriends(); }
     setIsFriendsModalVisible(!isFriendsModalVisible);
   };
-  const toggleSearchUsersModal = () => {
-    setIsSearchUsersModalVisible(!isSearchUsersModalVisible);
+  const toggleTeamsModal = () => {
+    setIsTeamsModalVisible(!isTeamsModalVisible);
   };
   useEffect(() => {
     fetchChat();
@@ -223,10 +152,7 @@ export const Social = ({ navigation }) => {
               <Text style={styles.title}>Social</Text>
             </View>
             <View style={styles.row}>
-              <Text style={styles.subtitle}>Amigos</Text>
-              <TouchableOpacity style={{ padding: 10 }} onPress={toggleSearchUsersModal}>
-                <AddUserFriendIcon color={theme.SECONDARY} />
-              </TouchableOpacity>
+              <Text style={styles.subtitle}>Chat</Text>
             </View>
             <View style={{ ...styles.col, borderTopWidth: 1.5, borderColor: theme.TERTIARY }}>
               {loading && <LoaderUnique />}
@@ -245,12 +171,13 @@ export const Social = ({ navigation }) => {
         )}
         style={styles.container}
       />
-      <SearchUsers open={isSearchUsersModalVisible} close={toggleSearchUsersModal} />
       <SearchFriendsAndSolicitations open={isFriendsModalVisible} close={toggleFriendsModal} navigation={navigation} />
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={toggleFriendsModal}>
-        <ChatsIcon color={theme.SECONDARY} />
+      <SearchTeamsAndSolicitations open={isTeamsModalVisible} close={toggleTeamsModal} navigation={navigation} />
+      <TouchableOpacity style={styles.teams} onPress={toggleTeamsModal}>
+        <TeamsIcon color={theme.SECONDARY} />
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.friends} onPress={toggleFriendsModal}>
+        <FriendsIcon color={theme.SECONDARY} />
       </TouchableOpacity>
     </>
   );
@@ -258,9 +185,25 @@ export const Social = ({ navigation }) => {
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
   StyleSheet.create({
-    addButton: {
+    friends: {
       position: 'absolute',
       right: 20,
+      bottom: 20,
+      width: 60,
+      height: 60,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.PRIMARY, // Substitua pela cor desejada
+      borderRadius: 30,
+      elevation: 5, // Sombra para Android
+      shadowColor: '#000', // Sombra para iOS
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    teams: {
+      position: 'absolute',
+      left: 20,
       bottom: 20,
       width: 60,
       height: 60,
@@ -365,12 +308,6 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       height: 40,
       marginRight: 10,
     },
-    headerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginVertical: 15,
-    },
     row: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -391,6 +328,13 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       fontSize: 18,
       marginHorizontal: 10,
       color: theme.SECONDARY,
+    },
+    
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 15,
     },
     text: {
       fontFamily: 'Sansation Regular',

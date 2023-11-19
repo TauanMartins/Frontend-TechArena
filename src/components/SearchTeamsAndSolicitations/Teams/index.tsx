@@ -11,11 +11,11 @@ import { screens } from '../../../navigation/ScreenProps';
 import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import API from '../../../utils/API';
-import LoaderUnique from '../../LoaderUnique';
-import { ChatIcon } from '../../IconsButton';
+import LoaderUnique from '../../../components/LoaderUnique';
+import { ChatIcon } from '../../../components/IconsButton';
 import { Image } from 'react-native-elements';
-import ConfirmationDialog from '../../ConfirmationDialog';
-import Notification from '../../Notification';
+import ConfirmationDialog from '../../../components/ConfirmationDialog';
+import Notification from '../../../components/Notification';
 import { navigate } from '../../../navigation/NavigationUtils';
 import Dark from '../../../utils/Theme/Dark';
 import Light from '../../../utils/Theme/Light';
@@ -27,7 +27,7 @@ export const TeamItem = ({ user, action }) => {
     return (
         <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
             <View style={{ flex: 1 }}>
-                <UserItem border={false} action={() => {action(user)  }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
             </View>
             <ChatIcon color={theme.SECONDARY} />
         </TouchableOpacity>
@@ -48,11 +48,7 @@ interface Friend {
     username: string;
 }
 
-interface FriendsResponse {
-    data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
-}
-
-const Friends = ({ open, close, navigation }) => {
+const Teams = ({ navigation, teams, close }) => {
     // Definição padrão para qualquer componente
 
     const { user, isAuthenticated } = useAuth();
@@ -67,8 +63,6 @@ const Friends = ({ open, close, navigation }) => {
 
     // -----------------------------------------------------
 
-    const [friends, setFriends] = useState<Friend[] | null>(null);
-
     const handleChatToUser = (friend: UsersSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
@@ -77,7 +71,7 @@ const Friends = ({ open, close, navigation }) => {
                 setLoading(true);
                 API.$chat.post_chats({ username_user_1: user.username, username_user_2: friend.username })
                     .then((response) => {
-                        toggleModal();
+                        close();
                         navigate(navigation,
                             screens.SocialChatStack.name as keyof RootStackParamList,
                             isAuthenticated,
@@ -97,20 +91,6 @@ const Friends = ({ open, close, navigation }) => {
             onCancel: () => { },
         });
     };
-    const fetchFriends = () => {
-        setLoading(true);
-        API.$friends.list_friends({ username: user.username }).then((response: FriendsResponse) => {
-            setFriends(response.data.friends)
-        }).catch((erro: any) => {
-            console.log(erro)
-        }).finally(() => {
-            setLoading(false);
-        })
-    };
-    const toggleModal = () => {
-        if (!open) { fetchFriends(); }
-        close();
-    };
 
     return (
         <>
@@ -119,26 +99,14 @@ const Friends = ({ open, close, navigation }) => {
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={open}
-                onShow={fetchFriends}
-                onRequestClose={toggleModal}
-            >
-                <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
-                    {loading && <LoaderUnique />}
-                    <Text style={styles.modalText}>Amigos</Text>
-                    <FlatList
-                        data={friends}
-                        renderItem={({ item: user }) => (<TeamItem action={() => handleChatToUser(user)} key={user.id} user={user} />)}
-                        style={styles.list}
-                    />
-                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-                        <Text style={styles.modalButtonText}>Fechar</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal>
+            <View style={styles.modalView}>
+                {loading && <LoaderUnique />}
+                <FlatList
+                    data={teams}
+                    renderItem={({ item: user }) => (<TeamItem action={() => handleChatToUser(user)} key={user.id} user={user} />)}
+                    style={styles.list}
+                />
+            </View>
         </>
     );
 };
@@ -155,11 +123,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             justifyContent: 'center', // Conteúdo alinhado ao topo
             backgroundColor: theme.PRIMARY,
             flex: 1,
-            borderRadius: 25,
-            elevation: 5,
-            padding: 5,
-            paddingHorizontal: 15,
-            margin: 30
+            width: '100%',
         },
         modalText: {
             marginTop: 30,
@@ -216,4 +180,4 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
         },
     });
 
-export default Friends;
+export default Teams;

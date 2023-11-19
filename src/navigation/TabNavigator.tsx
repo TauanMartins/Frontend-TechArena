@@ -40,7 +40,7 @@ export const TabNavigator = () => {
         tabBarStyle: {
           borderTopWidth: 0,
           elevation: 10,
-          maxHeight: 40,
+          maxHeight: 30,
           backgroundColor: theme.PRIMARY,
           display: keyboardVisible ? 'none' : 'flex'
         },
@@ -96,7 +96,7 @@ export const TabNavigator = () => {
             <SocialIcon
               isActive={navigation.isFocused()}
               color={theme.SECONDARY}
-              size={24}
+              size={26}
             />
           ),
         })}

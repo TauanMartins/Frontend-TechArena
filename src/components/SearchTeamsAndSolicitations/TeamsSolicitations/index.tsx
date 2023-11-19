@@ -4,32 +4,43 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    Modal, FlatList
+    FlatList
 } from 'react-native';
 import { useTheme } from '../../../utils/Theme/ThemeContext';
-import { screens } from '../../../navigation/ScreenProps';
-import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import API from '../../../utils/API';
-import LoaderUnique from '../../../components/LoaderUnique';
-import { ChatIcon } from '../../../components/IconsButton';
-import { Image } from 'react-native-elements';
-import ConfirmationDialog from '../../../components/ConfirmationDialog';
-import Notification from '../../../components/Notification';
-import { navigate } from '../../../navigation/NavigationUtils';
+import LoaderUnique from '../../LoaderUnique';
+import ConfirmationDialog from '../../ConfirmationDialog';
+import Notification from '../../Notification';
 import Dark from '../../../utils/Theme/Dark';
 import Light from '../../../utils/Theme/Light';
 import { UserItem } from '../../UserItem';
 
-export const TeamSolicitationItem = ({ user, action }) => {
+export const FriendSolicitationRequestedItem = ({ user, action }) => {
     const { theme } = useTheme();
-    const styles = createStyles(theme);
     return (
         <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
             <View style={{ flex: 1 }}>
-                <UserItem border={false} action={() => {action(user)  }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
             </View>
-            <ChatIcon color={theme.SECONDARY} />
+            <Text style={{
+                color: theme.SECONDARY, fontFamily: 'Sansation Regular',
+                fontSize: 12
+            }}>Pendente</Text>
+        </TouchableOpacity>
+    )
+};
+export const FriendSolicitationReceivedItem = ({ user, action }) => {
+    const { theme } = useTheme();
+    return (
+        <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
+            <View style={{ flex: 1 }}>
+                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+            </View>
+            <Text style={{
+                color: theme.SECONDARY, fontFamily: 'Sansation Regular',
+                fontSize: 12
+            }}>Aceitar</Text>
         </TouchableOpacity>
     )
 };
@@ -48,14 +59,10 @@ interface Friend {
     username: string;
 }
 
-interface FriendsResponse {
-    data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
-}
-
-const Friends = ({ open, close, navigation }) => {
+const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequested, search }) => {
     // Definição padrão para qualquer componente
 
-    const { user, isAuthenticated } = useAuth();
+    const { user } = useAuth();
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const [loading, setLoading] = useState(false);
@@ -66,27 +73,29 @@ const Friends = ({ open, close, navigation }) => {
     });
 
     // -----------------------------------------------------
+    const combinedData = [
+        ...teamsSolicitationsReceived.map((item: Friend) => ({ ...item, type: 'received' })),
+        ...teamsSolicitationsRequested.map((item: Friend) => ({ ...item, type: 'requested' })),
+    ];
 
-    const [friends, setFriends] = useState<Friend[] | null>(null);
-
-    const handleChatToUser = (friend: UsersSearch) => {
+    const handleAcceptRequest = (userPossibleFriend: UsersSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
-            message: 'Deseja iniciar uma conversa?',
+            message: 'Deseja aceitar o pedido de amizade?',
             onConfirm: async () => {
                 setLoading(true);
-                API.$chat.post_chats({ username_user_1: user.username, username_user_2: friend.username })
+                API.$friends.accept_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
                     .then((response) => {
-                        toggleModal();
-                        navigate(navigation,
-                            screens.SocialChatStack.name as keyof RootStackParamList,
-                            isAuthenticated,
-                            user, { chat_id: response.data.chat_id, friend: friend.name, image: friend.image })
+                        setNotification({
+                            message: 'Pedido de amizade aceito com sucesso!',
+                            success: true,
+                            visible: true,
+                        });
+                        search();
                     })
                     .catch((error: any) => {
-                        console.log(error);
                         setNotification({
-                            message: 'Não conseguimos iniciar uma conversa :(',
+                            message: 'Não conseguimos aceitar o pedido de amizade :(',
                             success: false,
                             visible: true,
                         });
@@ -97,20 +106,6 @@ const Friends = ({ open, close, navigation }) => {
             onCancel: () => { },
         });
     };
-    const fetchFriends = () => {
-        setLoading(true);
-        API.$friends.list_friends({ username: user.username }).then((response: FriendsResponse) => {
-            setFriends(response.data.friends)
-        }).catch((erro: any) => {
-            console.log(erro)
-        }).finally(() => {
-            setLoading(false);
-        })
-    };
-    const toggleModal = () => {
-        if (!open) { fetchFriends(); }
-        close();
-    };
 
     return (
         <>
@@ -119,26 +114,31 @@ const Friends = ({ open, close, navigation }) => {
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={open}
-                onShow={fetchFriends}
-                onRequestClose={toggleModal}
-            >
-                <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
-                    {loading && <LoaderUnique />}
-                    <Text style={styles.modalText}>Amigos</Text>
-                    <FlatList
-                        data={friends}
-                        renderItem={({ item: user }) => (<TeamSolicitationItem action={() => handleChatToUser(user)} key={user.id} user={user} />)}
-                        style={styles.list}
-                    />
-                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-                        <Text style={styles.modalButtonText}>Fechar</Text>
-                    </TouchableOpacity>
-                </View>
-            </Modal>
+            <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
+                {loading && <LoaderUnique />}
+                <FlatList
+                    data={combinedData}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({ item }) => {
+                        if (item.type === 'received') {
+                            return (
+                                <FriendSolicitationReceivedItem
+                                    action={() => handleAcceptRequest(item)}
+                                    user={item}
+                                />
+                            );
+                        } else {
+                            return (
+                                <FriendSolicitationRequestedItem
+                                    action={() => {}} 
+                                    user={item}
+                                />
+                            );
+                        }
+                    }}
+                    style={styles.list}
+                />
+            </View>
         </>
     );
 };
@@ -155,11 +155,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             justifyContent: 'center', // Conteúdo alinhado ao topo
             backgroundColor: theme.PRIMARY,
             flex: 1,
-            borderRadius: 25,
-            elevation: 5,
-            padding: 5,
-            paddingHorizontal: 15,
-            margin: 30
+            width: '100%',
         },
         modalText: {
             marginTop: 30,
@@ -216,4 +212,4 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
         },
     });
 
-export default Friends;
+export default TeamsSolicitations;

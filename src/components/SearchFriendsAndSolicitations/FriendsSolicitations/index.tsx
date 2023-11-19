@@ -61,7 +61,6 @@ interface Friend {
 
 const FriendsSolicitations = ({ friendsSolicitationsReceived, friendsSolicitationsRequested, search }) => {
     // Definição padrão para qualquer componente
-
     const { user } = useAuth();
     const { theme } = useTheme();
     const styles = createStyles(theme);
@@ -116,10 +115,12 @@ const FriendsSolicitations = ({ friendsSolicitationsReceived, friendsSolicitatio
                 onClose={() => setNotification({ ...notification, visible: false })} />
             <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
                 {loading && <LoaderUnique />}
-                <Text style={styles.modalText}>Solicitações de Amizade</Text>
                 <FlatList
                     data={combinedData}
                     keyExtractor={item => item.id.toString()}
+                    ListEmptyComponent={(
+                        <Text style={styles.text}>Opa, nada para ver aqui.</Text>
+                    )}
                     renderItem={({ item }) => {
                         if (item.type === 'received') {
                             return (
@@ -131,7 +132,7 @@ const FriendsSolicitations = ({ friendsSolicitationsReceived, friendsSolicitatio
                         } else {
                             return (
                                 <FriendSolicitationRequestedItem
-                                    action={() => {}} 
+                                    action={() => { }}
                                     user={item}
                                 />
                             );
@@ -147,6 +148,12 @@ const FriendsSolicitations = ({ friendsSolicitationsReceived, friendsSolicitatio
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
+        text: {
+            textAlign: 'center',
+            fontFamily: 'Sansation Regular',
+            fontSize: 13,
+            color: theme.SECONDARY,
+        },
         list: {
             flex: 1,
             width: '100%'

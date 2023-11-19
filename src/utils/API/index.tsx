@@ -6,7 +6,7 @@ import Messages from './Messages';
 import Friends from './Friends';
 
 const API = axios.create({
-  baseURL: 'https://api.techarena.com.br/api',
+  baseURL: 'http://10.0.2.2:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },

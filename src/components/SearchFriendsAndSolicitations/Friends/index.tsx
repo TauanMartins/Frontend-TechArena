@@ -12,7 +12,7 @@ import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import API from '../../../utils/API';
 import LoaderUnique from '../../../components/LoaderUnique';
-import { ChatIcon } from '../../../components/IconsButton';
+import { AddUserFriendIcon, ChatIcon } from '../../../components/IconsButton';
 import { Image } from 'react-native-elements';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import Notification from '../../../components/Notification';
@@ -52,7 +52,7 @@ interface FriendsResponse {
     data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
 }
 
-const Friends = ({ navigation, friends, close }) => {
+const Friends = ({ navigation, friends, close, closeSearchUsersModal }) => {
     // Definição padrão para qualquer componente
 
     const { user, isAuthenticated } = useAuth();
@@ -105,8 +105,13 @@ const Friends = ({ navigation, friends, close }) => {
                 onClose={() => setNotification({ ...notification, visible: false })} />
             <View style={styles.modalView}>
                 {loading && <LoaderUnique />}
-                <Text style={styles.modalText}>Amigos</Text>
                 <FlatList
+                    ListHeaderComponent={(
+                        <TouchableOpacity style={styles.headerRow} onPress={() => { closeSearchUsersModal() }}>
+                            <AddUserFriendIcon color={theme.QUATERNARY} />
+                            <Text style={styles.text}>Adicionar amigo</Text>
+                        </TouchableOpacity>
+                    )}
                     data={friends}
                     renderItem={({ item: user }) => (<FriendItem action={() => handleChatToUser(user)} key={user.id} user={user} />)}
                     style={styles.list}
@@ -119,6 +124,23 @@ const Friends = ({ navigation, friends, close }) => {
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
+        headerRow: {
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            width: '100%',
+            backgroundColor: theme.TERTIARY,
+            borderRadius: 25,
+            padding: 10
+        },
+        text: {
+            fontFamily: 'Sansation Regular',
+            fontSize: 13,
+            color: theme.QUATERNARY,
+        },
+
         list: {
             flex: 1,
             width: '100%'

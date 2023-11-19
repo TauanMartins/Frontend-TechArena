@@ -12,30 +12,28 @@ import API from '../../utils/API';
 import Notification from '../../components/Notification';
 import Dark from '../../utils/Theme/Dark';
 import Light from '../../utils/Theme/Light';
-import Friends from './Friends';
-import FriendsSolicitations from './FriendsSolicitations';
+import Teams from './Teams';
+import TeamsSolicitations from './TeamsSolicitations';
 import LoaderUnique from '../LoaderUnique';
-import { SearchUsers } from '../SearchUsers';
-interface Friend {
+interface Team {
   id: number;
   name: string;
   image: string;
-  username: string;
 }
 
-interface FriendsResponse {
-  data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
+interface TeamsResponse {
+  data: { teams: Team[], received_teams: Team[], requested_teams: Team[] };
 }
 
 const TabButton = ({ title, onPress, isActive, styles }) => (
-  <TouchableOpacity style={[styles.tabButton, isActive && styles.tabButtonActive]} onPress={() => { onPress() }}  >
+  <TouchableOpacity style={[styles.tabButton, isActive && styles.tabButtonActive]} onPress={() => { console.log('aaa'); onPress() }}  >
     <Text style={[styles.tabButtonText, isActive && styles.tabButtonTextActive]}>
       {title}
     </Text>
   </TouchableOpacity>
 );
 
-export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
+export const SearchTeamsAndSolicitations = ({ open, close, navigation }) => {
   // Definição padrão para qualquer componente
   const { user } = useAuth();
   const { theme } = useTheme();
@@ -49,36 +47,28 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
   // -----------------------------------------------------
 
   // Variável que controla a aba aberta
-  const [activeTab, setActiveTab] = useState('Amigos');
+  const [activeTab, setActiveTab] = useState('Times');
 
   // Variáveis para controlar o recebimento de amigos e solicitações.
-  const [friends, setFriends] = useState<Friend[] | null>(null);
-  const [receivedSolicitations, setReceivedSolicitations] = useState<Friend[] | null>(null);
-  const [requestedSolicitations, setRequestedSolicitations] = useState<Friend[] | null>(null);
+  const [teams, setTeams] = useState<Team[] | null>([]);
+  const [receivedSolicitations, setReceivedSolicitations] = useState<Team[] | null>([]);
+  const [requestedSolicitations, setRequestedSolicitations] = useState<Team[] | null>([]);
 
-  // Variável para controlar o aparecimento da modal de procurar usuários
-  const [isSearchUsersModalVisible, setIsSearchUsersModalVisible] = useState(false);
-
-  const fetchFriendsAndSolicitations = () => {
+  const fetchTeamsAndSolicitations = () => {
     setLoading(true);
-    API.$friends.list_friends({ username: user.username }).then((response: FriendsResponse) => {
-      setFriends(response.data.friends)
-      setReceivedSolicitations(response.data.received_friends)
-      setRequestedSolicitations(response.data.requested_friends)
+    API.$friends.list_friends({ username: user.username }).then((response: TeamsResponse) => {
+      setTeams(response.data.teams)
+      setReceivedSolicitations(response.data.received_teams)
+      setRequestedSolicitations(response.data.requested_teams)
     }).catch((erro: any) => {
-      console.log(erro);
+      console.log(erro)
     }).finally(() => {
       setLoading(false);
     })
   };
   const toggleModal = () => {
-    if (!open) { fetchFriendsAndSolicitations(); }
+    if (!open) { fetchTeamsAndSolicitations(); }
     close();
-  };
-
-  const toggleSearchUsersModal = () => {
-    fetchFriendsAndSolicitations();
-    setIsSearchUsersModalVisible(!isSearchUsersModalVisible);
   };
 
   return (
@@ -92,13 +82,13 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
         animationType="slide"
         transparent={true}
         visible={open}
-        onShow={fetchFriendsAndSolicitations}
+        onShow={fetchTeamsAndSolicitations}
         onRequestClose={toggleModal}
       >
         <View style={styles.modalView}>
           {loading && <LoaderUnique />}
           <View style={styles.tabBar}>
-            {['Amigos', 'Solicitações de Amizade'].map((tab) => (
+            {['Times', 'Solicitações de Times'].map((tab) => (
               <TabButton
                 key={tab}
                 title={tab}
@@ -108,18 +98,16 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
               />
             ))}
           </View>
-          {activeTab === 'Amigos' && (
-            <Friends navigation={navigation} friends={friends} close={toggleModal} closeSearchUsersModal={toggleSearchUsersModal} />
+          {activeTab === 'Times' && (
+            <Teams navigation={navigation} teams={teams} close={toggleModal} />
           )}
-          {activeTab === 'Solicitações de Amizade' && (
-            <FriendsSolicitations friendsSolicitationsReceived={receivedSolicitations} friendsSolicitationsRequested={requestedSolicitations} search={fetchFriendsAndSolicitations} />
+          {activeTab === 'Solicitações de Times' && (
+            <TeamsSolicitations teamsSolicitationsReceived={receivedSolicitations} teamsSolicitationsRequested={requestedSolicitations} search={fetchTeamsAndSolicitations} />
           )}
           <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
             <Text style={styles.modalButtonText}>Fechar</Text>
           </TouchableOpacity>
         </View>
-
-        <SearchUsers open={isSearchUsersModalVisible} close={toggleSearchUsersModal} />
       </Modal>
     </>
   );
@@ -148,7 +136,10 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       fontSize: 13,
     },
     tabButtonTextActive: {
-      color: theme.QUATERNARY,
+      fontFamily: 'Sansation Regular',
+      textAlign: 'center',
+      color: theme.PRIMARY,
+      fontSize: 13,
     },
     list: {
       flex: 1,
