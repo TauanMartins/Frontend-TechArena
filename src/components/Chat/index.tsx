@@ -14,7 +14,7 @@ import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { AvatarImage } from '../AvatarImage';
 
-export const Chat = ({ id, image, name, message, navigation, isAuthenticated, user }) => {
+export const Chat = ({ id, image, name, message, navigation, isAuthenticated, user, is_group_chat }) => {
   const { theme } = useTheme();
   const styles = createStyles(theme);
   return (
@@ -23,7 +23,7 @@ export const Chat = ({ id, image, name, message, navigation, isAuthenticated, us
         navigation,
         screens.SocialChatStack.name as keyof RootStackParamList,
         isAuthenticated,
-        user, { chat_id: id, friend: name, image: image })
+        user, { chat_id: id, name: name, image: image, is_group_chat: is_group_chat })
     }} style={styles.chat_button}>
       <AvatarImage image={image}/>
       <View style={styles.chat_content}>

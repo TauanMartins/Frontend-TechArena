@@ -4,6 +4,7 @@ import UserSensitiveInformation from './UserSensitiveInformation';
 import Chats from './Chats';
 import Messages from './Messages';
 import Friends from './Friends';
+import Teams from './Teams';
 
 const API = axios.create({
   baseURL: 'http://10.0.2.2:8000/api',
@@ -21,18 +22,32 @@ const API_2 = axios.create({
 });
 
 const $users = Users(API)('/users');
+const $users_team = Users(API)('/users/team');
 const $users_prefered_theme = Users(API)('/users/theme');
 const $users_sensitive_information =  UserSensitiveInformation(API_2)('/people/me');
 const $chat =  Chats(API)('/chat');
+const $chat_group_detail =  Chats(API)('/chat/group/detail');
+const $chat_user_detail =  Chats(API)('/chat/private/detail');
+const $chat_team =  Chats(API)('/chat/team');
 const $messages =  Messages(API)('/message');
 const $friends =  Friends(API)('/friend');
+const $teams =  Teams(API)('/team');
+const $teams_owner =  Teams(API)('/team/user');
+const $teamsCheck =  Teams(API)('/team/exist');
 
 export default {
   $users,
+  $users_team,
   $users_prefered_theme,
   $users_sensitive_information,
   $chat,
+  $chat_team,
   $messages,
-  $friends
+  $friends,
+  $teams,
+  $teamsCheck,
+  $chat_user_detail,
+  $chat_group_detail,
+  $teams_owner
 
 };

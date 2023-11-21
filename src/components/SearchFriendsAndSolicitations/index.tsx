@@ -77,17 +77,12 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
   };
 
   const toggleSearchUsersModal = () => {
-    fetchFriendsAndSolicitations();
     setIsSearchUsersModalVisible(!isSearchUsersModalVisible);
   };
 
   return (
     <>
-      <Notification
-        message={notification.message}
-        success={notification.success}
-        visible={notification.visible}
-        onClose={() => setNotification({ ...notification, visible: false })} />
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -96,7 +91,7 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
         onRequestClose={toggleModal}
       >
         <View style={styles.modalView}>
-          {loading && <LoaderUnique />}
+
           <View style={styles.tabBar}>
             {['Amigos', 'Solicitações de Amizade'].map((tab) => (
               <TabButton
@@ -109,7 +104,7 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
             ))}
           </View>
           {activeTab === 'Amigos' && (
-            <Friends navigation={navigation} friends={friends} close={toggleModal} closeSearchUsersModal={toggleSearchUsersModal} />
+            <Friends navigation={navigation} friends={friends} close={toggleModal} toggleSearchUsersModal={toggleSearchUsersModal} />
           )}
           {activeTab === 'Solicitações de Amizade' && (
             <FriendsSolicitations friendsSolicitationsReceived={receivedSolicitations} friendsSolicitationsRequested={requestedSolicitations} search={fetchFriendsAndSolicitations} />
@@ -118,9 +113,14 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
             <Text style={styles.modalButtonText}>Fechar</Text>
           </TouchableOpacity>
         </View>
-
         <SearchUsers open={isSearchUsersModalVisible} close={toggleSearchUsersModal} />
       </Modal>
+      <Notification
+        message={notification.message}
+        success={notification.success}
+        visible={notification.visible}
+        onClose={() => setNotification({ ...notification, visible: false })} />
+      {loading && <LoaderUnique />}
     </>
   );
 };

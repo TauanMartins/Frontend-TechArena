@@ -16,12 +16,12 @@ import Dark from '../../../utils/Theme/Dark';
 import Light from '../../../utils/Theme/Light';
 import { UserItem } from '../../UserItem';
 
-export const FriendSolicitationRequestedItem = ({ user, action }) => {
+export const TeamSolicitationRequestedItem = ({ team, action }) => {
     const { theme } = useTheme();
     return (
-        <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
+        <TouchableOpacity onPress={() => { action(team) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
             <View style={{ flex: 1 }}>
-                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+                <UserItem border={false} action={() => { action(team) }} image={team.image} name={team.name} id={team.id} subtitle={(team.description).substring(0, 100) + '...'} key={team.id} />
             </View>
             <Text style={{
                 color: theme.SECONDARY, fontFamily: 'Sansation Regular',
@@ -30,12 +30,12 @@ export const FriendSolicitationRequestedItem = ({ user, action }) => {
         </TouchableOpacity>
     )
 };
-export const FriendSolicitationReceivedItem = ({ user, action }) => {
+export const TeamSolicitationReceivedItem = ({ team, action }) => {
     const { theme } = useTheme();
     return (
-        <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
+        <TouchableOpacity onPress={() => { action(team) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
             <View style={{ flex: 1 }}>
-                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+                <UserItem border={false} action={() => { action(team) }} image={team.image} name={team.name} id={team.id} subtitle={(team.description).substring(0, 100) + '...'} key={team.id} />
             </View>
             <Text style={{
                 color: theme.SECONDARY, fontFamily: 'Sansation Regular',
@@ -52,14 +52,13 @@ interface UsersSearch {
     username: string;
 }
 
-interface Friend {
+interface Team {
     id: number;
     name: string;
     image: string;
-    username: string;
 }
 
-const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequested, search }) => {
+const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequested }) => {
     // Definição padrão para qualquer componente
 
     const { user } = useAuth();
@@ -74,28 +73,28 @@ const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequ
 
     // -----------------------------------------------------
     const combinedData = [
-        ...teamsSolicitationsReceived.map((item: Friend) => ({ ...item, type: 'received' })),
-        ...teamsSolicitationsRequested.map((item: Friend) => ({ ...item, type: 'requested' })),
+        ...teamsSolicitationsReceived.map((item: Team) => ({ ...item, type: 'received' })),
+        ...teamsSolicitationsRequested.map((item: Team) => ({ ...item, type: 'requested' })),
     ];
 
-    const handleAcceptRequest = (userPossibleFriend: UsersSearch) => {
+    const handleAcceptRequest = (userPossibleTeam: UsersSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
-            message: 'Deseja aceitar o pedido de amizade?',
+            message: 'Deseja aceitar o pedido de ingresso ao time?',
             onConfirm: async () => {
                 setLoading(true);
-                API.$friends.accept_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
+                API.$users_team.accept_team({ username: user.username, team_id: userPossibleTeam.id })
                     .then((response) => {
                         setNotification({
-                            message: 'Pedido de amizade aceito com sucesso!',
+                            message: 'Pedido aceito com sucesso!',
                             success: true,
                             visible: true,
                         });
-                        search();
                     })
                     .catch((error: any) => {
+                        console.log(error.message)
                         setNotification({
-                            message: 'Não conseguimos aceitar o pedido de amizade :(',
+                            message: `Não conseguimos aceitar o pedido :(\nCódigo do erro: ${error.message}`,
                             success: false,
                             visible: true,
                         });
@@ -114,30 +113,34 @@ const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequ
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
+            {loading && <LoaderUnique />}
             <View style={{ ...styles.modalView, backgroundColor: theme.PRIMARY }}>
-                {loading && <LoaderUnique />}
                 <FlatList
                     data={combinedData}
+                    ListEmptyComponent={(
+                        <Text style={styles.text}>Opa, nada para ver aqui.</Text>
+                    )}
                     keyExtractor={item => item.id.toString()}
                     renderItem={({ item }) => {
                         if (item.type === 'received') {
                             return (
-                                <FriendSolicitationReceivedItem
+                                <TeamSolicitationReceivedItem
                                     action={() => handleAcceptRequest(item)}
-                                    user={item}
+                                    team={item}
                                 />
                             );
                         } else {
                             return (
-                                <FriendSolicitationRequestedItem
-                                    action={() => {}} 
-                                    user={item}
+                                <TeamSolicitationRequestedItem
+                                    action={() => { }}
+                                    team={item}
                                 />
                             );
                         }
                     }}
                     style={styles.list}
                 />
+
             </View>
         </>
     );
@@ -146,6 +149,12 @@ const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequ
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
+        text: {
+            textAlign: 'center',
+            fontFamily: 'Sansation Regular',
+            fontSize: 13,
+            color: theme.SECONDARY,
+        },
         list: {
             flex: 1,
             width: '100%'

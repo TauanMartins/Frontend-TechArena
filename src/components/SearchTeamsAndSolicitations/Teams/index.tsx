@@ -12,7 +12,7 @@ import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import API from '../../../utils/API';
 import LoaderUnique from '../../../components/LoaderUnique';
-import { ChatIcon } from '../../../components/IconsButton';
+import { AddUserFriendIcon, ChatIcon } from '../../../components/IconsButton';
 import { Image } from 'react-native-elements';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import Notification from '../../../components/Notification';
@@ -21,13 +21,13 @@ import Dark from '../../../utils/Theme/Dark';
 import Light from '../../../utils/Theme/Light';
 import { UserItem } from '../../UserItem';
 
-export const TeamItem = ({ user, action }) => {
+export const TeamItem = ({ team, action }) => {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     return (
-        <TouchableOpacity onPress={() => { action(user) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
+        <TouchableOpacity onPress={() => { action(team) }} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderColor: theme.TERTIARY }}>
             <View style={{ flex: 1 }}>
-                <UserItem border={false} action={() => { action(user) }} image={user.image} name={user.name} id={user.id} subtitle={user.username} key={user.id} />
+                <UserItem border={false} action={() => { action(team) }} image={team.image} name={team.leader ? team.name + ' - Líder' : team.name} id={team.id} subtitle={(team.description).substring(0, 100) + '...'} key={team.id} />
             </View>
             <ChatIcon color={theme.SECONDARY} />
         </TouchableOpacity>
@@ -48,7 +48,7 @@ interface Friend {
     username: string;
 }
 
-const Teams = ({ navigation, teams, close }) => {
+const Teams = ({ navigation, teams, toggleSearchTeamsModal, toggleCreateTeamModal, search, close }) => {
     // Definição padrão para qualquer componente
 
     const { user, isAuthenticated } = useAuth();
@@ -63,19 +63,20 @@ const Teams = ({ navigation, teams, close }) => {
 
     // -----------------------------------------------------
 
-    const handleChatToUser = (friend: UsersSearch) => {
+    const handleChatToUser = (team: UsersSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
             message: 'Deseja iniciar uma conversa?',
             onConfirm: async () => {
                 setLoading(true);
-                API.$chat.post_chats({ username_user_1: user.username, username_user_2: friend.username })
+                API.$chat_team.post_chats_team({ username: user.username, team_id: team.id })
                     .then((response) => {
+                        console.log(response.data)
                         close();
                         navigate(navigation,
                             screens.SocialChatStack.name as keyof RootStackParamList,
                             isAuthenticated,
-                            user, { chat_id: response.data.chat_id, friend: friend.name, image: friend.image })
+                            user, { chat_id: response.data.chat_id, name: team.name, image: team.image, is_group_chat: true })
                     })
                     .catch((error: any) => {
                         console.log(error);
@@ -99,11 +100,23 @@ const Teams = ({ navigation, teams, close }) => {
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
+            {loading && <LoaderUnique />}
             <View style={styles.modalView}>
-                {loading && <LoaderUnique />}
                 <FlatList
+                    ListHeaderComponent={(
+                        <>
+                            <TouchableOpacity style={styles.headerRow} onPress={() => { toggleCreateTeamModal() }}>
+                                <AddUserFriendIcon color={theme.QUATERNARY} />
+                                <Text style={styles.text}>Criar time</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.headerRow} onPress={() => { toggleSearchTeamsModal() }}>
+                                <AddUserFriendIcon color={theme.QUATERNARY} />
+                                <Text style={styles.text}>Ingressar em time</Text>
+                            </TouchableOpacity>
+                        </>
+                    )}
                     data={teams}
-                    renderItem={({ item: user }) => (<TeamItem action={() => handleChatToUser(user)} key={user.id} user={user} />)}
+                    renderItem={({ item: team }) => (<TeamItem action={() => handleChatToUser(team)} key={team.id} team={team} />)}
                     style={styles.list}
                 />
             </View>
@@ -114,6 +127,23 @@ const Teams = ({ navigation, teams, close }) => {
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
+        headerRow: {
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+            alignContent: 'center',
+            alignItems: 'center',
+            flex: 1,
+            width: '100%',
+            backgroundColor: theme.TERTIARY,
+            borderRadius: 25,
+            padding: 10,
+            marginVertical: 5
+        },
+        text: {
+            fontFamily: 'Sansation Regular',
+            fontSize: 13,
+            color: theme.QUATERNARY,
+        },
         list: {
             flex: 1,
             width: '100%'

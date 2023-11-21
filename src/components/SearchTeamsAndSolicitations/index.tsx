@@ -15,6 +15,8 @@ import Light from '../../utils/Theme/Light';
 import Teams from './Teams';
 import TeamsSolicitations from './TeamsSolicitations';
 import LoaderUnique from '../LoaderUnique';
+import { SearchTeams } from '../SearchTeams';
+import { CreateTeam } from '../CreateTeam';
 interface Team {
   id: number;
   name: string;
@@ -26,7 +28,7 @@ interface TeamsResponse {
 }
 
 const TabButton = ({ title, onPress, isActive, styles }) => (
-  <TouchableOpacity style={[styles.tabButton, isActive && styles.tabButtonActive]} onPress={() => { console.log('aaa'); onPress() }}  >
+  <TouchableOpacity style={[styles.tabButton, isActive && styles.tabButtonActive]} onPress={() => { onPress() }}  >
     <Text style={[styles.tabButtonText, isActive && styles.tabButtonTextActive]}>
       {title}
     </Text>
@@ -54,9 +56,13 @@ export const SearchTeamsAndSolicitations = ({ open, close, navigation }) => {
   const [receivedSolicitations, setReceivedSolicitations] = useState<Team[] | null>([]);
   const [requestedSolicitations, setRequestedSolicitations] = useState<Team[] | null>([]);
 
+  // Variável para controlar o aparecimento da modal de procurar times
+  const [isSearchTeamsModalVisible, setIsSearchTeamsModalVisible] = useState(false);
+  const [isCreateTeamModalVisible, setIsCreateTeamModalVisible] = useState(false);
+
   const fetchTeamsAndSolicitations = () => {
     setLoading(true);
-    API.$friends.list_friends({ username: user.username }).then((response: TeamsResponse) => {
+    API.$users_team.select_user_teams({ idToken: user.idToken }).then((response: TeamsResponse) => {
       setTeams(response.data.teams)
       setReceivedSolicitations(response.data.received_teams)
       setRequestedSolicitations(response.data.requested_teams)
@@ -71,13 +77,17 @@ export const SearchTeamsAndSolicitations = ({ open, close, navigation }) => {
     close();
   };
 
+  const toggleSearchTeamsModal = () => {
+    setIsSearchTeamsModalVisible(!isSearchTeamsModalVisible);
+  };
+  const toggleCreateTeamModal = () => {
+    if (isCreateTeamModalVisible) fetchTeamsAndSolicitations();
+    setIsCreateTeamModalVisible(!isCreateTeamModalVisible);
+  };
+
   return (
     <>
-      <Notification
-        message={notification.message}
-        success={notification.success}
-        visible={notification.visible}
-        onClose={() => setNotification({ ...notification, visible: false })} />
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -86,6 +96,11 @@ export const SearchTeamsAndSolicitations = ({ open, close, navigation }) => {
         onRequestClose={toggleModal}
       >
         <View style={styles.modalView}>
+          <Notification
+            message={notification.message}
+            success={notification.success}
+            visible={notification.visible}
+            onClose={() => setNotification({ ...notification, visible: false })} />
           {loading && <LoaderUnique />}
           <View style={styles.tabBar}>
             {['Times', 'Solicitações de Times'].map((tab) => (
@@ -94,20 +109,22 @@ export const SearchTeamsAndSolicitations = ({ open, close, navigation }) => {
                 title={tab}
                 styles={styles}
                 isActive={activeTab === tab}
-                onPress={() => setActiveTab(tab)}
+                onPress={() => { fetchTeamsAndSolicitations(); setActiveTab(tab) }}
               />
             ))}
           </View>
           {activeTab === 'Times' && (
-            <Teams navigation={navigation} teams={teams} close={toggleModal} />
+            <Teams navigation={navigation} teams={teams} close={toggleModal} toggleSearchTeamsModal={toggleSearchTeamsModal} toggleCreateTeamModal={toggleCreateTeamModal} search={fetchTeamsAndSolicitations} />
           )}
           {activeTab === 'Solicitações de Times' && (
-            <TeamsSolicitations teamsSolicitationsReceived={receivedSolicitations} teamsSolicitationsRequested={requestedSolicitations} search={fetchTeamsAndSolicitations} />
+            <TeamsSolicitations teamsSolicitationsReceived={receivedSolicitations} teamsSolicitationsRequested={requestedSolicitations} />
           )}
           <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
             <Text style={styles.modalButtonText}>Fechar</Text>
           </TouchableOpacity>
         </View>
+        <SearchTeams open={isSearchTeamsModalVisible} close={toggleSearchTeamsModal} />
+        <CreateTeam open={isCreateTeamModalVisible} close={toggleCreateTeamModal} />
       </Modal>
     </>
   );
@@ -136,10 +153,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       fontSize: 13,
     },
     tabButtonTextActive: {
-      fontFamily: 'Sansation Regular',
-      textAlign: 'center',
-      color: theme.PRIMARY,
-      fontSize: 13,
+      color: theme.QUATERNARY,
     },
     list: {
       flex: 1,

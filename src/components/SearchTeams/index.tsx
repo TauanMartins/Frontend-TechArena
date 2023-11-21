@@ -9,28 +9,28 @@ import {
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { useAuth } from '../../utils/Auth/AuthContext';
 import API from '../../utils/API';
-import LoaderUnique from '../../components/LoaderUnique';
-import ConfirmationDialog from '../../components/ConfirmationDialog';
-import Notification from '../../components/Notification';
+import LoaderUnique from '../LoaderUnique';
+import ConfirmationDialog from '../ConfirmationDialog';
+import Notification from '../Notification';
 import { Keyboard } from 'react-native';
 import Dark from '../../utils/Theme/Dark';
 import Light from '../../utils/Theme/Light';
 import { UserItem } from '../UserItem';
 
 
-interface UsersSearch {
+interface TeamsSearch {
     id: number;
     name: string;
     image: string;
-    username: string;
+    description: string;
 }
 
-interface UsersSearchResponse {
-    data: UsersSearch[];
+interface TeamsSearchResponse {
+    data: TeamsSearch[];
 }
 
 
-export const SearchUsers = ({ open, close }) => {
+export const SearchTeams = ({ open, close }) => {
     // Definição padrão para qualquer componente
 
     const { user } = useAuth();
@@ -46,28 +46,29 @@ export const SearchUsers = ({ open, close }) => {
     // -----------------------------------------------------
 
     // Variáveis para texto de pesquisa de usuários e usuário encontrados
-    const [inputUserSearchForUsers, setinputUserSearchForUsers] = useState('');
-    const [usersSearched, setUsersSearched] = useState<UsersSearch[] | null>(null)
+    const [inputUserSearchForTeams, setinputUserSearchForTeams] = useState('');
+    const [teamsSearched, setTeamsSearched] = useState<TeamsSearch[] | null>(null)
     const [notFound, setNotFound] = useState(false)
 
-    const handleSendFriendRequest = (userPossibleFriend: UsersSearch) => {
+    const handleSendTeamRequest = (team: TeamsSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
-            message: 'Deseja enviar pedido de amizade?',
+            message: 'Deseja enviar pedido para ingressar ao time?',
             onConfirm: async () => {
                 setLoading(true);
-                API.$friends.request_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
-                    .then((response: UsersSearchResponse) => {
-                        setUsersSearched(response.data);
+                API.$users_team.request_team({ username: user.username, team_id: team.id })
+                    .then((response: TeamsSearchResponse) => {
+                        setTeamsSearched(response.data);
                         setNotification({
-                            message: 'Pedido de amizade enviado com sucesso!',
+                            message: 'Pedido de ingresso enviado com sucesso ao dono do Time!',
                             success: true,
                             visible: true,
                         });
                     })
                     .catch((error: any) => {
+                        console.log(error.message)
                         setNotification({
-                            message: 'Não conseguimos enviar o pedido de amizade :(',
+                            message: `Não conseguimos enviar o pedido de amizade :(\nCódigo do erro: ${error.message}`,
                             success: false,
                             visible: true,
                         });
@@ -81,14 +82,14 @@ export const SearchUsers = ({ open, close }) => {
     const handleSearch = () => {
         Keyboard.dismiss();
         setLoading(true);
-        API.$users.select_users({ search: inputUserSearchForUsers })
-            .then((response: UsersSearchResponse) => {
+        API.$teams.select_teams({ search: inputUserSearchForTeams })
+            .then((response: TeamsSearchResponse) => {
                 if (response.data.length === 0) {
                     setNotFound(true)
                 } else {
                     setNotFound(false)
                 }
-                setUsersSearched(response.data);
+                setTeamsSearched(response.data);
             })
             .catch((error: any) => {
                 console.error(error);
@@ -97,35 +98,36 @@ export const SearchUsers = ({ open, close }) => {
             })
     };
     const toggleModal = () => {
-        setinputUserSearchForUsers('');
-        setUsersSearched(null)
+        setinputUserSearchForTeams('');
+        setTeamsSearched(null)
         close();
     };
     return (
         <>
+
             <Modal animationType="fade"
                 transparent={true}
                 visible={open}
                 onRequestClose={toggleModal}>
-                <Notification
-                    message={notification.message}
-                    success={notification.success}
-                    visible={notification.visible}
-                    onClose={() => setNotification({ ...notification, visible: false })} />
                 <View style={styles.modalView}>
-                    <Text style={styles.modalText}>Usuários</Text>
+                    <Notification
+                        message={notification.message}
+                        success={notification.success}
+                        visible={notification.visible}
+                        onClose={() => setNotification({ ...notification, visible: false })} />
+                    <Text style={styles.modalText}>Times</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
-                        <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForUsers.length === 0} style={styles.searchButton}>
+                        <TextInput style={styles.input} value={inputUserSearchForTeams} onChangeText={setinputUserSearchForTeams} placeholder="Digite o nome do time" />
+                        <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForTeams.length === 0} style={styles.searchButton}>
                             <Text style={styles.searchButtonText}>Pesquisar</Text>
                         </TouchableOpacity>
                     </View>
                     <TouchableOpacity onPress={() => { Alert.alert('Ops', 'Essa funcionalidade não está pronta ainda.') }} style={styles.inviteButton}>
-                        <Text style={styles.inviteButtonText}>Não encontrou? Convide seus amigos.</Text>
+                        <Text style={styles.inviteButtonText}>Não encontrou? Crie seu Time.</Text>
                     </TouchableOpacity>
-                    {notFound && <Text style={styles.notFoundText}>Nenhum usuário encontrado.</Text>}
+                    {notFound && <Text style={styles.notFoundText}>Nenhum time encontrado.</Text>}
                     {loading && <LoaderUnique />}
-                    <FlatList data={usersSearched} renderItem={({ item: user }) => (<UserItem action={() => handleSendFriendRequest(user)} key={user.id} id={user.id} image={user.image} name={user.name} subtitle={user.username} />)} style={styles.list} />
+                    <FlatList data={teamsSearched} renderItem={({ item: team }) => (<UserItem action={() => handleSendTeamRequest(team)} key={team.id} id={team.id} image={team.image} name={team.name} subtitle={(((team.description).substring(0, 30)) + '...')} />)} style={styles.list} />
                     <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
                         <Text style={styles.modalButtonText}>Fechar</Text>
                     </TouchableOpacity>

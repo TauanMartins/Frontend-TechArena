@@ -5,7 +5,7 @@ export default API => (resource: string) => {
     user_sensitive_info(accessToken: Tokens['accessToken']) {
       return API.get(resource + '?personFields=birthdays,genders', {
         headers: {Authorization: 'Bearer ' + accessToken},
-      });
+      }).catch(error => { throw new Error(error.response.data.message) });
     },
   };
 };

@@ -146,6 +146,38 @@ export const BackButton = ({
     </TouchableOpacity>
   );
 };
+export const Detail = ({
+  color,
+}: {
+  color: string;
+}) => {
+  return (
+    <AntDesign style={{alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 20}} name="ellipsis1" size={35} color={color} />
+  );
+};
+
+export const CollapseDown = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <AntDesign style={{ ...style }} name="down" size={25} color={color} />
+  );
+};
+export const CollapseRight = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <AntDesign style={{ ...style }} name="right" size={25} color={color} />
+  );
+};
 export const PreferenceIcon = ({
   style,
   color,

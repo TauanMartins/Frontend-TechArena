@@ -9,9 +9,9 @@ import {
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { useAuth } from '../../utils/Auth/AuthContext';
 import API from '../../utils/API';
-import LoaderUnique from '../../components/LoaderUnique';
-import ConfirmationDialog from '../../components/ConfirmationDialog';
-import Notification from '../../components/Notification';
+import LoaderUnique from '../LoaderUnique';
+import ConfirmationDialog from '../ConfirmationDialog';
+import Notification from '../Notification';
 import { Keyboard } from 'react-native';
 import Dark from '../../utils/Theme/Dark';
 import Light from '../../utils/Theme/Light';
@@ -30,7 +30,7 @@ interface UsersSearchResponse {
 }
 
 
-export const SearchUsers = ({ open, close }) => {
+export const SearchUsersForTeam = ({ open, close, team_id }) => {
     // Definição padrão para qualquer componente
 
     const { user } = useAuth();
@@ -42,7 +42,6 @@ export const SearchUsers = ({ open, close }) => {
         success: false,
         visible: false,
     });
-
     // -----------------------------------------------------
 
     // Variáveis para texto de pesquisa de usuários e usuário encontrados
@@ -53,21 +52,22 @@ export const SearchUsers = ({ open, close }) => {
     const handleSendFriendRequest = (userPossibleFriend: UsersSearch) => {
         ConfirmationDialog({
             title: 'Confirmação',
-            message: 'Deseja enviar pedido de amizade?',
+            message: 'Deseja adicionar ao time?',
             onConfirm: async () => {
                 setLoading(true);
-                API.$friends.request_friend({ username_user_1: user.username, username_user_2: userPossibleFriend.username })
+                API.$teams_owner.request_member({ username_owner: user.username, username_member: userPossibleFriend.username, team_id: team_id })
                     .then((response: UsersSearchResponse) => {
                         setUsersSearched(response.data);
                         setNotification({
-                            message: 'Pedido de amizade enviado com sucesso!',
+                            message: 'Solicitação de ingresso enviado com sucesso!',
                             success: true,
                             visible: true,
                         });
                     })
                     .catch((error: any) => {
+                        console.log(error)
                         setNotification({
-                            message: 'Não conseguimos enviar o pedido de amizade :(',
+                            message: 'Não conseguimos enviar a solicitação de ingresso :(',
                             success: false,
                             visible: true,
                         });
@@ -103,6 +103,7 @@ export const SearchUsers = ({ open, close }) => {
     };
     return (
         <>
+
             <Modal animationType="fade"
                 transparent={true}
                 visible={open}

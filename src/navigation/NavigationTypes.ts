@@ -26,7 +26,7 @@ export type RootStackParamList = {
 
   SocialStack: undefined;
   Social: undefined;
-  SocialChatStack: { chat_id: string, friend: string, image: string } ;
+  SocialChatStack: { chat_id: number, name: string, image: string, is_group_chat?: boolean } ;
   SocialChat: undefined;
-  SocialUserChatDetail: undefined;
+  SocialUserChatDetail: { chat_id: number, name: string, image: string, is_group_chat?: boolean } ;
 };

@@ -52,7 +52,7 @@ interface FriendsResponse {
     data: { friends: Friend[], received_friends: Friend[], requested_friends: Friend[] };
 }
 
-const Friends = ({ navigation, friends, close, closeSearchUsersModal }) => {
+const Friends = ({ navigation, friends, close, toggleSearchUsersModal }) => {
     // Definição padrão para qualquer componente
 
     const { user, isAuthenticated } = useAuth();
@@ -79,7 +79,7 @@ const Friends = ({ navigation, friends, close, closeSearchUsersModal }) => {
                         navigate(navigation,
                             screens.SocialChatStack.name as keyof RootStackParamList,
                             isAuthenticated,
-                            user, { chat_id: response.data.chat_id, friend: friend.name, image: friend.image })
+                            user, { chat_id: response.data.chat_id, name: friend.name, image: friend.image })
                     })
                     .catch((error: any) => {
                         console.log(error);
@@ -103,11 +103,11 @@ const Friends = ({ navigation, friends, close, closeSearchUsersModal }) => {
                 success={notification.success}
                 visible={notification.visible}
                 onClose={() => setNotification({ ...notification, visible: false })} />
+            {loading && <LoaderUnique />}
             <View style={styles.modalView}>
-                {loading && <LoaderUnique />}
                 <FlatList
                     ListHeaderComponent={(
-                        <TouchableOpacity style={styles.headerRow} onPress={() => { closeSearchUsersModal() }}>
+                        <TouchableOpacity style={styles.headerRow} onPress={() => { toggleSearchUsersModal(); }}>
                             <AddUserFriendIcon color={theme.QUATERNARY} />
                             <Text style={styles.text}>Adicionar amigo</Text>
                         </TouchableOpacity>
@@ -126,14 +126,14 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
         headerRow: {
             flexDirection: 'row',
-            justifyContent: 'flex-start',
             alignContent: 'center',
             alignItems: 'center',
             flex: 1,
             width: '100%',
             backgroundColor: theme.TERTIARY,
             borderRadius: 25,
-            padding: 10
+            marginTop: 10,
+            padding: 15
         },
         text: {
             fontFamily: 'Sansation Regular',

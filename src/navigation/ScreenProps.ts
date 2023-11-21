@@ -13,6 +13,7 @@ import Home from '../pages/Home/Recommended';
 import Recommended from '../pages/Home/Recommended';
 import SocialStack, { Social } from '../pages/Social';
 import SocialChatStack, { SocialChat } from '../pages/Social/Chat';
+import SocialUserChatDetail from '../pages/Social/Chat/UserChatDetail';
 
 export type ScreenProps<T extends keyof RootStackParamList> = {
   route: RouteProp<RootStackParamList, T>;
@@ -67,6 +68,6 @@ export const screens = {
   },
   SocialUserChatDetail: {
     name: 'SocialUserChatDetail',
-    component: SettingsThemePreferences,
+    component: SocialUserChatDetail,
   },
 };

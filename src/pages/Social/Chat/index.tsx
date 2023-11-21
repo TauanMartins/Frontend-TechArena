@@ -5,7 +5,7 @@ import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import { useTheme } from '../../../utils/Theme/ThemeContext';
 import { FlatList, TextInput, TouchableOpacity, Text, View, Image, StyleSheet, Keyboard } from 'react-native';
-import { BackButton } from '../../../components/IconsButton';
+import { BackButton, Detail } from '../../../components/IconsButton';
 import API from '../../../utils/API';
 import Loader from '../../../components/Loader';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
@@ -13,6 +13,8 @@ import Notification from '../../../components/Notification';
 import Light from '../../../utils/Theme/Light';
 import Dark from '../../../utils/Theme/Dark';
 import { AvatarImage } from '../../../components/AvatarImage';
+import { navigate } from '../../../navigation/NavigationUtils';
+import SocialUserChatDetail from './UserChatDetail';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -35,17 +37,21 @@ const SocialChatStack = ({ route }) => {
       }}>
       <Stack.Screen
         initialParams={route.params}
+        name={screens.SocialStack.name as keyof RootStackParamList}
+        options={{ headerShown: false }}
+        component={SocialChat}
+      />
+      <Stack.Screen
+        initialParams={route.params}
         name={screens.SocialChat.name as keyof RootStackParamList}
         options={{ headerShown: false }}
         component={SocialChat}
       />
-      {/* <Stack.Screen
-        name={screens.SettingsThemePreferences.name as keyof RootStackParamList}
-        options={{
-          headerShown: false,
-        }}
-        component={}
-      /> */}
+      <Stack.Screen
+        name={screens.SocialUserChatDetail.name as keyof RootStackParamList}
+        options={{ headerShown: false }}
+        component={SocialUserChatDetail}
+      />
     </Stack.Navigator>
   );
 };
@@ -77,10 +83,11 @@ export const SocialChat = ({ navigation, route }) => {
   const ws = useRef(null);
 
   const flatListRef = useRef(null);
-  const friend = route.params.friend;
+  const name = route.params.name;
   const image = route.params.image;
   const chat_id = route.params.chat_id;
-
+  const is_group_chat = route.params.is_group_chat;
+  
   const { theme } = useTheme();
   const styles = createStyles(theme);
 
@@ -95,7 +102,6 @@ export const SocialChat = ({ navigation, route }) => {
     flatListRef.current?.scrollToEnd({ animated: true });
   };
   const fetchMessages = () => {
-    console.log('chamou')
     API.$messages.select_messages({ idToken: user.idToken, chat_id: chat_id })
       .then((response: MessageResponse) => {
         setMessages(response.data.data);
@@ -110,6 +116,7 @@ export const SocialChat = ({ navigation, route }) => {
   };
   const loadMoreMessages = () => {
     if (loading || !nextPageCursor) return;
+
     setRefreshing(true);
     API.$messages.select_messages({ idToken: user.idToken, chat_id: chat_id, cursor: nextPageCursor })
       .then((response: MessageResponse) => {
@@ -183,6 +190,15 @@ export const SocialChat = ({ navigation, route }) => {
 
   useEffect(() => {
 
+    return () => {
+      // Fechando a conexão WebSocket quando o componente é desmontado
+      if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+        ws.current.close();
+      }
+    };
+  }, []);
+  useEffect(() => {
+
     setLoading(true)
     openWebSocketConnection();
     return () => {
@@ -191,7 +207,7 @@ export const SocialChat = ({ navigation, route }) => {
         ws.current.close();
       }
     };
-  }, []);
+  }, [navigation, chat_id]);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', scrollToBottom);
@@ -203,37 +219,57 @@ export const SocialChat = ({ navigation, route }) => {
   const handleSendMessage = () => {
     sendMessages(inputMessage);
   };
+  const handleGoToDetails = () => {
+    navigate(
+      navigation,
+      screens.SocialUserChatDetail.name as keyof RootStackParamList,
+      isAuthenticated,
+      user, { chat_id: chat_id, name: name, image: image, is_group_chat: is_group_chat })
+  };
 
   const isMyMessage = (message: Message) => {
     return message.username === user.username;
   };
 
-  const renderItem = ({ item: message }) => (
-    <View key={message.id} style={[
-      styles.messageRow,
-      isMyMessage(message) ? styles.myMessage : styles.friendMessage
-    ]}>
-      <Text style={{ ...styles.message, color: theme.SECONDARY }}>
-        {message.message}
-      </Text>
-      <Text style={styles.time}>
-        {formatTime(message.created_at)}
-      </Text>
-    </View>
-  );
+  const renderItem = ({ item: message }) => {
+    const isGroup = is_group_chat;
+    const isMyMsg = isMyMessage(message);
+
+    return (
+      <View key={message.id} style={[
+        styles.messageRow,
+        isMyMsg ? styles.myMessage : styles.friendMessage
+      ]}>
+        {isGroup && !isMyMsg && (
+          <View style={styles.senderInfo}>
+            <AvatarImage image={message.image} size={30} />
+            <Text style={styles.senderName}>{message.username}</Text>
+          </View>
+        )}
+        <Text style={{ ...styles.message, color: theme.SECONDARY }}>
+          {message.message}
+        </Text>
+        <Text style={styles.time}>
+          {formatTime(message.created_at)}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
       {loading && <Loader />}
       <View style={styles.headerRow}>
         <BackButton onPress={() => navigation.goBack()} style={{}} color={theme.SECONDARY} />
-        <View style={styles.row}>
-          <AvatarImage image={image} size={50}/>
-          <Text style={{ ...styles.title, color: theme.SECONDARY }}>
-            {friend}
-          </Text>
-        </View>
-        <View style={{ width: 50 }} />
+        <TouchableOpacity style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', }} onPress={handleGoToDetails}>
+          <View style={styles.row}>
+            <AvatarImage image={image} size={50} />
+            <Text style={{ ...styles.title, color: theme.SECONDARY }}>
+              {name}
+            </Text>
+          </View>
+          <Detail color={theme.SECONDARY} />
+        </TouchableOpacity>
       </View>
       <FlatList
         ref={flatListRef}
@@ -266,6 +302,16 @@ export const SocialChat = ({ navigation, route }) => {
 };
 
 const createStyles = (theme: typeof Light | typeof Dark) => StyleSheet.create({
+  senderInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  senderName: {
+    fontFamily: 'Sansation Regular',
+    fontSize: 14,
+    marginLeft: 5,
+    color: theme.SECONDARY,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.PRIMARY,

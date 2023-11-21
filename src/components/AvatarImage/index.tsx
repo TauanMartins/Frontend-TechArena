@@ -4,7 +4,7 @@ import Light from '../../utils/Theme/Light';
 import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 
-export const AvatarImage = ({ image, size=40 }: { image: string, size?: number }) => {
+export const AvatarImage = ({ image, size = 40 }: { image: string, size?: number }) => {
   const { theme } = useTheme();
   const [isModalVisible, setModalVisible] = useState(false);
   const styles = createStyles(theme);
@@ -12,7 +12,7 @@ export const AvatarImage = ({ image, size=40 }: { image: string, size?: number }
   return (
     <>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Image style={{ ...styles.image, width: size, height: size, borderRadius: size * (size/40), borderWidth: (size/40) }} source={{ uri: image }} />
+        <Image style={{ ...styles.image, width: size, height: size, borderRadius: size * (size / 40), borderWidth: (size / 40) }} source={image ? { uri: image } : require('../../assets/Avatar/unknown.png')} />
       </TouchableOpacity>
 
       <Modal
@@ -25,7 +25,7 @@ export const AvatarImage = ({ image, size=40 }: { image: string, size?: number }
           onPress={() => setModalVisible(false)}
           activeOpacity={1}
         >
-          <Image style={styles.fullscreenImage} source={{ uri: image }} />
+          <Image style={styles.fullscreenImage} source={image ? { uri: image } : require('../../assets/Avatar/unknown.png')} />
         </TouchableOpacity>
       </Modal>
     </>
@@ -36,7 +36,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
   StyleSheet.create({
     image: {
       borderColor: theme.QUATERNARY,
-      width: 40, 
+      width: 40,
       height: 40,
       borderWidth: 1,
       borderRadius: 25,
