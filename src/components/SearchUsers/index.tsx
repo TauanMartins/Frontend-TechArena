@@ -67,7 +67,7 @@ export const SearchUsers = ({ open, close }) => {
                     })
                     .catch((error: any) => {
                         setNotification({
-                            message: 'Não conseguimos enviar o pedido de amizade :(',
+                            message: 'Não conseguimos enviar o pedido de amizade 😞',
                             success: false,
                             visible: true,
                         });
@@ -115,7 +115,7 @@ export const SearchUsers = ({ open, close }) => {
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>Usuários</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
+                        <TextInput multiline={true} style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
                         <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForUsers.length === 0} style={styles.searchButton}>
                             <Text style={styles.searchButtonText}>Pesquisar</Text>
                         </TouchableOpacity>

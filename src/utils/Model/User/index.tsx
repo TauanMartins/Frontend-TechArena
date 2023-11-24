@@ -1,3 +1,4 @@
+import { Localization } from "../Localization";
 import { Tokens } from "../Token";
 
 export interface User {
@@ -41,5 +42,5 @@ export const UnauthenticatedUser: User = {
   username: '',
   gender: '',
   dt_birth: '',
-  prefered_theme: null,
+  prefered_theme: null
 };

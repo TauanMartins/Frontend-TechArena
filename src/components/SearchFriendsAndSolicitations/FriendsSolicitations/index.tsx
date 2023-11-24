@@ -94,7 +94,7 @@ const FriendsSolicitations = ({ friendsSolicitationsReceived, friendsSolicitatio
                     })
                     .catch((error: any) => {
                         setNotification({
-                            message: 'Não conseguimos aceitar o pedido de amizade :(',
+                            message: 'Não conseguimos aceitar o pedido de amizade 😞',
                             success: false,
                             visible: true,
                         });

@@ -55,10 +55,10 @@ const navigate = (
     if (user.permission.includes(requiredPermission)) {
       return navigation.navigate(routeName, parameters);
     } else {
-      return Alert.alert('Erro', 'Desculpe, você não tem permissão. :(');
+      return Alert.alert('Erro', 'Desculpe, você não tem permissão. 😞');
     }
   } else {
-    return Alert.alert('Erro', 'Desculpe, você não está autenticado. :(');
+    return Alert.alert('Erro', 'Desculpe, você não está autenticado. 😞');
   }
 };
 

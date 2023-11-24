@@ -1,7 +1,7 @@
 import changeNavigationBarColor from 'react-native-navigation-bar-color';
 import Theme from '..';
-import {StatusBar} from 'react-native';
-import {User} from '../../Model/User';
+import { StatusBar } from 'react-native';
+import { User } from '../../Model/User';
 import API from '../../API';
 import Light from '../Light';
 import Dark from '../Dark';
@@ -14,7 +14,7 @@ export const changeThemeFirstScreen = () => {
   StatusBar.setBarStyle(nextBarStyle); // Tema da fonte da barra de cima
 };
 
-export const changeTheme = (
+export const changeTheme = async (
   nextThemeChoosed: User['prefered_theme'] | null,
   preferedTheme: User['prefered_theme'] | null,
   theme: typeof Light | typeof Dark,
@@ -23,18 +23,10 @@ export const changeTheme = (
   >,
   deviceTheme: 'light' | 'dark',
 ) => {
-  const nextTheme = nextThemeChoosed
-    ? Theme[nextThemeChoosed]
-    : preferedTheme
-    ? Theme[preferedTheme]
-    : Theme[deviceTheme];
-  if (theme === nextTheme) {
-    return;
-  }
-  const nextBarStyle =
-    nextTheme === Theme.light ? 'dark-content' : 'light-content';
-  setTheme(nextTheme); // Tema geral
+  const nextTheme = nextThemeChoosed ? Theme[nextThemeChoosed] : preferedTheme ? Theme[preferedTheme] : Theme[deviceTheme];
+  const nextBarStyle = (nextTheme === Theme.light) ? 'dark-content' : 'light-content';
   changeNavigationBarColor(nextTheme.PRIMARY, nextTheme === Theme.light); // Tema da barra de cima/baixo
+  setTheme(nextTheme); // Tema geral
   StatusBar.setBackgroundColor(nextTheme.PRIMARY); // Tema da barra de cima
   StatusBar.setBarStyle(nextBarStyle); // Tema da fonte da barra de cima
 };
@@ -48,5 +40,5 @@ export const saveTheme = async (
     prefered_theme: preferedTheme,
     user: user.email,
   });
-  setUser({...user, prefered_theme: preferedTheme});
+  setUser({ ...user, prefered_theme: preferedTheme });
 };

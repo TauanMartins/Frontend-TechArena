@@ -14,6 +14,7 @@ import Recommended from '../pages/Home/Recommended';
 import SocialStack, { Social } from '../pages/Social';
 import SocialChatStack, { SocialChat } from '../pages/Social/Chat';
 import SocialUserChatDetail from '../pages/Social/Chat/UserChatDetail';
+import { UpdateSportsPrefered } from '../components/UpdateSportsPrefered';
 
 export type ScreenProps<T extends keyof RootStackParamList> = {
   route: RouteProp<RootStackParamList, T>;
@@ -52,6 +53,10 @@ export const screens = {
   SettingsThemePreferences: {
     name: 'SettingsThemePreferences',
     component: SettingsThemePreferences,
+  },
+  SettingsFavoriteSports: {
+    name: 'SettingsFavoriteSports',
+    component: UpdateSportsPrefered,
   },
 
   /* ------------------------------------------------------------------------------------------------*/

@@ -68,7 +68,7 @@ export const SearchTeams = ({ open, close }) => {
                     .catch((error: any) => {
                         console.log(error.message)
                         setNotification({
-                            message: `Não conseguimos enviar o pedido de amizade :(\nCódigo do erro: ${error.message}`,
+                            message: `Não conseguimos enviar o pedido de amizade 😞\nCódigo do erro: ${error.message}`,
                             success: false,
                             visible: true,
                         });
@@ -117,7 +117,7 @@ export const SearchTeams = ({ open, close }) => {
                         onClose={() => setNotification({ ...notification, visible: false })} />
                     <Text style={styles.modalText}>Times</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} value={inputUserSearchForTeams} onChangeText={setinputUserSearchForTeams} placeholder="Digite o nome do time" />
+                        <TextInput multiline={true} style={styles.input} value={inputUserSearchForTeams} onChangeText={setinputUserSearchForTeams} placeholder="Digite o nome do time" />
                         <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForTeams.length === 0} style={styles.searchButton}>
                             <Text style={styles.searchButtonText}>Pesquisar</Text>
                         </TouchableOpacity>

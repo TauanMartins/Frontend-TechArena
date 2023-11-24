@@ -103,7 +103,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
   const name = route.params.name;
   const chat_id = route.params.chat_id;
   const is_group_chat = route.params.is_group_chat;
-  
+
   const selectImage = () => {
     const options = {
       mediaType: 'photo' as MediaType,
@@ -206,7 +206,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
             .catch((error: any) => {
               console.log(error.message)
               setNotification({
-                message: `Desculpe, não conseguimos editar o seu time :(\nCódigo do erro: ${error.message}`,
+                message: `Desculpe, não conseguimos editar o seu time 😞\nCódigo do erro: ${error.message}`,
                 success: false,
                 visible: true,
               });
@@ -237,7 +237,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
           .catch((error: any) => {
             console.log(error)
             setNotification({
-              message: 'Não conseguimos enviar a solicitação de ingresso :(',
+              message: 'Não conseguimos enviar a solicitação de ingresso 😞',
               success: false,
               visible: true,
             });
@@ -264,7 +264,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
           .catch((error: any) => {
             console.log(error);
             setNotification({
-              message: 'Não conseguimos iniciar uma conversa :(',
+              message: 'Não conseguimos iniciar uma conversa 😞',
               success: false,
               visible: true,
             });
@@ -295,7 +295,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
           .catch((error: any) => {
             console.log(error)
             setNotification({
-              message: 'Não conseguimos enviar o pedido de amizade :(',
+              message: 'Não conseguimos enviar o pedido de amizade 😞',
               success: false,
               visible: true,
             });
@@ -339,7 +339,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
               }
               <View style={styles.container}>
                 <Text style={styles.label}>Nome</Text>
-                <TextInput
+                <TextInput multiline={true}
                   style={styles.input}
                   value={team.name}
                   editable={false}
@@ -349,12 +349,12 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
               {is_group_chat && isTeamChat &&
                 <View style={styles.container}>
                   <Text style={styles.label}>Descrição</Text>
-                  <TextInput style={styles.input} value={team.description} onChangeText={(e) => setTeam({ ...team, description: e, valid: true, checked: false })} placeholder="Descrição do time" editable={is_group_chat && isOwner} />
+                  <TextInput multiline={true} style={styles.input} value={team.description} onChangeText={(e) => setTeam({ ...team, description: e, valid: true, checked: false })} placeholder="Descrição do time" editable={is_group_chat && isOwner} />
                 </View>
               }
               <View style={styles.container}>
                 <Text style={styles.label}>{`Data de criação ${is_group_chat ? isTeamChat ? 'do Time' : 'do Agendamento' : 'da amizade'}`}</Text>
-                <TextInput style={styles.input} value={team.created_at} placeholder={`Data de criação ${is_group_chat ? isTeamChat ? 'do Time' : 'do Agendamento' : 'da amizade'}`} editable={false} />
+                <TextInput multiline={true} style={styles.input} value={team.created_at} placeholder={`Data de criação ${is_group_chat ? isTeamChat ? 'do Time' : 'do Agendamento' : 'da amizade'}`} editable={false} />
               </View>
 
             </View>
@@ -388,8 +388,11 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
             )}
 
             {is_group_chat &&
-              <View style={styles.container}>
+              <View style={{ ...styles.container, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={styles.label}>Usuários no grupo</Text>
+                <TouchableOpacity onPress={()=>{Alert.alert('Saiba mais', 'O termo "Holder" é usado para descrever a pessoa encarregada de levar os equipamentos e materiais necessários, garantindo que a partida, sessão ou evento esportivo ocorra sem problemas.')}}>
+                  <Text style={{ ...styles.label, fontSize: 13 }}>Saiba mais</Text>
+                </TouchableOpacity>
               </View>
             }
             {is_group_chat && isTeamChat && isOwner &&

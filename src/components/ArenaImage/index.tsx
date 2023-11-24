@@ -4,7 +4,7 @@ import Light from '../../utils/Theme/Light';
 import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 
-export const AvatarImage = ({ image, size = 40 }: { image: string, size?: number }) => {
+export const ArenaImage = ({ image, size = 40 }: { image: string, size?: number }) => {
   const { theme } = useTheme();
   const [isModalVisible, setModalVisible] = useState(false);
   const styles = createStyles(theme);
@@ -12,7 +12,7 @@ export const AvatarImage = ({ image, size = 40 }: { image: string, size?: number
   return (
     <>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Image style={{ ...styles.image, width: size, height: size, borderRadius: size * (size / 40), borderWidth: (size / 40) }} source={image ? { uri: image } : require('../../assets/Avatar/unknown.png')} />
+        <Image style={{ ...styles.image, width: size, height: size, borderRadius: size/10, borderWidth: size/100 }} source={image ? { uri: image } : require('../../assets/Avatar/unknown.png')} />
       </TouchableOpacity>
 
       <Modal
@@ -39,7 +39,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       width: 40,
       height: 40,
       borderWidth: 1,
-      borderRadius: 25,
+      borderRadius: 10,
       marginHorizontal: 7.5,
     },
     modalContainer: {
@@ -51,9 +51,9 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
     fullscreenImage: {
       borderColor: theme.SECONDARY,
       borderWidth: 5,
-      borderRadius: 150,
-      width: 300,
-      height: 300,
+      borderRadius: 25,
+      width: 400,
+      height: 400,
       resizeMode: 'cover',
     },
   });

@@ -94,7 +94,7 @@ const TeamsSolicitations = ({ teamsSolicitationsReceived, teamsSolicitationsRequ
                     .catch((error: any) => {
                         console.log(error.message)
                         setNotification({
-                            message: `Não conseguimos aceitar o pedido :(\nCódigo do erro: ${error.message}`,
+                            message: `Não conseguimos aceitar o pedido 😞\nCódigo do erro: ${error.message}`,
                             success: false,
                             visible: true,
                         });

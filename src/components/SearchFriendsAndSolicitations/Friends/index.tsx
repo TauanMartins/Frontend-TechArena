@@ -84,7 +84,7 @@ const Friends = ({ navigation, friends, close, toggleSearchUsersModal }) => {
                     .catch((error: any) => {
                         console.log(error);
                         setNotification({
-                            message: 'Não conseguimos iniciar uma conversa :(',
+                            message: 'Não conseguimos iniciar uma conversa 😞',
                             success: false,
                             visible: true,
                         });

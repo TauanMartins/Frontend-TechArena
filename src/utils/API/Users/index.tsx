@@ -15,6 +15,9 @@ export default API => (resource: string) => {
     request_team(parameters: object) {
       return API.post(resource, parameters).catch(error => { throw new Error(error.response.data.message) });
     },
+    request(parameters: object) {
+      return API.post(resource, parameters).catch(error => { throw new Error(error.response.data.message) });
+    },
     accept_team(parameters: object) {
       return API.put(resource, parameters).catch(error => { throw new Error(error.response.data.message) });
     },

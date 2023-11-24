@@ -19,9 +19,11 @@ import {
   changeThemeFirstScreen,
   saveTheme,
 } from '../../Theme/ThemeUtils';
+import { Localization, standardLocalization } from '../../Model/Localization';
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User>(UnauthenticatedUser);
+  const [localization, setLocalization] = useState<Localization>(Localization);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState(null);
   const deviceTheme = useColorScheme();
@@ -31,13 +33,22 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     const idToken = await getIdToken();
     if (idToken) {
       let isValid = isTokenValid(idToken);
-      if (isValid && !isAuthenticated) {
-        console.log('É válido...');
-        ({ dt_birth, gender } = await getComplementarData());
-        await registerLogin(idToken, { dt_birth, gender });
-      } else if (!isValid) {
-        console.log('Não é válido...');
-        refreshLogin();
+      try {
+        if (isValid && !isAuthenticated) {
+          console.log('É válido...');
+          try {
+            ({ dt_birth, gender } = await getComplementarData());
+          } catch (error: any) {
+            throw new Error('Falha ao carregar dados do Google.')
+          }
+          registerLogin(idToken, { dt_birth, gender });
+        } else if (!isValid) {
+          console.log('Não é válido...');
+          await refreshLogin();
+        }
+      } catch (error) {
+        await logout();
+        Alert.alert('Sentimos muito!', `${error.message}`);
       }
     }
   };
@@ -45,31 +56,39 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const login = async () => {
     let userInfo: UserDecoded, dt_birth: string, gender: string, age: number;
     try {
-      await GoogleSignin.hasPlayServices();
-      userInfo = (await GoogleSignin.signIn()) as UserDecoded;
-      ({ age, dt_birth, gender } = await getComplementarData());
+      try {
+        await GoogleSignin.hasPlayServices();
+        userInfo = (await GoogleSignin.signIn()) as UserDecoded;
+        ({ age, dt_birth, gender } = await getComplementarData());
+      } catch (error: any) {
+        throw new Error('Falha ao carregar dados do Google. 😞')
+      }
+
+      if (age < 18) {
+        throw new Error('Você não possui idade suficiente 😞');
+      }
+      registerLogin(userInfo.idToken, { dt_birth, gender });
     } catch (error) {
       logout();
-      return;
+      Alert.alert('Sentimos muito!', `\n${error.message}`);
     }
-    if (age < 18) {
-      logout();
-      throw new Error('Você não possui idade suficiente :(');
-    }
-    registerLogin(userInfo.idToken, { dt_birth, gender });
   };
 
   const refreshLogin = async () => {
     let userInfo: UserDecoded, dt_birth: string, gender: string, age: number;
     try {
-      await GoogleSignin.hasPlayServices();
-      userInfo = (await GoogleSignin.signInSilently()) as UserDecoded;
-      ({ age, dt_birth, gender } = await getComplementarData());
+      try {
+        await GoogleSignin.hasPlayServices();
+        userInfo = (await GoogleSignin.signInSilently()) as UserDecoded;
+        ({ age, dt_birth, gender } = await getComplementarData());
+      } catch (error: any) {
+        throw new Error('Falha ao carregar dados do Google. 😞')
+      }
+      registerLogin(userInfo.idToken, { dt_birth, gender });
     } catch (error: any) {
-      logout();
-      Alert.alert('Sentimos muito!', `Falha ao reestabelecer conexão! \n${error}` );
+      throw new Error(error.message)
     }
-    registerLogin(userInfo.idToken, { dt_birth, gender });
+
   };
 
   const registerLogin = async (
@@ -93,7 +112,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         dt_birth: complementarData.dt_birth,
         gender: complementarData.gender
       }); // get user data = prefered_theme, permission..
-      changeTheme(null, prefered_theme, theme, setTheme, deviceTheme);
+      await changeTheme(null, prefered_theme, theme, setTheme, deviceTheme);
       setUser({
         ...extendedUserData,
         dt_birth: complementarData.dt_birth,
@@ -111,8 +130,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setIsAuthenticated(true);
       saveIdToken(idToken);
     } catch (error) {
-      logout();      
-      Alert.alert('Sentimos muito!', `Falha ao reestabelecer conexão! \n${error}` );
+      console.log('eeaaa', error)
+      throw new Error('Falha ao validar credenciais.')
     }
   };
 
@@ -120,6 +139,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     console.log('Não autenticado, deslogando...');
     await clearIdToken();
     setUser(UnauthenticatedUser);
+    setLocalization(standardLocalization)
     await GoogleSignin.signOut();
     setIsAuthenticated(false);
   };
@@ -132,6 +152,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     return () => clearInterval(checkTokenInterval);
   }, [isAuthenticated]);
 
+
+
   useEffect(() => {
     if (isAuthenticated) {
       changeTheme(null, user.prefered_theme, theme, setTheme, deviceTheme);
@@ -143,7 +165,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     <ThemeContext.Provider
       value={{ theme, setTheme, changeThemeFirstScreen, changeTheme, saveTheme }}>
       <AuthContext.Provider
-        value={{ user, setUser, isAuthenticated, login, logout }}>
+        value={{ user, setUser, localization, setLocalization, isAuthenticated, login, logout }}>
         {children}
       </AuthContext.Provider>
     </ThemeContext.Provider>

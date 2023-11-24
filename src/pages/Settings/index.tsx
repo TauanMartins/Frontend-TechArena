@@ -11,10 +11,11 @@ import {useTheme} from '../../utils/Theme/ThemeContext';
 import {screens} from '../../navigation/ScreenProps';
 import {RootStackParamList} from '../../navigation/NavigationTypes';
 import Light from '../../utils/Theme/Light';
-import {PreferenceIcon} from '../../components/IconsButton';
+import {FavoriteIcon, PreferenceIcon} from '../../components/IconsButton';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
 import {useAuth} from '../../utils/Auth/AuthContext';
 import SettingsPreferencesStack from './Preferences';
+import { UpdateSportsPrefered } from '../../components/UpdateSportsPrefered';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -48,6 +49,13 @@ const SettingsStack = () => {
           headerShown: false,
         }}
         component={SettingsPreferencesStack}
+      />
+      <Stack.Screen
+        name={screens.SettingsFavoriteSports.name as keyof RootStackParamList}
+        options={{
+          headerShown: false,
+        }}
+        component={UpdateSportsPrefered}
       />
     </Stack.Navigator>
   );
@@ -85,6 +93,21 @@ export const Settings = ({navigation}) => {
             <Text style={styles.button_text}>
               Selecione entre os temas claro e escuro, troque o idioma e limite
               a forma como o TechArena usa parte de seus dados.
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(
+              screens.SettingsFavoriteSports.name as keyof RootStackParamList,
+            )
+          }
+          style={styles.settingsButton}>
+          <FavoriteIcon color={theme.SECONDARY} />
+          <View style={styles.buttonContent}>
+            <Text style={styles.button_text_title}>Esportes favoritos</Text>
+            <Text style={styles.button_text}>
+              Modifique os seus esportes marcados como favoritos.
             </Text>
           </View>
         </TouchableOpacity>

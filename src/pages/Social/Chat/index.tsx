@@ -246,7 +246,7 @@ export const SocialChat = ({ navigation, route }) => {
             <Text style={styles.senderName}>{message.username}</Text>
           </View>
         )}
-        <Text style={{ ...styles.message, color: theme.SECONDARY }}>
+        <Text style={{ ...styles.message, color: theme.QUATERNARY }}>
           {message.message}
         </Text>
         <Text style={styles.time}>
@@ -281,7 +281,7 @@ export const SocialChat = ({ navigation, route }) => {
         style={styles.messageList}
       />
       <View style={styles.inputContainer}>
-        <TextInput
+        <TextInput multiline={true}
           style={styles.input}
           value={inputMessage}
           onPointerEnter={() => { scrollToBottom(); }}
@@ -310,7 +310,7 @@ const createStyles = (theme: typeof Light | typeof Dark) => StyleSheet.create({
     fontFamily: 'Sansation Regular',
     fontSize: 14,
     marginLeft: 5,
-    color: theme.SECONDARY,
+    color: theme.QUATERNARY,
   },
   container: {
     flex: 1,

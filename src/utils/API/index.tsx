@@ -5,9 +5,11 @@ import Chats from './Chats';
 import Messages from './Messages';
 import Friends from './Friends';
 import Teams from './Teams';
+import Sports from './Sports';
+import Appointments from './Appointments';
 
 const API = axios.create({
-  baseURL: 'https://api.techarena.com.br/api',
+  baseURL: 'http://10.0.2.2:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,31 +25,40 @@ const API_2 = axios.create({
 
 const $users = Users(API)('/users');
 const $users_team = Users(API)('/users/team');
+const $users_appointments = Users(API)('/users/appointments');
 const $users_prefered_theme = Users(API)('/users/theme');
 const $users_sensitive_information =  UserSensitiveInformation(API_2)('/people/me');
 const $chat =  Chats(API)('/chat');
 const $chat_group_detail =  Chats(API)('/chat/group/detail');
 const $chat_user_detail =  Chats(API)('/chat/private/detail');
 const $chat_team =  Chats(API)('/chat/team');
+const $chat_appointment =  Chats(API)('/chat/appointment');
 const $messages =  Messages(API)('/message');
 const $friends =  Friends(API)('/friend');
 const $teams =  Teams(API)('/team');
 const $teams_owner =  Teams(API)('/team/user');
 const $teamsCheck =  Teams(API)('/team/exist');
+const $sports =  Sports(API)('/sports');
+const $sports_prefered =  Sports(API)('/sports/prefered-sports');
+const $appointments =  Appointments(API)('/appointments');
 
 export default {
   $users,
   $users_team,
   $users_prefered_theme,
+  $users_appointments,
   $users_sensitive_information,
   $chat,
   $chat_team,
+  $chat_appointment,
   $messages,
   $friends,
   $teams,
   $teamsCheck,
   $chat_user_detail,
   $chat_group_detail,
-  $teams_owner
-
+  $teams_owner,
+  $sports,
+  $sports_prefered,
+  $appointments
 };

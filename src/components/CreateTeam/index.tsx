@@ -4,7 +4,7 @@ import {
     Text,
     StyleSheet,
     TouchableOpacity,
-    Modal, TextInput, FlatList, Alert
+    Modal, TextInput, FlatList, Alert, ScrollView
 } from 'react-native';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { useAuth } from '../../utils/Auth/AuthContext';
@@ -18,8 +18,6 @@ import Light from '../../utils/Theme/Light';
 import { UserItem } from '../UserItem';
 import { AvatarImage } from '../AvatarImage';
 import { MediaType, launchImageLibrary } from 'react-native-image-picker';
-import Geolocation from '@react-native-community/geolocation';
-import RNFetchBlob from 'rn-fetch-blob';
 
 interface Team {
     name: string;
@@ -98,7 +96,7 @@ export const CreateTeam = ({ open, close }) => {
                         .catch((error: any) => {
                             console.log(error)
                             setNotification({
-                                message: `Desculpe, não conseguimos criar o seu time :(\nCódigo do erro: ${error.message}`,
+                                message: `Desculpe, não conseguimos criar o seu time 😞\nCódigo do erro: ${error.message}`,
                                 success: false,
                                 visible: true,
                             });
@@ -152,64 +150,75 @@ export const CreateTeam = ({ open, close }) => {
         close();
     };
 
-    // Geolocation.getCurrentPosition(
-    //     (position) => {
-    //         console.log(position);
-    //     },
-    //     (error) => {
-    //         console.warn(error);
-    //     },
-    //     { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    // );
+
     return (
         <>
             <Modal animationType="fade"
                 transparent={true}
                 visible={open}
                 onRequestClose={toggleModal}>
-                <View style={styles.modalView}>
-                    <Notification
-                        message={notification.message}
-                        success={notification.success}
-                        visible={notification.visible}
-                        onClose={() => setNotification({ ...notification, visible: false })} />
-                    <Text style={styles.modalText}>Criar Time</Text>
-                    <View style={styles.inputContainer}>
-                        <AvatarImage image={team.image} key={team.image} size={100} />
-                        <TouchableOpacity style={styles.modalButton} onPress={selectImage}>
-                            <Text style={styles.modalButtonText} >Selecionar Imagem</Text>
-                        </TouchableOpacity>
-                        <TextInput style={styles.input} value={team.name} onChangeText={(e) => setTeam({ ...team, name: e, valid: true, checked: false })} onBlur={handleCheckNameTeam} placeholder="Nome do time" />
-                        <TextInput style={styles.input} value={team.description} onChangeText={(e) => setTeam({ ...team, description: e, valid: true, checked: false })} placeholder="Descrição do time" />
-                        <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleCreateTeamRequest} disabled={!team.valid}>
-                            <Text style={styles.modalButtonText}>Criar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-                            <Text style={styles.modalButtonText}>Cancelar</Text>
-                        </TouchableOpacity>
-                    </View>
-                    {!team.valid && team.checked && <Text style={styles.notAllowedText}>Um time com este nome já existe, por favor escolha outro.</Text>}
-                    {loading && <LoaderUnique />}
+                <ScrollView contentContainerStyle={styles.scrollView}>
+                    <View style={styles.modalView}>
+                        <Notification
+                            message={notification.message}
+                            success={notification.success}
+                            visible={notification.visible}
+                            onClose={() => setNotification({ ...notification, visible: false })} />
+                        <Text style={styles.modalText}>Criar Time</Text>
+                        <View style={styles.inputContainer}>
+                            <AvatarImage image={team.image} key={team.image} size={100} />
+                            <TouchableOpacity style={styles.modalButton} onPress={selectImage}>
+                                <Text style={styles.modalButtonText} >Selecionar Imagem</Text>
+                            </TouchableOpacity>
+                            <View style={styles.container}>
+                                <TextInput multiline={true} style={styles.input} value={team.name} onChangeText={(e) => setTeam({ ...team, name: e, valid: true, checked: false })} onBlur={handleCheckNameTeam} placeholder="Nome do time" />
+                            </View>
+                            <View style={styles.container}>
+                                <TextInput multiline={true} style={styles.input} value={team.description} onChangeText={(e) => setTeam({ ...team, description: e, valid: true, checked: false })} placeholder="Descrição do time" />
+                            </View>
 
-                </View>
-            </Modal>
+                            <View style={{...styles.container, flex: 1, justifyContent: 'flex-end'}}>
+                                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleCreateTeamRequest} disabled={!team.valid}>
+                                    <Text style={styles.modalButtonText}>Criar</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
+                                    <Text style={styles.modalButtonText}>Cancelar</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                        {!team.valid && team.checked && <Text style={styles.notAllowedText}>Um time com este nome já existe, por favor escolha outro.</Text>}
+                        {loading && <LoaderUnique />}
+
+                    </View>
+                </ScrollView>
+            </Modal >
         </>
     );
 };
 
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
+        scrollView: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            flexGrow: 1 // Fundo translúcido para obscurecer o conteúdo de trás
+        },
+        container: {
+            paddingTop: 20,
+            alignSelf: 'stretch', // Estica o contêiner para preencher a largura
+            alignItems: 'flex-start',
 
+        },
         modalView: {
             alignItems: 'center',
-            justifyContent: 'center', // Conteúdo alinhado ao topo
+            justifyContent: 'flex-start', 
             backgroundColor: theme.PRIMARY,
             flex: 1,
             borderRadius: 25,
-            elevation: 5,
+            elevation: 1,
             padding: 5,
             paddingHorizontal: 15,
-            margin: 30
+            margin: 30,
+
         },
         modalText: {
             marginTop: 30,
@@ -236,6 +245,12 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             flex: 1,
             width: '100%',
             justifyContent: 'flex-start',
+            alignItems: 'center'
+        },
+        inputContainer_2: {
+            flex: 1,
+            width: '100%',
+            justifyContent: 'flex-end',
             alignItems: 'center'
         },
         input: {

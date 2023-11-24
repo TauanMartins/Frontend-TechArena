@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import {
   TouchableOpacity,
@@ -17,6 +17,18 @@ import { useAuth } from '../../utils/Auth/AuthContext';
 import Recommended from './Recommended';
 import { navigate } from '../../navigation/NavigationUtils';
 import { AvatarImage } from '../../components/AvatarImage';
+import { Localization, standardLocalization } from '../../utils/Model/Localization';
+import Geolocation from '@react-native-community/geolocation';
+import { Header } from '../../components/HomeScreenComponents/Header';
+import Light from '../../utils/Theme/Light';
+import Dark from '../../utils/Theme/Dark';
+import { FavoriteSports } from '../../components/HomeScreenComponents/FavoriteSports';
+import API from '../../utils/API';
+import { CreateSportsPrefered } from '../../components/CreateSportsPrefered';
+import Loader from '../../components/Loader';
+import { EventCardRow } from '../../components/HomeScreenComponents/AppointmentListSuggested';
+import { DetailAppointment } from '../../components/DetailAppointment';
+import SocialChatStack from '../Social/Chat';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const HomeStack = () => {
@@ -50,259 +62,249 @@ const HomeStack = () => {
         }}
         component={Recommended}
       />
+      <Stack.Screen
+        name={screens.SocialChatStack.name as keyof RootStackParamList}
+        options={{
+          headerShown: false,
+        }}
+        component={SocialChatStack}
+      />
     </Stack.Navigator>
   );
 };
 
-// Carregamento de ícones esportivos
-const sportIcons = {
-  basquete: require('../../assets/LogoSports/basquete.png'),
-  futebol: require('../../assets/LogoSports/futebol.png'),
-  vôlei: require('../../assets/LogoSports/vôlei.png'),
-  tênis: require('../../assets/LogoSports/tênis.png'),
+
+const fetchLocalization = async (): Promise<Localization> => {
+  return new Promise((resolve, reject) => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        resolve({ lat: position.coords.latitude.toString(), longitude: position.coords.longitude.toString() });
+      },
+      (error) => {
+        resolve(standardLocalization);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  });
 };
-
-// Componente para exibir ícones esportivos
-const SportIcon = ({ iconName, sportName, colorButton, color }) => (
-  <View style={styles.centeredColumn}>
-    <View style={[styles.iconContainer, { backgroundColor: colorButton }]}>
-      <Image source={sportIcons[iconName]} />
-    </View>
-    <Text style={[styles.sportText, { color }]}>
-      {sportName}
-    </Text>
-  </View>
-);
-
 // Página inicial
 const Home = ({ navigation }) => {
-  const { user, isAuthenticated } = useAuth();
-  const { theme: { PRIMARY, SECONDARY, QUATERNARY, BASQUETE, FUTEBOL, VOLEI, TENIS } } = useTheme();
+  const { user, isAuthenticated, localization, setLocalization } = useAuth();
+  const { theme } = useTheme();
+  const [loading, setLoading] = useState(true);
+  const [loadingList, setLoadingList] = useState(false);
+  const styles = createStyles(theme);
 
+  const [preferedSports, setPreferedSports] = useState<[] | { id: number, name: string }[]>([])
+  const [isDetailAppointmentModalVisible, setIsDetailAppointmentModalVisible] = useState(false)
+  const [isCreatePreferedSportsModalVisible, setIsCreatePreferedSportsModalVisible] = useState(false)
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentSelected, setAppointmentSelected] = useState([]);
+
+  const toggleCreatePreferedSportsModal = () => {
+    setLoading(true)
+    fetchPreferedSports().then(() => {
+      setLoading(false)
+    })
+    setIsCreatePreferedSportsModalVisible(!isCreatePreferedSportsModalVisible)
+  };
+  const toggleDetailAppointmentModal = () => {
+    setIsDetailAppointmentModalVisible(!isDetailAppointmentModalVisible)
+  };
+  const handlePreferedSportPress = (e) => {
+    if (e === 0) {
+      toggleCreatePreferedSportsModal()
+    } else {
+      console.log(e)
+    }
+  };
+  const fetchPreferedSports = async () => {
+    API.$sports_prefered.select_prefered_sports({ username: user.username })
+      .then((result) => {
+        if (result.data.length === 0) {
+          setPreferedSports(result.data)
+          setIsCreatePreferedSportsModalVisible(!isCreatePreferedSportsModalVisible)
+        } else {
+          setPreferedSports(result.data)
+        }
+      }).catch((e) => {
+        console.log(e)
+      })
+  };
+  const fetchAppointments = async (latitude: string, longitude: string) => {
+    API.$appointments.select_appointments({ lat: latitude, longitude: longitude, username: user.username, filter: true })
+      .then((result) => {
+        setAppointments(result.data)
+      }).catch((e) => {
+        console.log(e)
+      })
+  };
+  const fetchAll = async (list = false) => {
+    try {
+      if (list) {
+        setLoadingList(true)
+      } else {
+        setLoading(true);
+      }
+      const localization = await fetchLocalization();
+      setLocalization(localization);
+      const fetchAppointmentsPromise = fetchAppointments(localization.lat, localization.longitude);
+      const fetchPreferedSportsPromise = fetchPreferedSports();
+
+      await Promise.all([fetchAppointmentsPromise, fetchPreferedSportsPromise]);
+    } catch (err) {
+      console.log(err)
+    } finally {
+      if (list) {
+        setLoadingList(false)
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+  useEffect(() => {
+    fetchAll()
+  }, [])
   return (
-    <ScrollView style={[styles.scrollView, { backgroundColor: PRIMARY }]} >
-      <View style={[styles.container, { backgroundColor: PRIMARY }]}>
-        <Header user={user} SECONDARY={SECONDARY} />
-        <SportSelectionRow SECONDARY={SECONDARY} BASQUETE={BASQUETE} FUTEBOL={FUTEBOL} VOLEI={VOLEI} TENIS={TENIS} />
-        <ScheduledSuggestionsRow SECONDARY={SECONDARY} navigation={navigation} isAuthenticated={isAuthenticated} user={user} />
-        <EventCardRow QUATERNARY={QUATERNARY} navigation={navigation} isAuthenticated={isAuthenticated} user={user} BASQUETE={BASQUETE} />
-      </View>
-    </ScrollView>
+    <>
+      {loading && <Loader />}
+      <FlatList
+        ListHeaderComponent={() => <Header theme={theme} user={user} />}
+        onRefresh={async () => { await fetchAll(true); }}
+        refreshing={loadingList}
+        data={[{ key: 'unique' }]}
+        renderItem={() =>
+          <>
+            <CreateSportsPrefered open={isCreatePreferedSportsModalVisible} close={toggleCreatePreferedSportsModal} />
+            <DetailAppointment open={isDetailAppointmentModalVisible} close={toggleDetailAppointmentModal} appointment={appointmentSelected} navigation={navigation} isAuthenticated={isAuthenticated} />
+            <FavoriteSports theme={theme} user={user} data={preferedSports} action={handlePreferedSportPress} />
+            <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { setAppointmentSelected(e); toggleDetailAppointmentModal() }} />
+          </>
+        }
+        style={styles.container}
+      />
+    </>
   );
 };
 
-// Componentes Auxiliares
-const Header = ({ user, SECONDARY }) => (
-  <View style={styles.headerRow}>
-    <View style={styles.column}>
-      <Text style={[styles.welcomeText, { color: SECONDARY }]}>
-        Olá, {user.name}!
-      </Text>
-      <Text style={[styles.findMatchesText, { color: SECONDARY }]}>
-        Encontre partidas
-      </Text>
-    </View>
-    <View style={styles.column}>
-      <UserNotificationRow user={user} SECONDARY={SECONDARY} />
-    </View>
-  </View>
-);
-
-const UserNotificationRow = ({ user, SECONDARY }) => (
-  <View style={styles.notificationRow}>
-    <NotificationIcon style={styles.notificationIcon} color={SECONDARY} size={32} />
-    {user.picture && (
-      <AvatarImage image={ user.picture} size={55}/>
-    )}
-  </View>
-);
-
-const SportSelectionRow = ({ SECONDARY, BASQUETE, FUTEBOL, VOLEI, TENIS }) => (
-  <View style={styles.sportSelectionRow}>
-    <SportIcon iconName="basquete" sportName="Basquete" colorButton={BASQUETE} color={SECONDARY} />
-    <SportIcon iconName="futebol" sportName="Futebol" colorButton={FUTEBOL} color={SECONDARY} />
-    <SportIcon iconName="vôlei" sportName="Vôlei" colorButton={VOLEI} color={SECONDARY} />
-    <SportIcon iconName="tênis" sportName="Tênis" colorButton={TENIS} color={SECONDARY} />
-  </View>
-);
-
-const ScheduledSuggestionsRow = ({ SECONDARY, navigation, isAuthenticated, user }) => (
-  <View style={styles.scheduledSuggestionsRow}>
-    <View style={styles.column}>
-      <Text style={[styles.scheduledSuggestionsText, { color: SECONDARY }]}>Sugestões agendadas</Text>
-    </View>
-    <View style={styles.column}>
-      <Text style={[styles.viewAllButton, { color: SECONDARY }]} onPress={() => navigate(navigation, screens.HomeRecommendedSchedules.name as keyof RootStackParamList, isAuthenticated, user)}>Ver todas</Text>
-    </View>
-  </View>
-);
-
-const EventCardRow = ({ QUATERNARY, navigation, isAuthenticated, user, BASQUETE }) => (
-  <FlatList
-    horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.cardList} // Adicione este estilo
-    data={[1, 2, 3, 4]} // Array com 4 elementos para representar os 4 cards
-    renderItem={({ item }) => (
-      <View style={styles.centeredColumn}>
-        <TouchableOpacity onPress={() => navigate(navigation, screens.HomeRecommendedSchedules.name as keyof RootStackParamList, isAuthenticated, user)}>
-          <EventCard QUATERNARY={QUATERNARY} BASQUETE={BASQUETE} />
-        </TouchableOpacity>
-      </View>
-    )}
-    keyExtractor={item => item.toString()}
-  />
-);
-
-const EventCard = ({ QUATERNARY, BASQUETE }) => (
-  <View style={[styles.eventCard, { backgroundColor: BASQUETE }]}>
-    <View style={{ ...styles.eventImagePlaceholder }}>
-      <View style={{ backgroundColor: 'gray', width: '85%', height: 200, borderRadius: 10 }}></View>
-    </View>
-    <View style={styles.column}>
-      <View style={{ ...styles.eventDetailsRow }}>
-        <Text style={{ ...styles.eventAddressText, color: QUATERNARY }}>
-          SQN 909, Norte - Asa Norte
-        </Text>
-      </View>
-      <View style={{ ...styles.eventDetailsRow }}>
-        <Text style={{ ...styles.eventInfoText, color: QUATERNARY }}>
-          Segunda-feira às 9:00h
-        </Text>
-      </View>
-      <View style={styles.eventAdditionalInfoRow}>
-        <Text style={[styles.eventInfoText, { color: QUATERNARY }]}>
-          1KM
-        </Text>
-        <Text style={[styles.eventInfoText, { color: QUATERNARY }]}>
-          8/10
-        </Text>
-      </View>
-    </View>
-  </View>
-);
 
 // Estilos
-const styles = StyleSheet.create({
-  scrollView: {
-    flex: 1,
-  },
-  container: {
-    flex: 1
-  },
-  cardList: {
-    marginLeft: 0, // Espaçamento à esquerda (ajuste conforme necessário)
-    marginRight: 110, // Espaçamento à direita (ajuste conforme necessário)
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
-  },
-  notificationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sportSelectionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginVertical: 30,
-  },
-  scheduledSuggestionsRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  column: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  centeredColumn: {
-    alignItems: 'center',
-  },
-  welcomeText: {
-    fontFamily: 'Sansation Regular',
-    marginTop: '10%',
-    fontSize: 13,
-  },
-  findMatchesText: {
-    fontFamily: 'Sansation Regular',
-    fontSize: 28,
-  },
-  notificationIcon: {
-    marginTop: '30%',
-  },
-  userPicture: {
-    marginTop: '30%',
-    marginLeft: '5%',
-    borderRadius: 50,
-    borderWidth: 2,
-    width: 55,
-    height: 55,
-  },
-  sportText: {
-    fontFamily: 'Sansation Regular',
-    marginTop: '4%',
-    fontSize: 13,
-  },
-  scheduledSuggestionsText: {
-    fontFamily: 'Sansation Regular',
-    fontWeight: 'bold',
-    fontSize: 16,
-    padding: 10,
-  },
-  viewAllButton: {
-    fontFamily: 'Sansation Regular',
-    fontSize: 13,
-    padding: 10,
-  },
-  iconContainer: {
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 10,
-    elevation: 8
-  },
-  eventCard: {
-    width: 250,
-    height: 400,
-    marginVertical: 20,
-    marginHorizontal: 15,
-    justifyContent: 'flex-start',
-    borderRadius: 10,
-    elevation: 10,
-  },
-  eventImagePlaceholder: {
-    flexDirection: 'row',
-    marginVertical: 20,
-    justifyContent: 'center',
-  },
-  eventDetailsRow: {
-    flexDirection: 'row',
-    marginLeft: '10%',
-    alignItems: 'flex-start',
-  },
-  eventAdditionalInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: '10%',
-    marginTop: '30%',
-  },
-  eventAddressText: {
-    fontFamily: 'Sansation Regular',
-    fontSize: 16,
-  },
-  eventInfoText: {
-    fontFamily: 'Sansation Regular',
-    fontSize: 13,
-  },
-});
+const createStyles = (theme: typeof Light | typeof Dark) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: theme.PRIMARY,
+      flex: 1,
+      paddingHorizontal: 20
+    },
+
+    ///
+    scrollView: {
+      flex: 1,
+    },
+    cardList: {
+      marginLeft: 0, // Espaçamento à esquerda (ajuste conforme necessário)
+      marginRight: 110, // Espaçamento à direita (ajuste conforme necessário)
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center'
+    },
+    notificationRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    sportSelectionRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      marginVertical: 30,
+    },
+    scheduledSuggestionsRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      justifyContent: 'space-between',
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+    },
+    column: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    centeredColumn: {
+      alignItems: 'center',
+    },
+    notificationIcon: {
+      marginTop: '30%',
+    },
+    userPicture: {
+      marginTop: '30%',
+      marginLeft: '5%',
+      borderRadius: 50,
+      borderWidth: 2,
+      width: 55,
+      height: 55,
+    },
+    sportText: {
+      fontFamily: 'Sansation Regular',
+      marginTop: '4%',
+      fontSize: 13,
+    },
+    scheduledSuggestionsText: {
+      fontFamily: 'Sansation Regular',
+      fontWeight: 'bold',
+      fontSize: 16,
+      padding: 10,
+    },
+    viewAllButton: {
+      fontFamily: 'Sansation Regular',
+      fontSize: 13,
+      padding: 10,
+    },
+    iconContainer: {
+      width: 50,
+      height: 50,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderRadius: 10,
+      elevation: 8
+    },
+    eventCard: {
+      width: 250,
+      height: 400,
+      marginVertical: 20,
+      marginHorizontal: 15,
+      justifyContent: 'flex-start',
+      borderRadius: 10,
+      elevation: 10,
+    },
+    eventImagePlaceholder: {
+      flexDirection: 'row',
+      marginVertical: 20,
+      justifyContent: 'center',
+    },
+    eventDetailsRow: {
+      flexDirection: 'row',
+      marginLeft: '10%',
+      alignItems: 'flex-start',
+    },
+    eventAdditionalInfoRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginHorizontal: '10%',
+      marginTop: '30%',
+    },
+    eventAddressText: {
+      fontFamily: 'Sansation Regular',
+      fontSize: 16,
+    },
+    eventInfoText: {
+      fontFamily: 'Sansation Regular',
+      fontSize: 13,
+    },
+  });
 
 export default HomeStack;

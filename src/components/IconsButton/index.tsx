@@ -3,7 +3,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -188,6 +188,19 @@ export const PreferenceIcon = ({
   return (
     <View style={{ ...style, paddingHorizontal: 10 }}>
       <FontAwesome5 name="sliders-h" size={20} color={color} />
+    </View>
+  );
+};
+export const FavoriteIcon = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10 }}>
+      <Entypo name="star" size={20} color={color} />
     </View>
   );
 };

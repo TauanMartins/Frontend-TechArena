@@ -84,7 +84,7 @@ const SettingsThemePreferences: React.FC<
           setPreferedTheme({ ...preferedTheme, edited: false });
         } catch (error) {
           setNotification({
-            message: 'Não conseguimos salvar as alterações :(',
+            message: 'Não conseguimos salvar as alterações 😞',
             success: false,
             visible: true,
           });

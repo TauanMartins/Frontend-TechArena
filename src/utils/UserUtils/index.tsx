@@ -25,8 +25,8 @@ export const getComplementarData = async () => {
   let birthday: { year: number; month: number; day: number } | undefined;
   let age: number = 18; // Idade padrão definida como 18
   let gender: string = 'Others'; // Gênero padrão definido como 'Others'
-
-  const { accessToken } = (await GoogleSignin.getTokens()) as Tokens;
+  try {
+    const { accessToken } = (await GoogleSignin.getTokens()) as Tokens;
   const response = await API.$users_sensitive_information.user_sensitive_info(
     accessToken,
   );
@@ -64,6 +64,10 @@ export const getComplementarData = async () => {
   }
 
   return { age, dt_birth, gender };
+  } catch (error) {
+    throw new Error('Não conseguimos validar suas credenciais.')
+  }
+  
 };
 
 

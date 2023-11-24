@@ -25,12 +25,7 @@ const Login: React.FC<ScreenProps<'Login'>> = () => {
       setLoading(true);
       await login();
     } catch (error: any) {
-      Alert.alert(
-        'Sentimos muito!',
-        error.message
-          ? error.message
-          : 'Não conseguimos confirmar sua conta. :(',
-      );
+      console.log('erro: ', error)
     } finally {
       setLoading(false);
     }

@@ -67,7 +67,7 @@ export const SearchUsersForTeam = ({ open, close, team_id }) => {
                     .catch((error: any) => {
                         console.log(error)
                         setNotification({
-                            message: 'Não conseguimos enviar a solicitação de ingresso :(',
+                            message: 'Não conseguimos enviar a solicitação de ingresso 😞',
                             success: false,
                             visible: true,
                         });
@@ -116,7 +116,7 @@ export const SearchUsersForTeam = ({ open, close, team_id }) => {
                 <View style={styles.modalView}>
                     <Text style={styles.modalText}>Usuários</Text>
                     <View style={styles.inputContainer}>
-                        <TextInput style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
+                        <TextInput multiline={true} style={styles.input} value={inputUserSearchForUsers} onChangeText={setinputUserSearchForUsers} placeholder="Digite o nome de usuário" />
                         <TouchableOpacity onPress={handleSearch} disabled={inputUserSearchForUsers.length === 0} style={styles.searchButton}>
                             <Text style={styles.searchButtonText}>Pesquisar</Text>
                         </TouchableOpacity>
