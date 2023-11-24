@@ -26,6 +26,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [localization, setLocalization] = useState<Localization>(Localization);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [theme, setTheme] = useState(null);
+  const [loading, setLoading] = useState(false);
   const deviceTheme = useColorScheme();
 
   const verifyAuthentication = async () => {
@@ -34,8 +35,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     if (idToken) {
       let isValid = isTokenValid(idToken);
       try {
-        if (isValid && !isAuthenticated) {
+        if (isValid && !isAuthenticated) {          
           console.log('É válido...');
+          setLoading(true);
           try {
             ({ dt_birth, gender } = await getComplementarData());
           } catch (error: any) {
@@ -44,9 +46,12 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           registerLogin(idToken, { dt_birth, gender });
         } else if (!isValid) {
           console.log('Não é válido...');
+
+          setLoading(true);
           await refreshLogin();
         }
       } catch (error) {
+        setLoading(false);
         await logout();
         Alert.alert('Sentimos muito!', `${error.message}`);
       }
@@ -130,8 +135,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
       setIsAuthenticated(true);
       saveIdToken(idToken);
     } catch (error) {
-      console.log('eeaaa', error)
       throw new Error('Falha ao validar credenciais.')
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,7 +171,9 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     <ThemeContext.Provider
       value={{ theme, setTheme, changeThemeFirstScreen, changeTheme, saveTheme }}>
       <AuthContext.Provider
-        value={{ user, setUser, localization, setLocalization, isAuthenticated, login, logout }}>
+        value={{
+          user, setUser, localization, setLocalization, isAuthenticated, login, logout, loading, setLoading
+        }}>
         {children}
       </AuthContext.Provider>
     </ThemeContext.Provider>

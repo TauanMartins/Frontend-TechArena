@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import { useTheme } from '../../utils/Theme/ThemeContext';
 import { ScreenProps, screens } from '../../navigation/ScreenProps';
@@ -115,7 +116,7 @@ const Home = ({ navigation }) => {
     if (e === 0) {
       toggleCreatePreferedSportsModal()
     } else {
-      console.log(e)
+      Alert.alert('Acalme-se', 'Logo logo você verá agendamentos dos seus esportes favoritos em um toque.')
     }
   };
   const fetchPreferedSports = async () => {
@@ -178,7 +179,7 @@ const Home = ({ navigation }) => {
             <CreateSportsPrefered open={isCreatePreferedSportsModalVisible} close={toggleCreatePreferedSportsModal} />
             <DetailAppointment open={isDetailAppointmentModalVisible} close={toggleDetailAppointmentModal} appointment={appointmentSelected} navigation={navigation} isAuthenticated={isAuthenticated} />
             <FavoriteSports theme={theme} user={user} data={preferedSports} action={handlePreferedSportPress} />
-            <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { setAppointmentSelected(e); toggleDetailAppointmentModal() }} />
+            <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { if(appointmentSelected!==e){setAppointmentSelected(e)}; toggleDetailAppointmentModal() }} />
           </>
         }
         style={styles.container}

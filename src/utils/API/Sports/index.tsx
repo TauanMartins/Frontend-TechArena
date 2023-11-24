@@ -3,6 +3,9 @@ export default API => (resource: string) => {
     select_sports(parameters) {
       return API.get(resource).catch(error => { throw new Error(error.response.data.message) });
     },
+    select_sports_materials(parameters) {
+      return API.get(resource+ '?sport_id=' + parameters.sport_id).catch(error => { throw new Error(error.response.data.message) });
+    },
     select_prefered_sports(parameters: { username: string }) {
       return API.get(resource + '?username=' + parameters.username).catch(error => { throw new Error(error.response.data.message) });
     },

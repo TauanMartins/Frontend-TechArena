@@ -16,9 +16,8 @@ import PrivacyPolicies_ServiceTems from '../../components/PrivacyPoliciesService
 import {useTheme} from '../../utils/Theme/ThemeContext';
 
 const Login: React.FC<ScreenProps<'Login'>> = () => {
-  const {login} = useAuth();
+  const {login, loading, setLoading} = useAuth();
   const {changeThemeFirstScreen} = useTheme();
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     try {

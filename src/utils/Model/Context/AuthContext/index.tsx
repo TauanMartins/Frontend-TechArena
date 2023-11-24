@@ -10,4 +10,6 @@ export interface AuthContextData {
   setLocalization: Dispatch<SetStateAction<Localization>>;
   login: () => Promise<void | Error>;
   logout: () => void;
+  loading: boolean,
+  setLoading: Dispatch<SetStateAction<boolean>>;
 }

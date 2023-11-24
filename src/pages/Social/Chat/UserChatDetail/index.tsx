@@ -11,10 +11,7 @@ import {
 import { ScreenProps } from '../../../../navigation/ScreenProps';
 import { useAuth } from '../../../../utils/Auth/AuthContext';
 import { useTheme } from '../../../../utils/Theme/ThemeContext';
-import LoaderUnique from '../../../../components/LoaderUnique';
 import ConfirmationDialog from '../../../../components/ConfirmationDialog';
-import { User } from '../../../../utils/Model/User';
-import RadioButton from '../../../../components/RadioButton';
 import Notification from '../../../../components/Notification';
 import { AddUserFriendIcon, BackButton } from '../../../../components/IconsButton';
 import { AvatarImage } from '../../../../components/AvatarImage';
@@ -28,7 +25,6 @@ import { UserItem } from '../../../../components/UserItem';
 import { navigate } from '../../../../navigation/NavigationUtils';
 import { screens } from '../../../../navigation/ScreenProps';
 import { RootStackParamList } from '../../../../navigation/NavigationTypes';
-import { SearchUsers } from '../../../../components/SearchUsers';
 import { SearchUsersForTeam } from '../../../../components/SearchUsersForTeam';
 interface Team {
   id: number | null
@@ -130,10 +126,7 @@ const SocialUserChatDetail: React.FC<ScreenProps<'SocialUserChatDetail'>> = ({ n
   const fetchGroupChatDetail = () => {
     setLoading(true)
     API.$chat_group_detail.detail_chat({ idToken: user.idToken, chat_id: chat_id }).then((response) => {
-      console.log(response.data)
-
       setIsTeamChat(response.data.isTeamChat)
-
       if (response.data.isTeamChat) {
         setTeam({ ...team, id: response.data.teamId, name: name, description: response.data.detail[0].description, created_at: response.data.detail[0].created_at })
       } else {

@@ -11,6 +11,8 @@ export const AuthContext = createContext<AuthContextData>({
   isAuthenticated: false,
   login: async () => {},
   logout: () => {},
+  loading: false,
+  setLoading: () => {},
 });
 
 const useAuth = () => {

@@ -66,7 +66,7 @@ const EventCard = ({ styles, appointment, theme }) => (
             </View>
 
             <View style={styles.eventAdditionalInfoRow}>
-                <Text style={styles.eventInfoText}>
+                <Text style={{...styles.eventInfoText, fontWeight: 'bold' }}>
                     {appointment.distance} Km
                 </Text>
                 <Text style={{ ...styles.eventInfoText, textAlign: 'right' }}>

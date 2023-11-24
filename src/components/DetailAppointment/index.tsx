@@ -21,6 +21,7 @@ import { navigate } from '../../navigation/NavigationUtils';
 import { screens } from '../../navigation/ScreenProps';
 import { RootStackParamList } from '../../navigation/NavigationTypes';
 import { CollapseDown, CollapseRight } from '../IconsButton';
+import CheckboxButton from '../CheckboxButton';
 
 
 interface UsersSearch {
@@ -75,7 +76,9 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
     // -----------------------------------------------------
     // Variáveis para texto de pesquisa de usuários e usuário encontrados
     const [entered, setEntered] = useState(false);
-    const [showMaterials, setShowMaterial] = useState(false);
+    const [showMaterials, setShowMaterial] = useState(true);
+    const [materials, setMaterials] = useState([]);
+    const [holder, setHolder] = useState(false);
 
     const handleRequestAppointment = () => {
         ConfirmationDialog({
@@ -83,7 +86,7 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
             message: 'Deseja marcar presença neste agendamento? As pessoas que ingressarem terão conhecimento disso.',
             onConfirm: async () => {
                 setLoading(true);
-                API.$users_appointments.request({ appointment_id: appointment.id, username: user.username, holder: false })
+                API.$users_appointments.request({ appointment_id: appointment.id, username: user.username, holder: holder })
                     .then((response: UsersSearchResponse) => {
                         setEntered(true);
                         appointment.is_inside = true
@@ -107,6 +110,16 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
         });
     };
 
+    const fetchMaterials = () => {
+        setLoading(true)
+        API.$sports_material.select_sports_materials({ sport_id: appointment.sport_id }).then((response) => {
+            setMaterials(response.data)
+        }).catch((err) => {
+            console.log(err)
+        }).finally(() => {
+            setLoading(false)
+        })
+    };
     const handleChatToAppointment = () => {
         ConfirmationDialog({
             title: 'Confirmação',
@@ -116,7 +129,7 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
                 API.$chat_appointment.post_chats_appointments({ username: user.username, appointment_id: appointment.id })
                     .then((response) => {
                         console.log(response.data)
-                        close();
+                        toggleModal();
                         navigate(navigation,
                             screens.SocialChatStack.name as keyof RootStackParamList,
                             isAuthenticated,
@@ -137,6 +150,8 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
         });
     };
     const toggleModal = () => {
+        setHolder(false)
+        setMaterials([])
         setEntered(false)
         close();
     };
@@ -149,7 +164,7 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
         let isGroupChat: boolean;
 
         switch (section.title) {
-            case 'Materiais necesários':
+            case 'Materiais necessários':
                 isVisible = showMaterials;
                 isGroupChat = false; // Friends chat é um chat pessoal, não de grupo
                 break;
@@ -162,14 +177,14 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
         if (!isVisible) return null;
         item.is_group_chat = isGroupChat;
         return (
-            <Text style={styles.label}>{item.description}</Text>
+            <Text style={{ ...styles.label, paddingTop: 10, }}>{item.description}</Text>
         );
     };
     const renderSectionHeader = ({ section: { title } }) => {
         let toggle;
         let active;
         switch (title) {
-            case 'Materiais necesários':
+            case 'Materiais necessários':
                 toggle = toggleShowMaterial;
                 active = showMaterials;
                 break;
@@ -182,12 +197,11 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
             </TouchableOpacity>
         );
     };
-
     return (
         <>
             <Modal animationType="fade"
                 visible={open}
-                onShow={() => { if (appointment.is_inside) { setEntered(true) } else { setEntered(false) } }}
+                onShow={() => { if (appointment.is_inside) { setEntered(true) } else { setEntered(false) } fetchMaterials() }}
                 transparent={true}
                 onRequestClose={toggleModal}>
                 <Notification
@@ -259,15 +273,26 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
                                     editable={false}
                                 />
                             </View>
+                            {!appointment.is_inside &&
+                                <View style={styles.container}>
+                                    <Text style={styles.label}>Ao marcar o item abaixo você se compromete a levar algum material necessário:</Text>
+                                    <CheckboxButton
+                                        colours={theme}
+                                        label='Holder'
+                                        value={holder}
+                                        handleSelectedOption={() => setHolder(!holder)}
+                                        description='Levarei o material necessário'
+                                    />
+                                </View>
+                            }
                             <View style={styles.container}>
                                 <SectionList
-                                    sections={[{ title: 'Materiais necesários', data: [{ id: 1, description: 'Luva de goleiro' }] }]}
+                                    sections={[{ title: 'Materiais necessários', data: materials }]}
                                     renderItem={renderItem}
                                     renderSectionHeader={renderSectionHeader}
-                                    keyExtractor={(item, index) => item + index}
+                                    keyExtractor={(item) => item.id.toString()}
                                     style={styles.container_material}
                                     scrollEnabled={false}
-
                                 />
                             </View>
 
@@ -299,8 +324,10 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
 
         sectionHeader: {
             flexDirection: 'row',
+            alignItems: 'center',
             justifyContent: 'space-between',
             backgroundColor: theme.PRIMARY,
+            elevation: 2
         },
         sectionHeaderText: {
             fontFamily: 'Sansation Regular',
@@ -315,13 +342,14 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             justifyContent: 'flex-start', // Alinhamento do conteúdo ao topo
             backgroundColor: theme.PRIMARY,
             flex: 1,
-            borderRadius: 20,
+            borderRadius: 25,
             elevation: 5,
             paddingVertical: 20,
             paddingHorizontal: 15,
             margin: 25,
         },
         container_material: {
+            width: '100%',
             flex: 1,
             backgroundColor: theme.PRIMARY,
 
@@ -330,7 +358,6 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             paddingTop: 20,
             alignSelf: 'stretch', // Estica o contêiner para preencher a largura
             alignItems: 'flex-start',
-
         },
         label: {
             flex: 1,

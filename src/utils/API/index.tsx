@@ -9,7 +9,7 @@ import Sports from './Sports';
 import Appointments from './Appointments';
 
 const API = axios.create({
-  baseURL: 'http://10.0.2.2:8000/api',
+  baseURL: 'https://api.techarena.com.br/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -39,6 +39,7 @@ const $teams =  Teams(API)('/team');
 const $teams_owner =  Teams(API)('/team/user');
 const $teamsCheck =  Teams(API)('/team/exist');
 const $sports =  Sports(API)('/sports');
+const $sports_material =  Sports(API)('/sports/material');
 const $sports_prefered =  Sports(API)('/sports/prefered-sports');
 const $appointments =  Appointments(API)('/appointments');
 
@@ -60,5 +61,6 @@ export default {
   $teams_owner,
   $sports,
   $sports_prefered,
-  $appointments
+  $appointments,
+  $sports_material
 };

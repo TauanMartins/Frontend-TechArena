@@ -65,7 +65,7 @@ export const CreateSportsPrefered = ({ open, close }) => {
             })
             .catch(err => {
                 setNotification({
-                    message: 'Não conseguimos salvar as alterações 😞',
+                    message: 'Não conseguimos salvar as alterações :(',
                     success: false,
                     visible: true,
                 });
@@ -78,6 +78,16 @@ export const CreateSportsPrefered = ({ open, close }) => {
     const toggleModal = () => {
         close();
     };
+    const fetchSports = () => {
+        setLoading(true)
+        API.$sports.select_sports({}).then((response: SportResponse) => {
+            setSports(response.data)
+        }).catch((err) => {
+            console.log(err)
+        }).finally(() => {
+            setLoading(false)
+        })
+    };
     const renderSportItem = ({ item: sport }) => (
         <CheckBox
             containerStyle={styles.checkboxContainer}
@@ -88,6 +98,9 @@ export const CreateSportsPrefered = ({ open, close }) => {
             onPress={() => handleSelectSport(sport.id)}
         />
     );
+    useEffect(() => {
+        fetchSports()
+    }, [])
 
     return (
         <>
