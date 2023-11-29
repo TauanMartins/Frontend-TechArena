@@ -176,12 +176,12 @@ const Home = ({ navigation }) => {
         refreshing={loadingList}
         data={[{ key: 'unique' }]}
         renderItem={() =>
-          <>
+          <View>
             <CreateSportsPrefered open={isCreatePreferedSportsModalVisible} close={toggleCreatePreferedSportsModal} />
             <DetailAppointment open={isDetailAppointmentModalVisible} close={toggleDetailAppointmentModal} appointment={appointmentSelected} navigation={navigation} isAuthenticated={isAuthenticated} />
             <FavoriteSports theme={theme} user={user} data={preferedSports} action={handlePreferedSportPress} />
             <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { if (appointmentSelected !== e) { setAppointmentSelected(e) }; toggleDetailAppointmentModal() }} />
-          </>
+          </View>
         }
         style={styles.container}
       />

@@ -103,34 +103,32 @@ export const CreateSportsPrefered = ({ open, close }) => {
     }, [])
 
     return (
-        <>
-            <Modal animationType="fade"
-                transparent={true}
-                visible={open}
-                onRequestClose={toggleModal}>
-                <View style={styles.modalView}>
-                    <Notification
-                        message={notification.message}
-                        success={notification.success}
-                        visible={notification.visible}
-                        onClose={() => setNotification({ ...notification, visible: false })} />
-                    <Text style={styles.modalText}>Esportes favoritos</Text>
-                    <Text style={styles.modalBody}>Identificamos que você não possui esportes favoritos salvos.</Text>
-                    <Text style={styles.modalBody}>Deseja definir seus favoritos agora?
-                        Não se preocupe, você poderá modificar a qualquer momento no menu de configurações.</Text>
-                    <Text style={styles.modalBody}>Selecione seus 4 esportes favoritos:</Text>
-                    <FlatList data={sports} renderItem={renderSportItem}
-                        keyExtractor={(item) => item.id.toString()} style={styles.list} />
-                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleSavePreferedSports} >
-                        <Text style={styles.modalButtonText}>Salvar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-                        <Text style={styles.modalButtonText}>Deixar para depois</Text>
-                    </TouchableOpacity>
-                    {loading && <LoaderUnique />}
-                </View>
-            </Modal>
-        </>
+        <Modal animationType="fade"
+            transparent={true}
+            visible={open}
+            onRequestClose={toggleModal}>
+            <View style={styles.modalView}>
+                <Notification
+                    message={notification.message}
+                    success={notification.success}
+                    visible={notification.visible}
+                    onClose={() => setNotification({ ...notification, visible: false })} />
+                <Text style={styles.modalText}>Esportes favoritos</Text>
+                <Text style={styles.modalBody}>Identificamos que você não possui esportes favoritos salvos.</Text>
+                <Text style={styles.modalBody}>Deseja definir seus favoritos agora?
+                    Não se preocupe, você poderá modificar a qualquer momento no menu de configurações.</Text>
+                <Text style={styles.modalBody}>Selecione seus 4 esportes favoritos:</Text>
+                <FlatList data={sports} renderItem={renderSportItem}
+                    keyExtractor={(item) => item.id.toString()} style={styles.list} />
+                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleSavePreferedSports} >
+                    <Text style={styles.modalButtonText}>Salvar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
+                    <Text style={styles.modalButtonText}>Deixar para depois</Text>
+                </TouchableOpacity>
+                {loading && <LoaderUnique />}
+            </View>
+        </Modal>
     );
 };
 

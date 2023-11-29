@@ -198,124 +198,122 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
         );
     };
     return (
-        <>
-            <Modal animationType="fade"
-                visible={open}
-                onShow={() => { if (appointment.is_inside) { setEntered(true) } else { setEntered(false) } fetchMaterials() }}
-                transparent={true}
-                onRequestClose={toggleModal}>
-                <Notification
-                    message={notification.message}
-                    success={notification.success}
-                    visible={notification.visible}
-                    onClose={() => setNotification({ ...notification, visible: false })} />
-                <ScrollView contentContainerStyle={styles.scrollView}>
-                    <View style={styles.modalView}>
-                        {loading && <LoaderUnique />}
-                        <Text style={styles.modalText}>Detalhes do agendamento</Text>
-                        <View style={styles.inputContainer}>
+        <Modal animationType="fade"
+            visible={open}
+            onShow={() => { if (appointment.is_inside) { setEntered(true) } else { setEntered(false) } fetchMaterials() }}
+            transparent={true}
+            onRequestClose={toggleModal}>
+            <Notification
+                message={notification.message}
+                success={notification.success}
+                visible={notification.visible}
+                onClose={() => setNotification({ ...notification, visible: false })} />
+            <ScrollView contentContainerStyle={styles.scrollView}>
+                <View style={styles.modalView}>
+                    {loading && <LoaderUnique />}
+                    <Text style={styles.modalText}>Detalhes do agendamento</Text>
+                    <View style={styles.inputContainer}>
 
-                            <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
-                                <ArenaImage image={appointment.image} size={200} />
-                            </View>
-                            <View style={styles.container}>
-                                <View style={{ paddingTop: 20, flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
-                                    <Text style={styles.label}>Endereço:</Text>
-                                    <TouchableOpacity onPress={() => { Alert.alert('Ops', 'Essa funcionalidade está em desenvolvimento')/*navigate(navigation, )*/ }}>
-                                        <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline' }}>Ver no mapa</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <TextInput multiline={true}
-                                    style={styles.input}
-                                    value={appointment.address}
-                                    editable={false}
-                                />
-                            </View>
-                            <View style={styles.container}>
-                                <Text style={styles.label}>Data marcada:</Text>
-                                <TextInput multiline={true}
-                                    style={styles.input}
-                                    value={`${formatDate(appointment.date, appointment.horary)} às ${formatTime(appointment.horary)}`}
-                                    editable={false}
-                                />
-                            </View>
-                            <View style={{ paddingTop: 20, flexDirection: 'row', flex: 1, justifyContent: 'space-between', }}>
-                                <View style={{ flexDirection: 'column', flex: 1, paddingRight: 5 }}>
-                                    <Text style={styles.label}>Distância da sua localização:</Text>
-                                    <TextInput multiline={true}
-                                        style={styles.input}
-                                        value={`${appointment.distance} Km`}
-                                        editable={false}
-                                    />
-                                </View>
-                                <View style={{ flexDirection: 'column', flex: 1, paddingLeft: 5 }}>
-                                    <Text style={styles.label}>Esporte:</Text>
-                                    <TextInput multiline={true}
-                                        style={styles.input}
-                                        value={`${appointment.name}`}
-                                        editable={false}
-                                    />
-                                </View>
-                            </View>
-                            <View style={styles.container}>
-                                <Text style={styles.label}>Quantidade de pessoas que ingressaram neste agendamento:</Text>
-                                <TextInput multiline={true}
-                                    style={styles.input}
-                                    value={`${appointment.players} ${appointment.players === 1 ? 'Jogador presente' : 'Jogadores presentes'}`}
-                                    editable={false}
-                                />
-                            </View>
-                            <View style={styles.container}>
-                                <Text style={styles.label}>Nome de usuário do organizador do agendamento:</Text>
-                                <TextInput multiline={true}
-                                    style={styles.input}
-                                    value={`${appointment.username}`}
-                                    editable={false}
-                                />
-                            </View>
-                            {!appointment.is_inside &&
-                                <View style={styles.container}>
-                                    <Text style={styles.label}>Ao marcar o item abaixo você se compromete a levar algum material necessário:</Text>
-                                    <CheckboxButton
-                                        colours={theme}
-                                        label='Holder'
-                                        value={holder}
-                                        handleSelectedOption={() => setHolder(!holder)}
-                                        description='Levarei o material necessário'
-                                    />
-                                </View>
-                            }
-                            <View style={styles.container}>
-                                <SectionList
-                                    sections={[{ title: 'Materiais necessários', data: materials }]}
-                                    renderItem={renderItem}
-                                    renderSectionHeader={renderSectionHeader}
-                                    keyExtractor={(item) => item.id.toString()}
-                                    style={styles.container_material}
-                                    scrollEnabled={false}
-                                />
-                            </View>
-
-                            <View style={styles.container}>
-                                {entered &&
-                                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleChatToAppointment}>
-                                        <Text style={styles.modalButtonText}>Ir ao chat</Text>
-                                    </TouchableOpacity>
-                                }
-                                {!appointment.is_inside &&
-                                    <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleRequestAppointment}>
-                                        <Text style={styles.modalButtonText}>Ingressar</Text>
-                                    </TouchableOpacity>
-                                }
-                                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
-                                    <Text style={styles.modalButtonText}>Fechar</Text>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', marginBottom: 20 }}>
+                            <ArenaImage image={appointment.image} size={200} />
+                        </View>
+                        <View style={styles.container}>
+                            <View style={{ paddingTop: 20, flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
+                                <Text style={styles.label}>Endereço:</Text>
+                                <TouchableOpacity onPress={() => { Alert.alert('Ops', 'Essa funcionalidade está em desenvolvimento')/*navigate(navigation, )*/ }}>
+                                    <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline' }}>Ver no mapa</Text>
                                 </TouchableOpacity>
                             </View>
+                            <TextInput multiline={true}
+                                style={styles.input}
+                                value={appointment.address}
+                                editable={false}
+                            />
+                        </View>
+                        <View style={styles.container}>
+                            <Text style={styles.label}>Data marcada:</Text>
+                            <TextInput multiline={true}
+                                style={styles.input}
+                                value={`${formatDate(appointment.date, appointment.horary)} às ${formatTime(appointment.horary)}`}
+                                editable={false}
+                            />
+                        </View>
+                        <View style={{ paddingTop: 20, flexDirection: 'row', flex: 1, justifyContent: 'space-between', }}>
+                            <View style={{ flexDirection: 'column', flex: 1, paddingRight: 5 }}>
+                                <Text style={styles.label}>Distância da sua localização:</Text>
+                                <TextInput multiline={true}
+                                    style={styles.input}
+                                    value={`${appointment.distance} Km`}
+                                    editable={false}
+                                />
+                            </View>
+                            <View style={{ flexDirection: 'column', flex: 1, paddingLeft: 5 }}>
+                                <Text style={styles.label}>Esporte:</Text>
+                                <TextInput multiline={true}
+                                    style={styles.input}
+                                    value={`${appointment.name}`}
+                                    editable={false}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.container}>
+                            <Text style={styles.label}>Quantidade de pessoas que ingressaram neste agendamento:</Text>
+                            <TextInput multiline={true}
+                                style={styles.input}
+                                value={`${appointment.players} ${appointment.players === 1 ? 'Jogador presente' : 'Jogadores presentes'}`}
+                                editable={false}
+                            />
+                        </View>
+                        <View style={styles.container}>
+                            <Text style={styles.label}>Nome de usuário do organizador do agendamento:</Text>
+                            <TextInput multiline={true}
+                                style={styles.input}
+                                value={`${appointment.username}`}
+                                editable={false}
+                            />
+                        </View>
+                        {!appointment.is_inside &&
+                            <View style={styles.container}>
+                                <Text style={styles.label}>Ao marcar o item abaixo você se compromete a levar algum material necessário:</Text>
+                                <CheckboxButton
+                                    colours={theme}
+                                    label='Holder'
+                                    value={holder}
+                                    handleSelectedOption={() => setHolder(!holder)}
+                                    description='Levarei o material necessário'
+                                />
+                            </View>
+                        }
+                        <View style={styles.container}>
+                            <SectionList
+                                sections={[{ title: 'Materiais necessários', data: materials }]}
+                                renderItem={renderItem}
+                                renderSectionHeader={renderSectionHeader}
+                                keyExtractor={(item) => item.id.toString()}
+                                style={styles.container_material}
+                                scrollEnabled={false}
+                            />
+                        </View>
+
+                        <View style={styles.container}>
+                            {entered &&
+                                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleChatToAppointment}>
+                                    <Text style={styles.modalButtonText}>Ir ao chat</Text>
+                                </TouchableOpacity>
+                            }
+                            {!appointment.is_inside &&
+                                <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={handleRequestAppointment}>
+                                    <Text style={styles.modalButtonText}>Ingressar</Text>
+                                </TouchableOpacity>
+                            }
+                            <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={toggleModal}>
+                                <Text style={styles.modalButtonText}>Fechar</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
-                </ScrollView>
-            </Modal>
-        </>
+                </View>
+            </ScrollView>
+        </Modal>
     );
 };
 

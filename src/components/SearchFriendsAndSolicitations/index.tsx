@@ -91,7 +91,7 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
         onRequestClose={toggleModal}
       >
         <View style={styles.modalView}>
-
+          {loading && <LoaderUnique />}
           <View style={styles.tabBar}>
             {['Amigos', 'Solicitações de Amizade'].map((tab) => (
               <TabButton
@@ -120,7 +120,6 @@ export const SearchFriendsAndSolicitations = ({ open, close, navigation }) => {
         success={notification.success}
         visible={notification.visible}
         onClose={() => setNotification({ ...notification, visible: false })} />
-      {loading && <LoaderUnique />}
     </>
   );
 };
