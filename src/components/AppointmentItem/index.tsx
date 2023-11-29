@@ -3,37 +3,43 @@ import {
   TouchableOpacity,
   View,
   Text,
-  Image,
   StyleSheet,
 } from 'react-native';
-import { RootStackParamList } from '../../navigation/NavigationTypes';
-import { screens } from '../../navigation/ScreenProps';
-import { navigate } from '../../navigation/NavigationUtils';
 import Light from '../../utils/Theme/Light';
 import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';
-import { AvatarImage } from '../AvatarImage';
+import { ArenaImage } from '../ArenaImage';
 
-export const UserItem = ({ id, image, name, subtitle, action, border = true }) => {
+export const AppointmentItem = ({ id, image, name, subtitle, sport, distance, players, action, color, border = false }) => {
   const { theme } = useTheme();
-  const styles = createStyles(theme, border);
+  const styles = createStyles(theme, border, color);
   return (
     <TouchableOpacity onPress={() => { action() }} style={styles.chat_button}>
-      <AvatarImage image={image} />
+      <ArenaImage image={image} />
       <View style={styles.chat_content}>
         <Text style={styles.chat_text_title}>{name}</Text>
         <Text style={styles.chat_text_subtitle}>{subtitle}</Text>
+        <Text style={styles.chat_text_subtitle}>{sport}</Text>
+
+        <View style={{flex:1, flexDirection: 'row', justifyContent: 'space-between'}}>
+          <Text style={styles.chat_text_subtitle}>{distance} Km</Text>
+          <Text style={{...styles.chat_text_subtitle, textAlign: 'right'}}>{players}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   )
 }
 
-const createStyles = (theme: typeof Light | typeof Dark, border: boolean) =>
+const createStyles = (theme: typeof Light | typeof Dark, border: boolean, color: string) =>
   StyleSheet.create({
     chat_button: {
+      elevation: 4,
       flexDirection: 'row',
       alignItems: 'center',
       padding: 10,
+      marginVertical: 10,
+      borderRadius: 15,
+      backgroundColor: color,
       ...(border ? { borderBottomWidth: 1, borderColor: theme.TERTIARY } : {})
     },
     image: {
@@ -50,15 +56,14 @@ const createStyles = (theme: typeof Light | typeof Dark, border: boolean) =>
       alignItems: 'flex-start',
     },
     chat_text_title: {
-      flex: 1,
       fontFamily: 'Sansation Regular',
       fontSize: 16,
-      color: theme.SECONDARY,
+      color: theme.QUATERNARY,
     },
     chat_text_subtitle: {
       flex: 1,
       fontFamily: 'Sansation Regular',
       fontSize: 13,
-      color: theme.SECONDARY,
+      color: theme.QUATERNARY,
     },
   });

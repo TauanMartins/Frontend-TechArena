@@ -10,15 +10,13 @@ interface CheckboxButtonProps {
     QUATERNARY: string;
   };
   label: string;
-  description: string;
   value: boolean;
   handleSelectedOption: () => void;
 }
 
-const CheckboxButton: React.FC<CheckboxButtonProps> = ({
+const CheckboxButton2: React.FC<CheckboxButtonProps> = ({
   colours,
   label,
-  description,
   value,
   handleSelectedOption,
 }) => {
@@ -33,7 +31,6 @@ const CheckboxButton: React.FC<CheckboxButtonProps> = ({
       </View>
       <View style={styles.containerText}>
         <Text style={styles.text}>{label}</Text>
-        <Text style={styles.description}>{description}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -62,8 +59,8 @@ const createStyles = (
       alignItems: 'center',
     },
     checkboxInner: {
-      width: 12,
-      height: 12,
+      width: 10,
+      height: 10,
       borderRadius: 1,
       backgroundColor: colours.SECONDARY,
     },
@@ -82,4 +79,4 @@ const createStyles = (
     },
   });
 
-export default CheckboxButton;
+export default CheckboxButton2;

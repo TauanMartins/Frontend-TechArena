@@ -26,7 +26,7 @@ const formatDate = (dateString, timeString) => {
     const utcDate = new Date(dateString + `T${timeString}Z`);
     const spTimeZoneOffset = 0; // Fuso horário de São Paulo, sem considerar horário de verão
     const spDate = new Date(utcDate.getTime() + spTimeZoneOffset * 60 * 60 * 1000);
-    
+
     const day = spDate.getUTCDate();
     const monthNames = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
     const month = monthNames[spDate.getUTCMonth()];
@@ -66,7 +66,7 @@ const EventCard = ({ styles, appointment, theme }) => (
             </View>
 
             <View style={styles.eventAdditionalInfoRow}>
-                <Text style={{...styles.eventInfoText, fontWeight: 'bold' }}>
+                <Text style={{ ...styles.eventInfoText, fontWeight: 'bold' }}>
                     {appointment.distance} Km
                 </Text>
                 <Text style={{ ...styles.eventInfoText, textAlign: 'right' }}>
@@ -79,7 +79,7 @@ const EventCard = ({ styles, appointment, theme }) => (
 const ScheduledSuggestionsRow = ({ styles, navigation, isAuthenticated, user }) => (
     <View style={styles.sugestionTextRow}>
         <Text style={styles.sugestionText}>Sugestões agendadas</Text>
-        <Text style={styles.viewAllButton} onPress={() => navigate(navigation, screens.HomeRecommendedSchedules.name as keyof RootStackParamList, isAuthenticated, user)}>Ver todas</Text>
+        <Text style={styles.viewAllButton} onPress={() => navigate(navigation, screens.HomeAppointments.name as keyof RootStackParamList, isAuthenticated, user)}>Ver todas</Text>
     </View>
 );
 export const EventCardRow = ({ appointments, theme, navigation, isAuthenticated, user, action }) => {
@@ -88,8 +88,9 @@ export const EventCardRow = ({ appointments, theme, navigation, isAuthenticated,
         <View style={styles.container}>
             <ScheduledSuggestionsRow styles={styles} navigation={navigation} isAuthenticated={isAuthenticated} user={user} />
             <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}// Adicione este estilo
+                horizontal={appointments.data.length>0}
+                showsHorizontalScrollIndicator={false}
+                ListEmptyComponent={(<Text style={styles.emptyList}>Ops, não existem agendamentos por perto. Aproveite e crie um agendamento na arena mais próxima.</Text>)}
                 data={appointments.data} // Array com 4 elementos para representar os 4 cards
                 renderItem={({ item }) => (
                     <TouchableHighlight underlayColor={theme[item.sport_id]} style={{ borderRadius: 25 }} onPress={() => action(item)}>
@@ -112,6 +113,12 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             alignItems: 'baseline',
             justifyContent: 'space-between',
             paddingVertical: 10,
+        },
+        emptyList: {
+            textAlign: "center",
+            fontFamily: 'Sansation Regular',
+            fontSize: 13,
+            color: theme.SECONDARY
         },
         sugestionText: {
             flex: 1,

@@ -91,7 +91,7 @@ export const CreateSportsPrefered = ({ open, close }) => {
     const renderSportItem = ({ item: sport }) => (
         <CheckBox
             containerStyle={styles.checkboxContainer}
-            textStyle={styles.modalBody}
+            textStyle={styles.modalSports}
             title={sport.name}
             fontFamily='Sansation Regular'
             checked={selectedSports.includes(sport.id)}
@@ -164,6 +164,12 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             fontFamily: 'Sansation Regular',
             fontSize: 16,
             color: theme.SECONDARY,
+        },
+        modalSports: {
+            marginBottom: 10,
+            fontFamily: 'Sansation Regular',
+            fontSize: 16,
+            color: theme.QUATERNARY,
         },
         modalButton: {
             padding: 15,

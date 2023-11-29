@@ -17,7 +17,7 @@ const SCREENS: Record<
 
   HomeStack: { permission: PERMISSIONS.USER, implemented: true },
   Home: { permission: PERMISSIONS.USER, implemented: true },
-  HomeRecommendedSchedules: { permission: PERMISSIONS.USER, implemented: false },
+  HomeAppointments: { permission: PERMISSIONS.USER, implemented: true },
 
   SettingsStack: { permission: PERMISSIONS.USER, implemented: true },
   Settings: { permission: PERMISSIONS.USER, implemented: true },
@@ -46,7 +46,7 @@ const navigate = (
 
   if (!implemented) {
     return Alert.alert(
-      'Erro',
+      'Ops',
       'Desculpe, esta tela ainda não foi implementada.',
     );
   }

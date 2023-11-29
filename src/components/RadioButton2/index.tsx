@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
-import { User } from '../../utils/Model/User';
+import {Text, TouchableOpacity, View, StyleSheet} from 'react-native';
+import {User} from '../../utils/Model/User';
 
-interface CheckboxButtonProps {
+interface RadioButtonProps {
   colours: {
     PRIMARY: string;
     SECONDARY: string;
@@ -11,26 +11,26 @@ interface CheckboxButtonProps {
   };
   label: string;
   description: string;
-  value: boolean;
-  handleSelectedOption: () => void;
+  value: string; // Tipo genérico
+  selectedOption: string;
+  handleSelectedOption: (option: string) => void; // Tipo genérico
 }
 
-const CheckboxButton: React.FC<CheckboxButtonProps> = ({
+const RadioButton2: React.FC<RadioButtonProps> = ({
   colours,
   label,
   description,
   value,
+  selectedOption,
   handleSelectedOption,
 }) => {
-  const styles = createStyles(colours, value);
+  const styles = createStyles(colours, selectedOption === value);
 
   return (
     <TouchableOpacity
-      style={styles.checkboxButton}
-      onPress={handleSelectedOption}>
-      <View style={styles.checkbox}>
-        {value && <View style={styles.checkboxInner} />}
-      </View>
+      style={styles.radioButton}
+      onPress={() => handleSelectedOption(value)}>
+      <View style={styles.radioDot} />
       <View style={styles.containerText}>
         <Text style={styles.text}>{label}</Text>
         <Text style={styles.description}>{description}</Text>
@@ -40,35 +40,27 @@ const CheckboxButton: React.FC<CheckboxButtonProps> = ({
 };
 
 const createStyles = (
-  colours: CheckboxButtonProps['colours'],
+  colours: RadioButtonProps['colours'],
   isSelected: boolean,
 ) =>
   StyleSheet.create({
-    checkboxButton: {
+    radioButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginHorizontal: 10,
       marginVertical: 7.5,
+      flex: 1,
     },
-    checkbox: {
+    radioDot: {
       width: 20,
       height: 20,
-      borderRadius: 2,
-      backgroundColor: isSelected ? colours.TERTIARY : 'transparent',
+      borderRadius: 10,
+      backgroundColor: isSelected ? colours.SECONDARY : 'transparent',
       borderWidth: 2,
       borderColor: colours.SECONDARY,
-      marginRight: 10,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    checkboxInner: {
-      width: 12,
-      height: 12,
-      borderRadius: 1,
-      backgroundColor: colours.SECONDARY,
+      marginHorizontal: 10
     },
     containerText: {
-      flex: 1,
+      flex: 1
     },
     text: {
       fontFamily: 'Sansation Regular',
@@ -76,10 +68,11 @@ const createStyles = (
       color: colours.SECONDARY,
     },
     description: {
+      flex:1,
       fontFamily: 'Sansation Regular',
       fontSize: 13,
       color: colours.SECONDARY,
     },
   });
 
-export default CheckboxButton;
+export default RadioButton2;

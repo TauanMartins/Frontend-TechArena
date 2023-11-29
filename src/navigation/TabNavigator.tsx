@@ -36,11 +36,9 @@ export const TabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarIconStyle: { width: 34, height: 34 },
+        tabBarIconStyle: { borderWidth: 1, borderColor: 'transparent', width: 34, height: 34 },
         tabBarStyle: {
-          borderTopWidth: 0,
           elevation: 10,
-          maxHeight: 30,
           backgroundColor: theme.PRIMARY,
           display: keyboardVisible ? 'none' : 'flex'
         },

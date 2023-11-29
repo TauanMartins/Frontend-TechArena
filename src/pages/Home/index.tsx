@@ -15,7 +15,7 @@ import { ScreenProps, screens } from '../../navigation/ScreenProps';
 import { RootStackParamList } from '../../navigation/NavigationTypes';
 import { NotificationIcon } from '../../components/IconsButton';
 import { useAuth } from '../../utils/Auth/AuthContext';
-import Recommended from './Recommended';
+import Recommended from './HomeAppointments';
 import { navigate } from '../../navigation/NavigationUtils';
 import { AvatarImage } from '../../components/AvatarImage';
 import { Localization, standardLocalization } from '../../utils/Model/Localization';
@@ -30,6 +30,7 @@ import Loader from '../../components/Loader';
 import { EventCardRow } from '../../components/HomeScreenComponents/AppointmentListSuggested';
 import { DetailAppointment } from '../../components/DetailAppointment';
 import SocialChatStack from '../Social/Chat';
+import HomeAppointments from './HomeAppointments';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const HomeStack = () => {
@@ -57,11 +58,11 @@ const HomeStack = () => {
         component={Home}
       />
       <Stack.Screen
-        name={screens.HomeRecommendedSchedules.name as keyof RootStackParamList}
+        name={screens.HomeAppointments.name as keyof RootStackParamList}
         options={{
           headerShown: false,
         }}
-        component={Recommended}
+        component={HomeAppointments}
       />
       <Stack.Screen
         name={screens.SocialChatStack.name as keyof RootStackParamList}
@@ -99,7 +100,7 @@ const Home = ({ navigation }) => {
   const [preferedSports, setPreferedSports] = useState<[] | { id: number, name: string }[]>([])
   const [isDetailAppointmentModalVisible, setIsDetailAppointmentModalVisible] = useState(false)
   const [isCreatePreferedSportsModalVisible, setIsCreatePreferedSportsModalVisible] = useState(false)
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState({ data: [] });
   const [appointmentSelected, setAppointmentSelected] = useState([]);
 
   const toggleCreatePreferedSportsModal = () => {
@@ -116,7 +117,7 @@ const Home = ({ navigation }) => {
     if (e === 0) {
       toggleCreatePreferedSportsModal()
     } else {
-      Alert.alert('Acalme-se', 'Logo logo você verá agendamentos dos seus esportes favoritos em um toque.')
+      navigate(navigation, screens.HomeAppointments.name as keyof RootStackParamList, isAuthenticated, user)
     }
   };
   const fetchPreferedSports = async () => {
@@ -133,7 +134,7 @@ const Home = ({ navigation }) => {
       })
   };
   const fetchAppointments = async (latitude: string, longitude: string) => {
-    API.$appointments.select_appointments({ lat: latitude, longitude: longitude, username: user.username, filter: true })
+    API.$appointments.select_appointments({ lat: latitude, longitude: longitude, username: user.username, preferSports: true, orderByTime: 'recent', distance: 'near', page: 1 })
       .then((result) => {
         setAppointments(result.data)
       }).catch((e) => {
@@ -167,7 +168,7 @@ const Home = ({ navigation }) => {
     fetchAll()
   }, [])
   return (
-    <>
+    <View style={{flex: 1}}>
       {loading && <Loader />}
       <FlatList
         ListHeaderComponent={() => <Header theme={theme} user={user} />}
@@ -179,12 +180,12 @@ const Home = ({ navigation }) => {
             <CreateSportsPrefered open={isCreatePreferedSportsModalVisible} close={toggleCreatePreferedSportsModal} />
             <DetailAppointment open={isDetailAppointmentModalVisible} close={toggleDetailAppointmentModal} appointment={appointmentSelected} navigation={navigation} isAuthenticated={isAuthenticated} />
             <FavoriteSports theme={theme} user={user} data={preferedSports} action={handlePreferedSportPress} />
-            <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { if(appointmentSelected!==e){setAppointmentSelected(e)}; toggleDetailAppointmentModal() }} />
+            <EventCardRow appointments={appointments} isAuthenticated={isAuthenticated} navigation={navigation} theme={theme} user={user} action={(e) => { if (appointmentSelected !== e) { setAppointmentSelected(e) }; toggleDetailAppointmentModal() }} />
           </>
         }
         style={styles.container}
       />
-    </>
+    </View>
   );
 };
 

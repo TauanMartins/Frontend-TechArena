@@ -9,8 +9,8 @@ import SettingsPreferencesStack, {
   SettingsPreferences,
 } from '../pages/Settings/Preferences';
 import HomeStack from '../pages/Home';
-import Home from '../pages/Home/Recommended';
-import Recommended from '../pages/Home/Recommended';
+import Home from '../pages/Home';
+import HomeAppointments from '../pages/Home/HomeAppointments';
 import SocialStack, { Social } from '../pages/Social';
 import SocialChatStack, { SocialChat } from '../pages/Social/Chat';
 import SocialUserChatDetail from '../pages/Social/Chat/UserChatDetail';
@@ -36,7 +36,7 @@ export const screens = {
 
   HomeStack: {name: 'HomeStack', component: HomeStack},
   Home: {name: 'Home', component: Home},
-  HomeRecommendedSchedules: {name: 'HomeRecommendedSchedules', component: Recommended},
+  HomeAppointments: {name: 'HomeAppointments', component: HomeAppointments},
 
   /* ------------------------------------------------------------------------------------------------*/
 

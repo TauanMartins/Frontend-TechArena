@@ -12,7 +12,7 @@ export type RootStackParamList = {
 
   HomeStack: undefined,
   Home: undefined,
-  HomeRecommendedSchedules: undefined,
+  HomeAppointments: { sport_id?: number },
   /* ------------------------------------------------------------------------------------------------*/
 
   SettingsStack: undefined;
@@ -20,13 +20,13 @@ export type RootStackParamList = {
   SettingsPreferencesStack: undefined;
   SettingsPreferences: undefined;
   SettingsThemePreferences: undefined;
-  
- /* ------------------------------------------------------------------------------------------------*/
+
+  /* ------------------------------------------------------------------------------------------------*/
 
 
   SocialStack: undefined;
   Social: undefined;
-  SocialChatStack: { chat_id: number, name: string, image: string, is_group_chat?: boolean } ;
+  SocialChatStack: { chat_id: number, name: string, image: string, is_group_chat?: boolean };
   SocialChat: undefined;
-  SocialUserChatDetail: { chat_id: number, name: string, image: string, is_group_chat?: boolean } ;
+  SocialUserChatDetail: { chat_id: number, name: string, image: string, is_group_chat?: boolean };
 };

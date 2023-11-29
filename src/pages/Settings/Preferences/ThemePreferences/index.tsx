@@ -117,51 +117,55 @@ const SettingsThemePreferences: React.FC<
     return backHandler;
   }, [navigation, preferedTheme.edited]);
   return (
-    <ScrollView style={{ ...styles.scrollView, backgroundColor: theme.PRIMARY }}>
-      <View style={{ ...styles.container, backgroundColor: theme.PRIMARY }}>
-        <View style={styles.headerRow}>
-          <BackButton
-            onPress={() => navigation.goBack()}
-            style={{}}
-            color={theme.SECONDARY}
-          />
-          <Text style={{ ...styles.title, color: theme.SECONDARY }}>
-            Temas claro e escuro
-          </Text>
-          <View style={{ width: 50 }} />
-        </View>
-        <View style={styles.col}>
-          {themeOptions.map(themeOption => (
-            <RadioButton
-              key={themeOption.label}
-              colours={theme}
-              label={themeOption.label}
-              description={themeOption.description}
-              value={themeOption.value}
-              selectedOption={preferedTheme.prefered_theme}
-              handleSelectedOption={handleSelectedOption}
+    <>
+      <ScrollView style={{ ...styles.scrollView, backgroundColor: theme.PRIMARY }}>
+        <View style={{ ...styles.container, backgroundColor: theme.PRIMARY }}>
+          <View style={styles.headerRow}>
+            <BackButton
+              onPress={() => navigation.goBack()}
+              style={{}}
+              color={theme.SECONDARY}
             />
-          ))}
-        </View>
-        <View style={styles.row}>
-          <TouchableOpacity
-            onPress={handleSavePreferedTheme}
-            disabled={!preferedTheme.edited}
-            style={{ ...styles.button, backgroundColor: theme.TERTIARY }}>
-            {loading && <LoaderUnique />}
-            <Text style={{ ...styles.button_text, color: theme.QUATERNARY }}>
-              Salvar
+            <Text style={{ ...styles.title, color: theme.SECONDARY }}>
+              Temas claro e escuro
             </Text>
-          </TouchableOpacity>
+            <View style={{ width: 50 }} />
+          </View>
+          <View style={styles.col}>
+            {themeOptions.map(themeOption => (
+              <RadioButton
+                key={themeOption.label}
+                colours={theme}
+                label={themeOption.label}
+                description={themeOption.description}
+                value={themeOption.value}
+                selectedOption={preferedTheme.prefered_theme}
+                handleSelectedOption={handleSelectedOption}
+              />
+            ))}
+          </View>
+          <View style={styles.row}>
+            <TouchableOpacity
+              onPress={handleSavePreferedTheme}
+              disabled={!preferedTheme.edited}
+              style={{ ...styles.button, backgroundColor: theme.TERTIARY }}>
+              {loading && <LoaderUnique />}
+              <Text style={{ ...styles.button_text, color: theme.QUATERNARY }}>
+                Salvar
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <Notification
-          message={notification.message}
-          success={notification.success}
-          visible={notification.visible}
-          onClose={() => setNotification({ ...notification, visible: false })}
-        />
-      </View>
-    </ScrollView>
+      </ScrollView>
+      
+      <Notification
+        message={notification.message}
+        success={notification.success}
+        visible={notification.visible}
+        onClose={() => setNotification({ ...notification, visible: false })}
+      />
+    </>
+
   );
 };
 
@@ -181,7 +185,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'Sansation Regular',
     fontSize: 26,
-    alignItems: 'center', 
+    alignItems: 'center',
     flex: 1,
   },
   row: {

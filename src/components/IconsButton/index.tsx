@@ -135,7 +135,7 @@ export const BackButton = ({
   color,
 }: {
   onPress: () => void;
-  style: ViewStyle;
+  style?: ViewStyle;
   color: string;
 }) => {
   return (
