@@ -7,6 +7,8 @@ import Friends from './Friends';
 import Teams from './Teams';
 import Sports from './Sports';
 import Appointments from './Appointments';
+import Arenas from './Arenas';
+import Horary from './Horary';
 
 const API = axios.create({
   baseURL: 'https://api.techarena.com.br/api',
@@ -42,6 +44,11 @@ const $sports =  Sports(API)('/sports');
 const $sports_material =  Sports(API)('/sports/material');
 const $sports_prefered =  Sports(API)('/sports/prefered-sports');
 const $appointments =  Appointments(API)('/appointments');
+const $user_appointments =  Appointments(API)('/appointments/user');
+const $arenas =  Arenas(API)('/arenas');
+const $arenas_sport =  Arenas(API)('/arenas/sports');
+const $arenas_user =  Arenas(API)('/arenas/users');
+const $horary =  Horary(API)('/horary');
 
 export default {
   $users,
@@ -62,5 +69,10 @@ export default {
   $sports,
   $sports_prefered,
   $appointments,
-  $sports_material
+  $sports_material,
+  $arenas,
+  $arenas_sport,
+  $arenas_user,
+  $horary,
+  $user_appointments
 };

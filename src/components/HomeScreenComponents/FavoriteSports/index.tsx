@@ -69,7 +69,7 @@ type SportIconProps = {
     action: (sportCode: number) => void
 };
 
-const SportIcon = ({ styles, theme, sportCode, sportName, action }: SportIconProps) => (
+export const SportIcon = ({ styles, theme, sportCode, sportName, action }: SportIconProps) => (
     <TouchableHighlight underlayColor={theme.TERTIARY} style={{ borderRadius: 10, alignItems: 'center' }} onPress={() => action(sportCode)}>
         <View style={styles.col}>
             <View style={{ ...styles.iconContainer, backgroundColor: theme[sportCode] }}>
@@ -120,6 +120,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
             alignItems: 'center',
             borderRadius: 10,
             elevation: 3,
+            
         }, sportText: {
             flex: 1,
             fontFamily: 'Sansation Regular',

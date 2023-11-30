@@ -144,10 +144,10 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const logout = async () => {
     console.log('Não autenticado, deslogando...');
     await clearIdToken();
+    setIsAuthenticated(false);
     setUser(UnauthenticatedUser);
     setLocalization(standardLocalization)
     await GoogleSignin.signOut();
-    setIsAuthenticated(false);
   };
 
   useEffect(() => {

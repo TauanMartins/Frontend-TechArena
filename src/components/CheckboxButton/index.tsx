@@ -68,7 +68,6 @@ const createStyles = (
       backgroundColor: colours.SECONDARY,
     },
     containerText: {
-      flex: 1,
     },
     text: {
       fontFamily: 'Sansation Regular',

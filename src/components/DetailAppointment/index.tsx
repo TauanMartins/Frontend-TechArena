@@ -128,7 +128,6 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
                 setLoading(true);
                 API.$chat_appointment.post_chats_appointments({ username: user.username, appointment_id: appointment.id })
                     .then((response) => {
-                        console.log(response.data)
                         toggleModal();
                         navigate(navigation,
                             screens.SocialChatStack.name as keyof RootStackParamList,
@@ -220,7 +219,13 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
                         <View style={styles.container}>
                             <View style={{ paddingTop: 20, flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
                                 <Text style={styles.label}>Endereço:</Text>
-                                <TouchableOpacity onPress={() => { Alert.alert('Ops', 'Essa funcionalidade está em desenvolvimento')/*navigate(navigation, )*/ }}>
+                                <TouchableOpacity onPress={() => {
+                                    toggleModal();
+                                    navigate(navigation,
+                                        screens.CreateMatchStack.name as keyof RootStackParamList,
+                                        isAuthenticated,
+                                        user, { page: 'Mapa', arena_id: appointment.arena_id })
+                                }}>
                                     <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline' }}>Ver no mapa</Text>
                                 </TouchableOpacity>
                             </View>
@@ -274,7 +279,7 @@ export const DetailAppointment = ({ open, close, appointment, navigation, isAuth
                         </View>
                         {!appointment.is_inside &&
                             <View style={styles.container}>
-                                <Text style={styles.label}>Ao marcar o item abaixo você se compromete a levar algum material necessário:</Text>
+                                <Text style={styles.label}>Ao marcar o item abaixo você se compromete a levar algum material necessário (opcional):</Text>
                                 <CheckboxButton
                                     colours={theme}
                                     label='Holder'

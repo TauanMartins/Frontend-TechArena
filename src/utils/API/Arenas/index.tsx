@@ -2,12 +2,11 @@ import { User } from "../../Model/User";
 
 export default API => (resource: string) => {
   return {
-    select_arenas(parameters: { lat: string, longitude: number, username?: User['username'] }) {
-      if (parameters.username) {
-        return API.get(resource + '?lat=' + parameters.lat + '&longitude=' + parameters.longitude + '&username=' + parameters.username).catch(error => { throw new Error(error.response.data.message) });
-      } else {
-        return API.get(resource + '?lat=' + parameters.lat + '&longitude=' + parameters.longitude).catch(error => { throw new Error(error.response.data.message) });
-      }
+    select_arenas_sports(parameters: { sport_id: number }) {
+      return API.get(resource + '?sport_id=' + parameters.sport_id).catch(error => { throw new Error(error.response.data.message) });
+    },
+    select_arenas_user(parameters: { lat: string, longitude: number }) {
+      return API.get(resource + '?lat=' + parameters.lat + '&longitude=' + parameters.longitude).catch(error => { throw new Error(error.response.data.message) });
     },
   };
 };

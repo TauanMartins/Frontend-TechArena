@@ -94,7 +94,6 @@ export const UpdateSportsPrefered = ({ navigation, open, close }) => {
         API.$sports_prefered.select_prefered_sports({ username: user.username })
             .then((result) => {
                 let lista = result.data.map(sport => {
-                    console.log(sport)
                     return sport.id
                 });
                 setSelectedSports(lista)

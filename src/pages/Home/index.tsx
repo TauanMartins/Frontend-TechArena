@@ -31,6 +31,8 @@ import { EventCardRow } from '../../components/HomeScreenComponents/AppointmentL
 import { DetailAppointment } from '../../components/DetailAppointment';
 import SocialChatStack from '../Social/Chat';
 import HomeAppointments from './HomeAppointments';
+import { CreateMatchMapStack } from '../CreateMatch/CreateMatchMap';
+import CreateMatchStack, { TopTabs } from '../CreateMatch';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const HomeStack = () => {
@@ -71,6 +73,13 @@ const HomeStack = () => {
         }}
         component={SocialChatStack}
       />
+      
+      <Stack.Screen
+        name={screens.CreateMatchStack.name as keyof RootStackParamList}
+        options={{
+          headerShown: false,
+        }}
+        component={CreateMatchStack} />
     </Stack.Navigator>
   );
 };

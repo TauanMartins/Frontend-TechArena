@@ -3,12 +3,8 @@ import {
   TouchableOpacity,
   View,
   Text,
-  Image,
   StyleSheet,
 } from 'react-native';
-import { RootStackParamList } from '../../navigation/NavigationTypes';
-import { screens } from '../../navigation/ScreenProps';
-import { navigate } from '../../navigation/NavigationUtils';
 import Light from '../../utils/Theme/Light';
 import Dark from '../../utils/Theme/Dark';
 import { useTheme } from '../../utils/Theme/ThemeContext';

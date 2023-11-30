@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator  } from '@react-navigation/bottom-tabs';
 import { screens } from './ScreenProps';
 import {
   SettingsIcon,
@@ -72,10 +72,10 @@ export const TabNavigator = () => {
         })}
       />
       <Tab.Screen
-        name="CreateMatch"
-        component={screens.Home.component}
+        name="CreateMatchStack"
+        component={screens.CreateMatchStack.component}
         options={({ navigation }) => ({
-          title: 'CreateMatch',
+          title: 'CreateMatchStack',
           tabBarIcon: () => (
             <CreateMatchIcon
               isActive={navigation.isFocused()}

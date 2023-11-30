@@ -25,6 +25,14 @@ const SCREENS: Record<
   SettingsPreferences: { permission: PERMISSIONS.USER, implemented: true },
   SettingsThemePreferences: { permission: PERMISSIONS.USER, implemented: true },
 
+  CreateMatchStack: { permission: PERMISSIONS.USER, implemented: true },
+  Agendamentos: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchMapStack: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchMap: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchHomeStack: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchHome: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchPersonalStack: { permission: PERMISSIONS.USER, implemented: true },
+  CreateMatchPersonal: { permission: PERMISSIONS.USER, implemented: true },
 
   SocialStack: { permission: PERMISSIONS.USER, implemented: true },
   Social: { permission: PERMISSIONS.USER, implemented: true },
@@ -38,7 +46,7 @@ const navigate = (
   routeName: keyof RootStackParamList,
   isAuthenticated: boolean,
   user: User,
-  parameters?: any 
+  parameters?: any
 ) => {
   const screen = SCREENS[routeName];
   const requiredPermission = screen.permission;
