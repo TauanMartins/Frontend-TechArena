@@ -75,7 +75,7 @@ const SettingsThemePreferences: React.FC<
       onConfirm: async () => {
         try {
           setLoading(true);
-          saveTheme(preferedTheme.prefered_theme, user, setUser);
+          await saveTheme(preferedTheme.prefered_theme, user, setUser)
           setNotification({
             message: 'As configurações foram salvas com sucesso!',
             success: true,
@@ -157,7 +157,7 @@ const SettingsThemePreferences: React.FC<
           </View>
         </View>
       </ScrollView>
-      
+
       <Notification
         message={notification.message}
         success={notification.success}

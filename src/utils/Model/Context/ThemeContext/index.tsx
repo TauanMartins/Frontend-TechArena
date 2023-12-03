@@ -1,7 +1,7 @@
 import Light from '../../../Theme/Light';
 import Dark from '../../../Theme/Dark';
-import {User} from '../../User';
-import React, {Dispatch, SetStateAction} from 'react';
+import { User } from '../../User';
+import React, { Dispatch, SetStateAction } from 'react';
 
 export interface ThemeContextData {
   theme: null | typeof Light | typeof Dark;
@@ -18,5 +18,5 @@ export interface ThemeContextData {
     preferedTheme: User['prefered_theme'],
     user: User,
     setUser: React.Dispatch<React.SetStateAction<User>>,
-  ) => void;
+  ) => Promise<object>;
 }

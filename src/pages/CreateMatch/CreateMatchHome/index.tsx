@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScreenProps, screens } from '../../../navigation/ScreenProps';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useAuth } from '../../../utils/Auth/AuthContext';
@@ -18,6 +18,7 @@ import ArenaMenu from '../../../components/CreateMatchComponents/ArenaMenu';
 import HoraryMenu from '../../../components/CreateMatchComponents/HoraryMenu';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import Notification from '../../../components/Notification';
+import { useFocusEffect } from '@react-navigation/native';
 
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -96,6 +97,7 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
     setDate(date);
   };
 
+
   const saveAppointment = () => {
     if (!(arena?.arena_id && horary?.id && sport?.id)) {
       return Alert.alert('Erro', 'Por favor, preencha os dados corretamente.');
@@ -135,6 +137,8 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
       setLoading(false)
     })
   };
+
+
   const fetchArena = () => {
     if (sport) {
       setLoading(true)

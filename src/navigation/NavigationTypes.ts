@@ -9,19 +9,19 @@ export type RootStackParamList = {
   Login: undefined;
 
   /* ------------------------------------------------------------------------------------------------*/
-  
+
   HomeStack: undefined,
   Home: undefined,
   HomeAppointments: { sport_id?: number },
-  
+
   /* ------------------------------------------------------------------------------------------------*/
-  
+
   CreateMatchStack: { page?: string, arena_id?: number },
   Agendamentos: { page?: string, arena_id?: number },
   CreateMatchMapStack: undefined,
   CreateMatchMap: { arena_id?: number },
   CreateMatchHomeStack: undefined,
-  CreateMatchHome: undefined,
+  CreateMatchHome: { arena: object },
   CreateMatchPersonalStack: undefined,
   CreateMatchPersonal: undefined,
 

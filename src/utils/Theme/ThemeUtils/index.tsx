@@ -31,14 +31,14 @@ export const changeTheme = async (
   StatusBar.setBarStyle(nextBarStyle); // Tema da fonte da barra de cima
 };
 
-export const saveTheme = async (
+export const saveTheme = (
   preferedTheme: User['prefered_theme'],
   user: User,
   setUser: React.Dispatch<React.SetStateAction<User>>,
 ) => {
-  await API.$users_prefered_theme.user_prefered_theme({
+  setUser({ ...user, prefered_theme: preferedTheme });
+  return API.$users_prefered_theme.user_prefered_theme({
     prefered_theme: preferedTheme,
     user: user.email,
   });
-  setUser({ ...user, prefered_theme: preferedTheme });
 };

@@ -16,6 +16,8 @@ import CheckboxButton2 from '../../../components/CheckboxButton2';
 import RadioButton2 from '../../../components/RadioButton2';
 import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../../../navigation/NavigationTypes';
+import { CreateMatchMapStack } from '../CreateMatchMap';
+import CreateMatchStack from '..';
 
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -41,6 +43,12 @@ export const CreateMatchPersonalStack = () => {
           headerShown: false,
         }}
         component={CreateMatchPersonal} />
+      <Stack.Screen
+        name={screens.CreateMatchStack.name as keyof RootStackParamList}
+        options={{
+          headerShown: false,
+        }}
+        component={CreateMatchStack} />
     </Stack.Navigator>
   );
 };

@@ -1,6 +1,6 @@
 {
   "name": "app_techarena",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -29,6 +29,7 @@
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "^2.14.0",
     "react-native-image-picker": "^7.0.2",
+    "react-native-maps": "1.8.0",
     "react-native-navigation-bar-color": "^2.0.2",
     "react-native-pager-view": "^6.2.2",
     "react-native-reanimated": "^3.6.0",

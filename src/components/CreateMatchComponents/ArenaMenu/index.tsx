@@ -47,7 +47,7 @@ const ArenaMenu = ({ arenas, selectedArena, onChange, navigation }) => {
                         <TouchableOpacity onPress={() => {
                             navigation.navigate('CreateMatchMap', { arena_id: selectedArena.arena_id })
                         }}>
-                            <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline' }}>Ver no mapa</Text>
+                            <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline', padding: 10}}>Ver no mapa</Text>
                         </TouchableOpacity>
                     </>
 

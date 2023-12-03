@@ -57,7 +57,6 @@ const DateMenu = ({ date, onChange }) => {
 const createStyles = (theme: typeof Light | typeof Dark) =>
     StyleSheet.create({
         container: {
-            paddingTop: 10,
             flex: 1,
             flexDirection: 'row',
             backgroundColor: theme.PRIMARY,

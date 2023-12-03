@@ -11,7 +11,7 @@ const PrivacyPolicies_ServiceTems = () => {
       <Text
         style={styles.link}
         onPress={() =>
-          handleLinkPress('https://techarena.com.br/service-terms')
+          handleLinkPress('https://techarena.com.br/use-terms')
         }>
         Termos de Uso
       </Text>{' '}
