@@ -76,6 +76,7 @@ export const SocialChat = ({ navigation, route }) => {
   const { isAuthenticated, user } = useAuth();
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sending, setSending] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isScreenActive, setIsScreenActive] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -185,6 +186,7 @@ export const SocialChat = ({ navigation, route }) => {
       .finally(() => {
         scrollToBottom();
         setInputMessage('');
+        setSending(false)
       });
   };
 
@@ -217,6 +219,7 @@ export const SocialChat = ({ navigation, route }) => {
   }, []);
 
   const handleSendMessage = () => {
+    setSending(true);
     sendMessages(inputMessage);
   };
   const handleGoToDetails = () => {
@@ -291,7 +294,7 @@ export const SocialChat = ({ navigation, route }) => {
         />
         <TouchableOpacity
           onPress={handleSendMessage}
-          disabled={inputMessage.length === 0}
+          disabled={inputMessage.length === 0 || sending}
           style={{ ...styles.sendButton, backgroundColor: theme.TERTIARY }}
         >
           <Text style={{ ...styles.sendButtonText, color: theme.QUATERNARY }}>Enviar</Text>

@@ -58,10 +58,10 @@ export const TabNavigator = () => {
         })}
       />
       <Tab.Screen
-        name="League"
-        component={screens.Home.component}
+        name="LeagueStack"
+        component={screens.LeagueStack.component}
         options={({ navigation }) => ({
-          title: 'League',
+          title: 'LeagueStack',
           tabBarIcon: () => (
             <LeagueIcon
               isActive={navigation.isFocused()}

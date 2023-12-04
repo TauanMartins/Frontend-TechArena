@@ -25,6 +25,15 @@ const SCREENS: Record<
   SettingsPreferences: { permission: PERMISSIONS.USER, implemented: true },
   SettingsThemePreferences: { permission: PERMISSIONS.USER, implemented: true },
 
+  LeagueStack: { permission: PERMISSIONS.USER, implemented: true },
+  Ligas: { permission: PERMISSIONS.USER, implemented: true },
+  LeagueMapStack: { permission: PERMISSIONS.ADMIN, implemented: true },
+  LeagueMap: { permission: PERMISSIONS.ADMIN, implemented: true },
+  LeagueHomeStack: { permission: PERMISSIONS.ADMIN, implemented: true },
+  LeagueHome: { permission: PERMISSIONS.ADMIN, implemented: true },
+  LeaguePersonalStack: { permission: PERMISSIONS.ADMIN, implemented: true },
+  LeaguePersonal: { permission: PERMISSIONS.ADMIN, implemented: true },
+
   CreateMatchStack: { permission: PERMISSIONS.USER, implemented: true },
   Agendamentos: { permission: PERMISSIONS.USER, implemented: true },
   CreateMatchMapStack: { permission: PERMISSIONS.USER, implemented: true },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import {
   View,
@@ -21,6 +21,7 @@ import Dark from '../../utils/Theme/Dark';
 import Light from '../../utils/Theme/Light';
 import { SearchFriendsAndSolicitations } from '../../components/SearchFriendsAndSolicitations';
 import { SearchTeamsAndSolicitations } from '../../components/SearchTeamsAndSolicitations';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -120,9 +121,11 @@ export const Social = ({ navigation }) => {
   const toggleTeamsChats = () => setShowTeamsChats(!showTeamsChats);
   const toggleAppointmentsChats = () => setShowAppointmentsChats(!showAppointmentsChats);
 
-  useEffect(() => {
-    fetchChat();
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      fetchChat();
+    }, []))
+
   const renderChatItem = ({ item }) => (
     <Chat key={item.id} id={item.id} name={item.name} message={item.last_message} navigation={navigation} image={item.image} isAuthenticated={isAuthenticated} user={user} is_group_chat={item.is_group_chat} />
   );
@@ -210,7 +213,7 @@ export const Social = ({ navigation }) => {
     { title: 'Chat do Agendamento', data: appointmentsChats },
   ];
   return (
-    <View style={{flex: 1, backgroundColor: theme.PRIMARY}}>
+    <View style={{ flex: 1, backgroundColor: theme.PRIMARY }}>
       <Notification
         message={notification.message}
         success={notification.success}

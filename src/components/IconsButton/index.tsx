@@ -204,6 +204,32 @@ export const FavoriteIcon = ({
     </View>
   );
 };
+export const SecurityIcon = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10 }}>
+      <Ionicons name="shield-checkmark-outline" size={20} color={color} />
+    </View>
+  );
+};
+export const MyProfile = ({
+  style,
+  color,
+}: {
+  style?: ViewStyle;
+  color: string;
+}) => {
+  return (
+    <View style={{ ...style, paddingHorizontal: 10 }}>
+      <Feather name="user" size={20} color={color} />
+    </View>
+  );
+};
 export const PreferenceThemeIcon = ({
   style,
   color,

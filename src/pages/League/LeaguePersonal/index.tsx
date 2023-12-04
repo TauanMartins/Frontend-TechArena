@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScreenProps } from '../../../navigation/ScreenProps';
+import { ScreenProps, screens } from '../../../navigation/ScreenProps';
 import { StyleSheet, FlatList, View, TouchableOpacity, Text, TouchableHighlight, SectionList } from 'react-native';
 import { useAuth } from '../../../utils/Auth/AuthContext';
 import { BackButton, CollapseDown, CollapseRight, NotificationIcon } from '../../../components/IconsButton';
@@ -14,6 +14,38 @@ import { DetailAppointment } from '../../../components/DetailAppointment';
 import CheckboxButton from '../../../components/CheckboxButton';
 import CheckboxButton2 from '../../../components/CheckboxButton2';
 import RadioButton2 from '../../../components/RadioButton2';
+import { createStackNavigator } from '@react-navigation/stack';
+import { RootStackParamList } from '../../../navigation/NavigationTypes';
+import CreateMatchStack from '..';
+import { DetailAppointment2 } from '../../../components/DetailAppointment2';
+
+
+const Stack = createStackNavigator<RootStackParamList>();
+
+export const LeaguePersonalStack = () => {
+  const { theme } = useTheme();
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          elevation: 0,
+          borderBottomWidth: 0,
+          backgroundColor: theme.PRIMARY,
+        },
+        headerTitleStyle: {
+          color: theme.SECONDARY,
+        },
+      }}>
+      <Stack.Screen
+        name={screens.LeaguePersonal.name as keyof RootStackParamList}
+        options={{
+          headerShown: false,
+        }}
+        component={LeaguePersonal} />
+    </Stack.Navigator>
+  );
+};
 
 const formatDate = (dateString, timeString) => {
   if (!dateString) {
@@ -39,24 +71,23 @@ const formatTime = (timeString) => {
   return `${hours}h${minutes}`;
 };
 
-const HomeAppointments: React.FC<ScreenProps<'HomeAppointments'>> = ({ navigation, route }) => {
+const LeaguePersonal: React.FC<ScreenProps<'LeaguePersonal'>> = ({ navigation, route }) => {
   const { user, localization, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const styles = createStyles(theme);
-  const sport_filter = route.params?.sport_id;
 
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [appointments, setAppointments] = useState({ data: [], current_page: 1, total: 0, per_page: 5 });
   const [appointmentSelected, setAppointmentSelected] = useState([]);
   const [isDetailAppointmentModalVisible, setIsDetailAppointmentModalVisible] = useState(false);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({ preferSports: true, orderByTime: 'recent', distance: 'near' });
 
   const fetchAppointments = async (latitude: string, longitude: string) => {
     setLoading(true);
     try {
-      const result = await API.$appointments.select_appointments({
+      const result = await API.$user_appointments.select_user_appointments({
         lat: latitude,
         longitude: longitude,
         username: user.username,
@@ -75,7 +106,7 @@ const HomeAppointments: React.FC<ScreenProps<'HomeAppointments'>> = ({ navigatio
   const fetchMoreAppointments = async (latitude: string, longitude: string) => {
     try {
       if (appointments.current_page < (appointments.total / appointments.per_page)) {
-        const result = await API.$appointments.select_appointments({
+        const result = await API.$user_appointments.select_user_appointments({
           lat: latitude,
           longitude: longitude,
           username: user.username,
@@ -156,19 +187,10 @@ const HomeAppointments: React.FC<ScreenProps<'HomeAppointments'>> = ({ navigatio
       }
     </>
   );
-
   return (
     <View style={styles.container}>
       {loading && <Loader />}
-      <View style={styles.headerRow}>
-        <BackButton onPress={() => navigation.goBack()} color={theme.SECONDARY} />
-        <View style={styles.row}>
-          <Text style={{ ...styles.title, color: theme.SECONDARY }}>
-            Agendamentos
-          </Text>
-        </View>
-      </View>
-      <DetailAppointment
+      <DetailAppointment2
         open={isDetailAppointmentModalVisible}
         close={toggleDetailAppointmentModal}
         appointment={appointmentSelected}
@@ -179,7 +201,7 @@ const HomeAppointments: React.FC<ScreenProps<'HomeAppointments'>> = ({ navigatio
         data={appointments.data}
         ListEmptyComponent={(
           <Text style={styles.emptyList}>
-            Ops, não existem agendamentos por perto. Aproveite e crie um agendamento na arena mais próxima.
+            Ops, você não participou de nenhum agendamento até o momento. 
           </Text>
         )}
         ListHeaderComponent={<FiltersHeader />}
@@ -189,11 +211,11 @@ const HomeAppointments: React.FC<ScreenProps<'HomeAppointments'>> = ({ navigatio
         onEndReached={() => fetchMoreAppointments(localization.lat, localization.longitude)}
         renderItem={({ item: appointment }) => (
           <AppointmentItem
-            color={theme[appointment.sport_id]}
+            color={(appointment.date<(new Date()).toISOString().split('T')[0])?'lightgrey':theme[appointment.sport_id]}
             distance={appointment.distance}
             id={appointment.id}
             image={appointment.image}
-            name={appointment.address}
+            name={`${appointment.address} ${(appointment.date<(new Date()).toISOString().split('T')[0])?'- AGENDAMENTO ANTIGO':''}`}
             players={`${appointment.players} ${appointment.players === 1 ? 'Jogador presente' : 'Jogadores presentes'}`}
             sport={appointment.name}
             subtitle={`${formatDate(appointment.date, appointment.horary)} às ${formatTime(appointment.horary)}`}
@@ -278,4 +300,4 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
     },
   });
 
-export default HomeAppointments;
+export default LeaguePersonal;

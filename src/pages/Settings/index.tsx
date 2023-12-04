@@ -1,26 +1,27 @@
 import React from 'react';
-import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import {
   TouchableOpacity,
   View,
   Text,
   StyleSheet,
   ScrollView,
+  Alert,
 } from 'react-native';
-import {useTheme} from '../../utils/Theme/ThemeContext';
-import {screens} from '../../navigation/ScreenProps';
-import {RootStackParamList} from '../../navigation/NavigationTypes';
+import { useTheme } from '../../utils/Theme/ThemeContext';
+import { screens } from '../../navigation/ScreenProps';
+import { RootStackParamList } from '../../navigation/NavigationTypes';
 import Light from '../../utils/Theme/Light';
-import {FavoriteIcon, PreferenceIcon} from '../../components/IconsButton';
+import { FavoriteIcon, MyProfile, PreferenceIcon, SecurityIcon } from '../../components/IconsButton';
 import ConfirmationDialog from '../../components/ConfirmationDialog';
-import {useAuth} from '../../utils/Auth/AuthContext';
+import { useAuth } from '../../utils/Auth/AuthContext';
 import SettingsPreferencesStack from './Preferences';
 import { UpdateSportsPrefered } from '../../components/UpdateSportsPrefered';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const SettingsStack = () => {
-  const {theme} = useTheme();
+  const { theme } = useTheme();
 
   return (
     <Stack.Navigator
@@ -61,9 +62,9 @@ const SettingsStack = () => {
   );
 };
 
-export const Settings = ({navigation}) => {
-  const {logout} = useAuth();
-  const {theme} = useTheme();
+export const Settings = ({ navigation }) => {
+  const { logout } = useAuth();
+  const { theme } = useTheme();
   const styles = createStyles(theme);
 
   const handleLogout = () => {
@@ -71,7 +72,7 @@ export const Settings = ({navigation}) => {
       title: 'Confirmação',
       message: 'Deseja sair da aplicação?',
       onConfirm: logout,
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
   return (
@@ -80,6 +81,32 @@ export const Settings = ({navigation}) => {
         <Text style={styles.title}>Configurações</Text>
       </View>
       <View style={styles.col}>
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert('Ops', 'Não disponibilizamos essa funcionalidade ainda...')
+          }
+          style={styles.settingsButton}>
+          <MyProfile color={theme.SECONDARY} />
+          <View style={styles.buttonContent}>
+            <Text style={styles.button_text_title}>Meu perfil</Text>
+            <Text style={styles.button_text}>
+              Visualize suas informações pessoais, altere sua senha ou desative sua conta.
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            Alert.alert('Ops', 'Não disponibilizamos essa funcionalidade ainda...')
+          }
+          style={styles.settingsButton}>
+          <SecurityIcon color={theme.SECONDARY} />
+          <View style={styles.buttonContent}>
+            <Text style={styles.button_text_title}>Segurança e acesso à conta</Text>
+            <Text style={styles.button_text}>
+              Confira as configurações de segurança e monitore o uso da sua conta, incluindo os aplicativos conectados a ela.
+            </Text>
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate(

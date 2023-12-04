@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import {
   TouchableOpacity,
@@ -33,6 +33,7 @@ import SocialChatStack from '../Social/Chat';
 import HomeAppointments from './HomeAppointments';
 import { CreateMatchMapStack } from '../CreateMatch/CreateMatchMap';
 import CreateMatchStack, { TopTabs } from '../CreateMatch';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const HomeStack = () => {
@@ -73,7 +74,7 @@ const HomeStack = () => {
         }}
         component={SocialChatStack}
       />
-      
+
       <Stack.Screen
         name={screens.CreateMatchStack.name as keyof RootStackParamList}
         options={{
@@ -150,15 +151,17 @@ const Home = ({ navigation }) => {
         console.log(e)
       })
   };
-  const fetchAll = async (list = false) => {
+  const fetchAll = async (list = false, refresh = false) => {
     try {
       if (list) {
         setLoadingList(true)
       } else {
         setLoading(true);
       }
-      const localization = await fetchLocalization();
-      setLocalization(localization);
+      if (!refresh) {
+        const localization = await fetchLocalization();
+        setLocalization(localization);
+      }
       const fetchAppointmentsPromise = fetchAppointments(localization.lat, localization.longitude);
       const fetchPreferedSportsPromise = fetchPreferedSports();
 
@@ -173,11 +176,16 @@ const Home = ({ navigation }) => {
       }
     }
   };
+  useFocusEffect(
+    useCallback(() => {
+      fetchAll(false, true)
+    }, [])
+  );
   useEffect(() => {
     fetchAll()
   }, [])
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       {loading && <Loader />}
       <FlatList
         ListHeaderComponent={() => <Header theme={theme} user={user} />}

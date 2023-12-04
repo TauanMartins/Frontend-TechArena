@@ -6,7 +6,7 @@ export type RootStackParamList = {
   // 4 - Página final.
   /* ------------------------------------------------------------------------------------------------*/
 
-  Login: undefined;
+  Login: undefined,
 
   /* ------------------------------------------------------------------------------------------------*/
 
@@ -14,6 +14,16 @@ export type RootStackParamList = {
   Home: undefined,
   HomeAppointments: { sport_id?: number },
 
+  /* ------------------------------------------------------------------------------------------------*/
+
+  LeagueStack: { page?: string, arena_id?: number },
+  Ligas: { page?: string, arena_id?: number },
+  LeagueMapStack: undefined,
+  LeagueMap: { arena_id?: number },
+  LeagueHomeStack: undefined,
+  LeagueHome: { arena: object },
+  LeaguePersonalStack: undefined,
+  LeaguePersonal: undefined,
   /* ------------------------------------------------------------------------------------------------*/
 
   CreateMatchStack: { page?: string, arena_id?: number },
@@ -27,18 +37,18 @@ export type RootStackParamList = {
 
   /* ------------------------------------------------------------------------------------------------*/
 
-  SettingsStack: undefined;
-  Settings: undefined;
-  SettingsPreferencesStack: undefined;
-  SettingsPreferences: undefined;
-  SettingsThemePreferences: undefined;
+  SettingsStack: undefined,
+  Settings: undefined,
+  SettingsPreferencesStack: undefined,
+  SettingsPreferences: undefined,
+  SettingsThemePreferences: undefined,
 
   /* ------------------------------------------------------------------------------------------------*/
 
 
-  SocialStack: undefined;
-  Social: undefined;
-  SocialChatStack: { chat_id: number, name: string, image: string, is_group_chat?: boolean };
-  SocialChat: undefined;
-  SocialUserChatDetail: { chat_id: number, name: string, image: string, is_group_chat?: boolean };
+  SocialStack: undefined,
+  Social: undefined,
+  SocialChatStack: { chat_id: number, name: string, image: string, is_group_chat?: boolean },
+  SocialChat: undefined,
+  SocialUserChatDetail: { chat_id: number, name: string, image: string, is_group_chat?: boolean },
 };
