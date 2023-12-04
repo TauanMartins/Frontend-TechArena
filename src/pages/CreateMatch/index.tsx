@@ -116,7 +116,7 @@ export const TopTabs = ({ route }) => {
       initialRouteName={route.params?.page ? route.params.page : 'Agendar'}
 
       screenOptions={{
-        lazy: true,
+        lazy: false,
         tabBarStyle: {
           backgroundColor: theme.PRIMARY
         },

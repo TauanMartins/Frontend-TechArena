@@ -18,6 +18,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { RootStackParamList } from '../../../navigation/NavigationTypes';
 import { CreateMatchMapStack } from '../CreateMatchMap';
 import CreateMatchStack from '..';
+import { DetailAppointment2 } from '../../../components/DetailAppointment2';
 
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -196,7 +197,7 @@ const CreateMatchPersonal: React.FC<ScreenProps<'CreateMatchPersonal'>> = ({ nav
   return (
     <View style={styles.container}>
       {loading && <Loader />}
-      <DetailAppointment
+      <DetailAppointment2
         open={isDetailAppointmentModalVisible}
         close={toggleDetailAppointmentModal}
         appointment={appointmentSelected}

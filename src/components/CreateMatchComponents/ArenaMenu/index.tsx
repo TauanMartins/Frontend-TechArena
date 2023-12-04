@@ -12,7 +12,7 @@ import { SelectList } from 'react-native-dropdown-select-list'
 import { SportIcon } from '../../HomeScreenComponents/FavoriteSports';
 import { ArenaImage } from '../../ArenaImage';
 
-const ArenaMenu = ({ arenas, selectedArena, onChange, navigation }) => {
+const ArenaMenu = ({ arenas, selectedArena, onChange, navigation, checkArena }) => {
     const { theme } = useTheme();
     const styles = createStyles(theme);
 
@@ -44,10 +44,8 @@ const ArenaMenu = ({ arenas, selectedArena, onChange, navigation }) => {
                 {selectedArena &&
                     <>
                         <ArenaImage image={selectedArena.image} size={75} />
-                        <TouchableOpacity onPress={() => {
-                            navigation.navigate('CreateMatchMap', { arena_id: selectedArena.arena_id })
-                        }}>
-                            <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline', padding: 10}}>Ver no mapa</Text>
+                        <TouchableOpacity onPress={() => { checkArena() }}>
+                            <Text style={{ ...styles.label, textAlign: 'right', fontSize: 13, textDecorationLine: 'underline', padding: 10 }}>Ver no mapa</Text>
                         </TouchableOpacity>
                     </>
 

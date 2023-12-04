@@ -19,6 +19,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MapView, { Callout, Marker } from 'react-native-maps';
 import { ArenaImage } from '../../../components/ArenaImage';
 import { useFocusEffect } from '@react-navigation/native';
+import { Modal } from 'react-native';
+import LoaderUnique from '../../../components/LoaderUnique';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -56,6 +58,7 @@ const CreateMatchMap: React.FC<ScreenProps<'CreateMatchMap'>> = ({ navigation, r
   const { theme } = useTheme();
   const styles = createStyles(theme);
   const [loading, setLoading] = useState(false);
+  const [loadingSports, setLoadingSports] = useState(false);
   const [arenas, setArenas] = useState([]);
   var arenaId = route.params?.arena_id;
   const [selectedArena, setSelectedArena] = useState(null);
@@ -87,23 +90,36 @@ const CreateMatchMap: React.FC<ScreenProps<'CreateMatchMap'>> = ({ navigation, r
     })
   };
   const fetchSportsArena = () => {
+    if (selectedArena) {
+      setLoadingSports(true)
+    } else {
+      setLoading(true)
+    }
     API.$sport_arena.select_sports_arena({ arena_id: selectedArena.id }).then(async (response) => {
       setSelectedArenaSportsEnabled(response.data)
     }).catch((err) => {
       console.log(err)
     }).finally(() => {
       navigation.setParams({ arena_id: null });
+      if (selectedArena) {
+        setLoadingSports(false)
+      } else {
+        setLoading(false)
+      }
     })
   };
 
   useFocusEffect(
     useCallback(() => {
+      if (selectedArena) {
+        markerRefs.current.get(selectedArena.id).hideCallout()
+      }
+      setSelectedArena(null)
       fetchArenas();
     }, [])
   );
 
   const markerRefs = useRef(new Map());
-
   useEffect(() => {
     if (selectedArena && markerRefs.current.has(selectedArena.id)) {
       fetchSportsArena();
@@ -148,12 +164,26 @@ const CreateMatchMap: React.FC<ScreenProps<'CreateMatchMap'>> = ({ navigation, r
             ref={(ref) => {
               markerRefs.current.set(arena.id, ref);
             }}
-            onCalloutPress={() => navigation.navigate('CreateMatchHome', { arena: arena })}
             title={arena.address}
-            description={`Esportes possíveis: ${selectedArenaSportsEnabled.map((sport) => sport.name).join(', ')}`}
           />
         ))}
       </MapView>
+      {selectedArena && (
+        <View style={{ top: 35, left: 35, width: 200, position: 'absolute', justifyContent: 'center', alignItems: 'center', backgroundColor: theme.QUATERNARY, borderRadius: 25 }}>
+          <View style={{ width: '100%', backgroundColor: theme.QUATERNARY, padding: 10, borderRadius: 25, justifyContent: 'center', alignItems: 'center', }}>
+            {loadingSports && <LoaderUnique />}
+            <Text style={styles.modalSubTitle}>Endereço: {selectedArena.address}</Text>
+            <ArenaImage image={selectedArena.image} size={70} />
+            <Text style={styles.modalText} >Esportes disponíveis: {selectedArenaSportsEnabled.map((sport) => sport.name).join(', ')}</Text>
+            <TouchableOpacity style={styles.modalButton} onPress={() => { setSelectedArena(null); navigation.navigate('CreateMatchHome', { arena: { ...selectedArena, arena_id: selectedArena.id } }); markerRefs.current.get(selectedArena.id).hideCallout(); }}>
+              <Text style={styles.modalButtonText} >Criar agendamento</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => { setSelectedArena(null); }}>
+              <Text style={styles.modalButtonText} >Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </View>
   );
 };
@@ -173,30 +203,32 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       fontWeight: 'bold',
       fontSize: 16,
       fontFamily: 'Sansation Regular',
-      color: theme.QUATERNARY, // Supondo que você tenha um tema de texto primário
+      color: theme.TERTIARY, // Supondo que você tenha um tema de texto primário
     },
     modalSubTitle: {
       fontWeight: 'bold',
       fontSize: 13,
       fontFamily: 'Sansation Regular',
-      color: theme.QUATERNARY, // Supondo que você tenha um tema de texto primário
+      color: theme.TERTIARY, // Supondo que você tenha um tema de texto primário
     },
     modalText: {
       flexDirection: 'row',
       textAlign: 'left',
       fontSize: 13,
       fontFamily: 'Sansation Regular',
-      color: theme.QUATERNARY, // Supondo que você tenha um tema de texto primário
+      color: theme.TERTIARY, // Supondo que você tenha um tema de texto primário
     },
     modalButton: {
-      backgroundColor: theme.PRIMARY, // Supondo que você tenha uma cor de acento no seu tema
+      width: '100%',
+      marginTop: 10,
+      backgroundColor: theme.TERTIARY, // Supondo que você tenha uma cor de acento no seu tema
       borderRadius: 20,
+      padding: 12,
     },
     modalButtonText: {
       color: theme.QUATERNARY,
-      fontSize: 14,
+      fontSize: 13,
       fontFamily: 'Sansation Regular',
-      fontWeight: 'bold',
     },
     userLocationMarker: {
       padding: 5,

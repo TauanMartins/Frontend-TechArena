@@ -19,6 +19,7 @@ import HoraryMenu from '../../../components/CreateMatchComponents/HoraryMenu';
 import ConfirmationDialog from '../../../components/ConfirmationDialog';
 import Notification from '../../../components/Notification';
 import { useFocusEffect } from '@react-navigation/native';
+import RadioButton2 from '../../../components/RadioButton2';
 
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -71,6 +72,96 @@ const formatTime = (timeString) => {
   const [hours, minutes] = timeString.split(':');
   return `${hours}h${minutes}`;
 };
+const CreateMatchHomeBySport = ({ navigation, createBy,
+  notification, setNotification,
+  setLoading, loading,
+  sports, setSports,
+  arenas, setArenas,
+  horarys, setHorarys,
+  sport, setSport,
+  horary, setHorary,
+  date, setDate,
+  holder, setHolder,
+  arena, setArena,
+  fetchArenaBySport, fetchHorary, checkArena }) => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
+  const onChange = (date) => {
+    setDate(date);
+  };
+
+  useEffect(() => {
+    setSport(null);
+    setArena(null);
+    setHorary(null);
+  }, [date])
+  useEffect(() => {
+    fetchHorary();
+    setHorary(null);
+  }, [arena])
+  useEffect(() => {
+    fetchArenaBySport();
+    setArena(null);
+    setHorary(null);
+    setHorarys([])
+  }, [sport])
+  return (
+    <>
+      <DateMenu date={date} onChange={onChange} />
+      <View style={styles.horizontalRule} />
+      <SportMenu onChange={setSport} selectedSport={sport} sports={sports} holder={holder} setHolder={setHolder} />
+      <View style={styles.horizontalRule} />
+      <ArenaMenu onChange={setArena} selectedArena={arena} arenas={arenas} navigation={navigation} checkArena={checkArena} />
+      <View style={styles.horizontalRule} />
+      <HoraryMenu onChange={setHorary} selectedHorary={horary} horarys={horarys} />
+      <View style={styles.horizontalRule} />
+    </>
+  );
+};
+
+const CreateMatchHomeByArena = ({ navigation, createBy,
+  notification, setNotification,
+  setLoading, loading,
+  sports, setSports,
+  arenas, setArenas,
+  horarys, setHorarys,
+  sport, setSport,
+  horary, setHorary,
+  date, setDate,
+  holder, setHolder,
+  arena, setArena,
+  fetchSportsByArena, fetchHorary, checkArena }) => {
+  const { theme } = useTheme();
+  const styles = createStyles(theme);
+
+  const onChange = (date) => {
+    setDate(date);
+  };
+  useEffect(() => {
+    setSport(null);
+    setHorary(null);
+    fetchSportsByArena();
+  }, [arena])
+  useEffect(() => {
+    setHorary(null);
+    fetchHorary();
+  }, [sport])
+
+  return (
+    <>
+      <DateMenu date={date} onChange={onChange} />
+      <View style={styles.horizontalRule} />
+      <ArenaMenu onChange={setArena} selectedArena={arena} arenas={arenas} navigation={navigation} checkArena={checkArena} />
+      <View style={styles.horizontalRule} />
+      <SportMenu onChange={setSport} selectedSport={sport} sports={sports} holder={holder} setHolder={setHolder} />
+      <View style={styles.horizontalRule} />
+      <HoraryMenu onChange={setHorary} selectedHorary={horary} horarys={horarys} />
+      <View style={styles.horizontalRule} />
+    </>
+  );
+};
+
 const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation, route }) => {
   const { user, localization, isAuthenticated } = useAuth();
   const { theme } = useTheme();
@@ -80,53 +171,23 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
     success: false,
     visible: false,
   });
+  var arenaSelected = route.params?.arena;
 
-  const [loading, setLoading] = useState(false);
   const [sports, setSports] = useState([]);
   const [arenas, setArenas] = useState([]);
   const [horarys, setHorarys] = useState([]);
 
-
   const [date, setDate] = useState(new Date());
   const [sport, setSport] = useState(null);
-  const [arena, setArena] = useState(null);
   const [horary, setHorary] = useState(null);
   const [holder, setHolder] = useState(false);
-  const formattedDate = date.toISOString().split('T')[0];
-  const onChange = (date) => {
-    setDate(date);
-  };
+  const [arena, setArena] = useState(null); // standard option - null
+
+  const [loading, setLoading] = useState(false);
+  const [createBy, setCreateBy] = useState('sport'); // option A - arena, B - sport
 
 
-  const saveAppointment = () => {
-    if (!(arena?.arena_id && horary?.id && sport?.id)) {
-      return Alert.alert('Erro', 'Por favor, preencha os dados corretamente.');
-    }
-    ConfirmationDialog({
-      title: 'Confirmação',
-      message: `Deseja criar o agendamento com os dados fornecidos? Confirme abaixo:\n--Arena: ${arena.address}\n--Esporte: ${sport.name}\n--Dia e hora: ${formatDate(formattedDate, horary.horary)} às ${formatTime(horary.horary)}\n--Holder: ${holder ? 'sim' : 'não'}`,
-      onConfirm: async () => {
-        setLoading(true);
-        API.$appointments.create_appointments({ arena_id: arena.arena_id, date: formattedDate, schedule_id: horary.id, sport_id: sport.id, username: user.username, holder: holder }).then(async (response) => {
-          setNotification({
-            message: 'Parabéns, agendamento criado com sucesso!',
-            success: true,
-            visible: true,
-          });
-        }).catch((error) => {
 
-          setNotification({
-            message: `Desculpe, não conseguimos criar o seu agendamento 😞\nCódigo do erro: ${error.message}`,
-            success: false,
-            visible: true,
-          });
-        }).finally(() => {
-          setLoading(false)
-        })
-      },
-      onCancel: () => { },
-    });
-  };
   const fetchSports = () => {
     setLoading(true)
     API.$sports.select_sports({}).then(async (response) => {
@@ -138,8 +199,20 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
     })
   };
 
+  const fetchSportsByArena = () => {
+    if (arena) {
+      setLoading(true)
+      API.$sport_arena.select_sports_arena({ arena_id: arena.id }).then(async (response) => {
+        setSports(response.data)
+      }).catch((err) => {
+        console.log(err)
+      }).finally(() => {
+        setLoading(false)
+      })
+    }
+  };
 
-  const fetchArena = () => {
+  const fetchArenaBySport = () => {
     if (sport) {
       setLoading(true)
       API.$arenas_sport.select_arenas_sports({ sport_id: sport.id }).then(async (response) => {
@@ -152,8 +225,20 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
     }
   };
 
+  const fetchArenas = () => {
+    setLoading(true)
+    API.$arenas_user.select_arenas_user({ lat: localization.lat, longitude: localization.longitude }).then(async (response) => {
+      setArenas(((response.data).map(arena => { return { ...arena, arena_id: arena.id } })))
+    }).catch((err) => {
+      console.log(err)
+    }).finally(() => {
+      setLoading(false)
+    })
+  }
+
   const fetchHorary = () => {
-    if (arena) {
+    const formattedDate = date.toISOString().split('T')[0];
+    if (arena && sport) {
       setLoading(true)
       API.$horary.select_available_horary({ arena_id: arena.arena_id, sport_id: sport.id, date: formattedDate }).then(async (response) => {
         const today = new Date();
@@ -186,45 +271,140 @@ const CreateMatchHome: React.FC<ScreenProps<'CreateMatchHome'>> = ({ navigation,
       })
     }
   };
-
-
-  useEffect(() => {
-    setSport(null);
-    setArena(null);
-    setHorary(null);
-  }, [date])
-  useEffect(() => {
-    fetchHorary();
-    setHorary(null);
-  }, [arena])
-  useEffect(() => {
-    fetchArena();
+  const handleChangeCreateMode = (option) => {
+    navigation.setParams({arena: null});
+    setCreateBy(option)
     setArena(null)
-    setHorary(null);
-  }, [sport])
+    setSport(null)
+    setHorary(null)
+    setArenas([])
+    setSports([])
+    setHorarys([])
+  }
+  const checkArena = () => {
+    navigation.setParams({arena: null});
+    navigation.navigate('CreateMatchMap', { arena_id: arena.arena_id })
+  }
+
+  const saveAppointment = () => {
+    const formattedDate = date.toISOString().split('T')[0];
+    if (!(arena?.arena_id && horary?.id && sport?.id)) {
+      return Alert.alert('Erro', 'Por favor, preencha os dados corretamente.');
+    }
+    ConfirmationDialog({
+      title: 'Confirmação',
+      message: `Deseja criar o agendamento com os dados fornecidos? Confirme abaixo:\n--Arena: ${arena.address}\n--Esporte: ${sport.name}\n--Dia e hora: ${formatDate(formattedDate, horary.horary)} às ${formatTime(horary.horary)}\n--Holder: ${holder ? 'sim' : 'não'}`,
+      onConfirm: async () => {
+        setLoading(true);
+        API.$appointments.create_appointments({ arena_id: arena.arena_id, date: formattedDate, schedule_id: horary.id, sport_id: sport.id, username: user.username, holder: holder }).then(async (response) => {
+          setNotification({
+            message: 'Parabéns, agendamento criado com sucesso!',
+            success: true,
+            visible: true,
+          });
+        }).catch((error) => {
+
+          setNotification({
+            message: `Desculpe, não conseguimos criar o seu agendamento 😞\nCódigo do erro: ${error.message}`,
+            success: false,
+            visible: true,
+          });
+        }).finally(() => {
+          setLoading(false)
+        })
+      },
+      onCancel: () => { },
+    });
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (arenaSelected) {        
+        setCreateBy('arena')
+        setArena(arenaSelected)
+      } else {
+        if (!arena) {
+          setCreateBy('sport')
+        }
+      }
+      navigation.setParams({arena: null});
+    }, [arenaSelected])
+  );
+
+
   useEffect(() => {
-    fetchSports();
-  }, [])
+    if (createBy === 'arena') {
+      fetchArenas();
+    } else {
+      fetchSports();
+    }
+  }, [createBy, arena])
   return (
-    <ScrollView style={styles.container}>
-      <Notification
-        message={notification.message}
-        success={notification.success}
-        visible={notification.visible}
-        onClose={() => setNotification({ ...notification, visible: false })} />
+    <>
       {loading && <Loader />}
-      <DateMenu date={date} onChange={onChange} />
-      <View style={styles.horizontalRule} />
-      <SportMenu onChange={setSport} selectedSport={sport} sports={sports} holder={holder} setHolder={setHolder} />
-      <View style={styles.horizontalRule} />
-      <ArenaMenu onChange={setArena} selectedArena={arena} arenas={arenas} navigation={navigation} />
-      <View style={styles.horizontalRule} />
-      <HoraryMenu onChange={setHorary} selectedHorary={horary} horarys={horarys} />
-      <View style={styles.horizontalRule} />
-      <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={saveAppointment}>
-        <Text style={styles.modalButtonText}>Salvar</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      <ScrollView style={styles.container}>
+
+        <Notification
+          message={notification.message}
+          success={notification.success}
+          visible={notification.visible}
+          onClose={() => setNotification({ ...notification, visible: false })} />
+
+        <View style={{ paddingTop: 20 }} >
+          <Text style={styles.text}>Selecione o modo de criação:</Text>
+          <RadioButton2
+            colours={theme}
+            label="Criar agendamento por esporte"
+            description="Selecione o esporte e veja as arenas disponíveis."
+            value="sport"
+            selectedOption={createBy}
+            handleSelectedOption={handleChangeCreateMode}
+          />
+          <RadioButton2
+            colours={theme}
+            label="Criar agendamento por arena"
+            description="Selecione a arena e veja os esportes disponíveis."
+            value="arena"
+            selectedOption={createBy}
+            handleSelectedOption={handleChangeCreateMode}
+          />
+        </View>
+        <View style={styles.horizontalRule} />
+        {createBy === 'sport' ?
+          <CreateMatchHomeBySport navigation={navigation} createBy={createBy}
+            loading={loading} setLoading={setLoading}
+            notification={notification} setNotification={setNotification}
+            arenas={arenas} setArenas={setArenas}
+            horarys={horarys} setHorarys={setHorarys}
+            sports={sports} setSports={setSports}
+            horary={horary} setHorary={setHorary}
+            arena={arena} setArena={setArena}
+            date={date} setDate={setDate}
+            holder={holder} setHolder={setHolder}
+            sport={sport} setSport={setSport}
+            fetchArenaBySport={fetchArenaBySport}
+            fetchHorary={fetchHorary}
+            checkArena={checkArena} /> :
+          <CreateMatchHomeByArena navigation={navigation} createBy={createBy}
+            loading={loading} setLoading={setLoading}
+            notification={notification} setNotification={setNotification}
+            arenas={arenas} setArenas={setArenas}
+            horarys={horarys} setHorarys={setHorarys}
+            sports={sports} setSports={setSports}
+            horary={horary} setHorary={setHorary}
+            arena={arena} setArena={setArena}
+            date={date} setDate={setDate}
+            holder={holder} setHolder={setHolder}
+            sport={sport} setSport={setSport}
+            fetchSportsByArena={fetchSportsByArena}
+            fetchHorary={fetchHorary}
+            checkArena={checkArena} />
+        }
+        <TouchableOpacity style={{ ...styles.modalButton, backgroundColor: theme.TERTIARY }} onPress={saveAppointment}>
+          <Text style={styles.modalButtonText}>Salvar</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </>
   );
 };
 const createStyles = (theme: typeof Light | typeof Dark) =>
@@ -251,7 +431,7 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
     },
     modalButton: {
       padding: 15,
-      marginVertical: 5,
+      marginBottom: 25,
       borderRadius: 20,
       alignSelf: 'stretch', // Estica o botão para preencher a largura
       backgroundColor: theme.TERTIARY,
@@ -259,6 +439,11 @@ const createStyles = (theme: typeof Light | typeof Dark) =>
       justifyContent: 'center',
     },
     modalButtonText: {
+      fontFamily: 'Sansation Regular',
+      fontSize: 18,
+      color: theme.QUATERNARY,
+    },
+    text: {
       fontFamily: 'Sansation Regular',
       fontSize: 18,
       color: theme.QUATERNARY,
