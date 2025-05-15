@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/PostNoBillsColombo/PostNoBillsColombo Medium.ttf",
+      "sha1": "0f9318c71b51c7a91e3d5c72a361035d9854ca09"
+    },
+    {
+      "path": "src/assets/fonts/Sansation/Sansation Light.ttf",
+      "sha1": "b238ba4e6e92afab7d1f4fee34cda9573ebfd547"
+    },
+    {
+      "path": "src/assets/fonts/Sansation/Sansation Regular.ttf",
+      "sha1": "cce586ccae3991a117fb36f80e4f71cc321fd670"
+    }
+  ]
+}
